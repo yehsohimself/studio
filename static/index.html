@@ -2096,6 +2096,11 @@
   #gh .gh-zincir li::marker{color:var(--muted);font:600 12px var(--mono)}
   #gh .gh-zincir small{display:block;text-align:right;font:500 11px var(--mono);color:var(--muted);margin-top:4px}
   #gh .gh-mac-s{display:flex;flex-direction:column;gap:2px;margin:2px 0 8px}
+  #gh .gh-2s{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #gh details.gh-ic{margin:12px 0 0;padding:0;background:none}#gh details.gh-ic>summary{padding:6px 0;cursor:pointer;font-weight:600;font-size:13.5px}
+  #gh .gh-tk-d{margin:4px 0}#gh .gh-tk-d>summary{cursor:pointer;font-size:12.5px;color:var(--muted)}#gh .gh-tk-d p{margin:4px 0}
+  #gh .gh-tk-soru{all:unset;cursor:pointer;display:block;font-weight:600;font-size:13.5px;line-height:1.45;color:var(--ink);margin:6px 0 2px}
+  #gh .gh-tk-soru:hover{color:var(--vurgu)}#gh .gh-tk-soru i{font-style:normal;color:var(--green);font-weight:500;font-size:12px}
   #gh .gh-mac-s b{font-size:16px;color:var(--ink)}#gh .gh-mac-s span{font-size:13px;color:var(--ink2)}
   @media (max-width:640px){
     #gh .gh-bas{flex-direction:row;align-items:flex-end}
@@ -2433,6 +2438,7 @@
   .turemis{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 0;font-size:12.5px;color:var(--muted)}
   .turemis button{border:1px solid var(--hair);background:transparent;color:var(--ink);border-radius:999px;padding:2px 9px;font:inherit;font-size:12px;cursor:pointer}
   .w.duz{background:color-mix(in srgb,var(--vurgu,#3b63e6) 12%,transparent);border-radius:4px;cursor:help}
+  .w.duz.tahmin{background:none;text-decoration:underline dotted color-mix(in srgb,var(--vurgu,#3b63e6) 70%,transparent);text-underline-offset:3px}
   .w.sup{text-decoration:underline dotted color-mix(in srgb,#c27c0e 80%,transparent);text-underline-offset:3px;cursor:help}
   .kbel{display:inline-block;margin-left:5px;width:15px;height:15px;line-height:15px;text-align:center;border-radius:50%;font-size:10.5px;font-weight:700;color:#c27c0e;border:1px solid color-mix(in srgb,#c27c0e 50%,transparent);cursor:help}
   .st-paket{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin:4px 0 10px}
@@ -3011,7 +3017,7 @@ async function indirilendenBaslat(x){
 
 /* ürünler: aynı motor ve ortak hafıza, ayrı adresler (2026-10-20) */
 const URUNLER = {transcript:{ad:'Studio', port:8765, yuz:['video','kitaplik'], acik:'video'}, note:{ad:'Meet', port:8766, yuz:['toplanti'], acik:'toplanti'},
-  ghost:{ad:'Ghost', port:8767, yuz:['paylasim'], acik:'paylasim'}, atolye:{ad:'Couple', port:8768, yuz:['atolye'], acik:'atolye'},
+  ghost:{ad:'Ghost', port:8767, yuz:['paylasim'], acik:'paylasim'}, atolye:{ad:'Couple', port:8768, yuz:['atolye'], acik:'atolye', menude:false},   /* 25 Ekim: Couple kapandı (teslim kontrolü Studio'da, müşteri takibi Meet'te) */
   content:{ad:'Content', port:8769, yuz:[], acik:''}, pt:{ad:'PT', port:8771, yuz:[], acik:''}};   // 24 Ekim: Atölye → Couple (8768, kendi sayfası static/couple.html); Content 8769
 const URUN = document.documentElement.dataset.urun || 'transcript', URUN_AD = URUNLER[URUN].ad;
 /* Şirket renkleri (24 Ekim): kırık beyaz #F4F2EE, mor #9A1FF4 gibi açık renkler. Açık renk zeminde yazı koyu; açık temada açık renk çizgi kaybolmasın diye bir ton koyusu */
@@ -3337,8 +3343,8 @@ async function toplantiDurum(){
   try{ tk = await (await fetch('/api/takvim')).json(); }catch(e){}
   const kayitta = !!(u && u.kayit);
   { const sat = $('#tDurumSat'); if (sat){ const p = [];
-      p.push(d && d.oto_kayit ? `<span class="dot ok"></span>Google Meet, Zoom ya da Teams’e girdiğiniz an dinlemeye başlar` : `<span class="dot"></span>Otomatik kayıt kapalı · <button class="textbtn" type="button" data-ac="ayar">Aç</button>`);
-      if (d && d.yol && d.acik) p.push(`notlar Drive’a düşer`);
+      p.push(d && d.oto_kayit ? `<span class="dot ok"></span>Toplantıya girdiğinizde kayıt kendiliğinden başlar` : `<span class="dot"></span>Otomatik kayıt kapalı · <button class="textbtn" type="button" data-ac="ayar">Aç</button>`);
+      if (d && d.yol && d.acik) p.push(`notlar Drive’a kaydedilir`);
       if (u && u.mik && u.mik.bos_mik_sn >= 1200){ const dk = Math.round(u.mik.bos_mik_sn / 60), sure_ = dk < 90 ? dk + ' dakikadır' : Math.round(dk / 60) + ' saattir';
         const pen = (u.mik.pencereler || []).filter(t => t && t !== 'Google Chrome').slice(0, 4);
         p.push(`<span class="uyar" title="${esc('Toplantı yokken mikrofon açık. Chrome’da başlığında kırmızı nokta olan sekmeyi kapatın.' + (pen.length ? ' Açık pencereler: ' + pen.join(' · ') : ''))}">Chrome mikrofonu ${sure_} açık${pen.length ? ': ' + esc(pen[0].slice(0, 40)) + (pen.length > 1 ? ` +${pen.length - 1}` : '') : ''}</span>`); }
@@ -3473,7 +3479,7 @@ async function izgaraCiz(){
   // öne çıkanlar: ana sayfada şirketler, şirket sayfasında o şirketin müşterileri
   let vurgu = '';
   if (!sirket){
-    vurgu = SIRKET.liste.map(x => { const n = tum.filter(o => sk(o.x) === x.kod).length;
+    vurgu = SIRKET.liste.filter(x => tum.some(o => sk(o.x) === x.kod)).map(x => { const n = tum.filter(o => sk(o.x) === x.kod).length;
       return `<button type="button" data-s="${esc(x.kod)}" title="${esc(x.ad)} · ${n} toplantı">${x.kod === 'genel' ? `<span class="hal genel"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/></svg></span>` : halHtml(x.ad, x.logo, null, 'sirket')}<small>${esc(x.ad)}</small></button>`; }).join('');
   } else if (!(sirket.musteriler || []).length){ vurgu = '';   // tek markalı şirket: alt marka yuvarlağı yok
   } else {
@@ -3483,7 +3489,7 @@ async function izgaraCiz(){
     vurgu = `<button type="button" data-m="" class="${!tMusteri ? 'on' : ''}"><span class="hal tum"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span><small>Tümü</small></button>`
       + mus.map(m => `<button type="button" data-m="${esc(m)}" class="${tMusteri === m ? 'on' : ''}">${m === 'Diğer' ? '<span class="hal">…</span>' : halHtml(m, (sirket.musteri_logolari || {})[m], null)}<small>${esc(m)}</small></button>`).join('');
   }
-  vurgu += `<button type="button" data-h="1" class="${tHaftalikAcik ? 'on' : ''}"><span class="hal haf"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span><small>Bu hafta</small></button>`;
+  vurgu += `<button type="button" data-h="1" class="${tHaftalikAcik ? 'on' : ''}"><span class="hal haf"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span><small>Haftalık özet</small></button>`;
   $('#tVurgu').innerHTML = vurgu;
   $$('#tVurgu button[data-s]').forEach(b => { b.onclick = () => sirketSec(b.dataset.s); });
   $$('#tVurgu button[data-m]').forEach(b => { b.onclick = () => { tMusteri = b.dataset.m; izgaraCiz(); }; });
@@ -3566,7 +3572,7 @@ async function tGhostIpucu(){
   if (Date.now() - tGhostZ > 60000){ tGhostZ = Date.now(); try{ tGhostN = ((await (await fetch('/api/ghost/defter')).json()).adaylar || []).filter(a => (a.durum || 'bekliyor') === 'bekliyor').length; }catch(e){} }
   let k = $('#tGhost'); if (!tGhostN){ k?.remove(); return; }
   if (!k){ k = document.createElement('a'); k.id = 'tGhost'; k.className = 'tghost'; k.target = '_blank'; k.rel = 'noopener'; ($('#tOnay') || $('#tizgara')).before(k); }
-  k.href = `${location.protocol}//${location.hostname}:8767/#defter`; k.innerHTML = `Toplantılarınızda söylediklerinizden ${tGhostN} görüş Ghost’ta sizi bekliyor <span>→</span>`;
+  k.href = `${location.protocol}//${location.hostname}:8767/#defter`; k.innerHTML = `Toplantılarınızdan ${tGhostN} görüş Ghost’ta onayınızı bekliyor <span>→</span>`;
 }
 /* Toplantıya benzemeyen kayıtlar (toplanti_kapisi.py): listeye girmeden önce sorulur */
 function tOnayCiz(l){
@@ -3998,8 +4004,8 @@ async function sonucGoster(temel, opts={}){
       <div class="r2 hidden" id="altPanel"><span class="lbl">Altyazı</span><span class="lbl" style="margin-left:6px">Dil</span><div class="seg mini" id="altDil"></div><span class="lbl" style="margin-left:6px">Görünüm</span><div class="seg mini" id="altStil2"><button type="button" data-v="kutu" aria-pressed="true">Kutu</button><button type="button" data-v="sade" aria-pressed="false">Sade</button><button type="button" data-v="karaoke" aria-pressed="false" title="Cümle görünür, söylenen kelime renklenir">Karaoke</button><button type="button" data-v="pop" aria-pressed="false" title="2-3 kelime büyük harf, söylenen sarı">Pop</button><button type="button" data-v="vurgu" aria-pressed="false" title="Söylenen kelime büyür ve renklenir">Vurgu</button></div><span class="lbl altKaliteL" style="margin-left:6px">Kalite</span><div class="seg mini" id="altKalite"><button type="button" data-v="720" aria-pressed="true">720p</button><button type="button" data-v="1080" aria-pressed="false">1080p</button></div><span class="hint" id="altKaynak"></span><span class="act"><button class="sbtn" id="altSecenek" type="button" aria-haspopup="menu">Seçenekler ▾</button><button class="sbtn plain" id="altVazgec" type="button">Vazgeç</button><button class="sbtn blue" id="altBasla" type="button">Oluştur</button></span></div>
       <div class="r2 kolRow" id="kolRow"></div>
       <div class="r2"><span class="lbl">Konuşmacılar</span>
-        ${adlar.map(ad => `<span class="spk" style="${renk(ad)}"><span class="dot">${esc(initials(ad))}</span><input value="${esc(ad)}" data-eski="${esc(ad)}" aria-label="Konuşmacı adı" size="${Math.max(4, ad.length)}"><span class="pct">${Math.round(100*(pay[ad]||0)/toplam)}%</span></span>`).join('')}
-        <span class="act"><button class="sbtn" id="adUygula" type="button">Adları kaydet</button>${adlar.length > 2 ? `<button class="sbtn plain" id="hayalet" type="button" title="En az konuşan kişiyi diğer konuşmacılara dağıtır">En az konuşanı birleştir</button>` : ''}</span></div>
+        ${adlar.map(ad => `<span class="spk" style="${renk(ad)}"><span class="dot">${esc(initials(ad))}</span><input value="${esc(ad)}" data-eski="${esc(ad)}" aria-label="Konuşmacı adı" size="${Math.max(4, ad.length)}"><span class="pct">%${Math.round(100*(pay[ad]||0)/toplam)}</span></span>`).join('')}
+        <span class="act"><button class="sbtn" id="adUygula" type="button">Adları kaydet</button>${adlar.length > 2 ? `<button class="sbtn plain" id="hayalet" type="button" title="Aynı kişi iki kişi sayıldıysa en az konuşanı öbür konuşmacılara dağıtır">Fazla kişiyi birleştir</button>` : ''}</span></div>
       <div class="r2 hidden" id="cevProg" style="padding-top:0"><span class="hint" id="cevProgT"></span><div class="pbar mini" style="flex:1;min-width:120px;margin:0"><div id="cevProgB"></div></div></div>
     </div>
     ${v.marka ? `<div class="ozet mkutu" id="markaKutu">${markaHtml(v)}</div>` : ''}
@@ -4092,7 +4098,10 @@ function oyZaman(){ try{ return OY.tur === 'yt' ? (OY.p?.getCurrentTime?.() || 0
 function oyCaliyor(){ try{ return OY.tur === 'yt' ? OY.p?.getPlayerState?.() === 1 : (OY.p && !OY.p.paused); }catch(e){ return false; } }
 function oyGit(sn){ if (!OY.p) return false; try{ if (OY.tur === 'yt'){ OY.p.seekTo(sn, true); OY.p.playVideo(); } else { OY.p.currentTime = sn; OY.p.play(); } return true; }catch(e){ return false; } }
 // 23 Ekim (ChatGPT brifi, Studio 2): düzeltilen söz (duyulan hali üzerine gelince) ve düşük güvenle duyulan ad/sayı işaretli; metnin kendisi aynı
-function kelimeHtml(p){ return p.k.map(([t, w, f]) => f && f.startsWith('d:') ? `<span class="w duz" data-t="${t}" title="Duyulan: ${esc(f.slice(2))} · yapay zekâ düzeltti">${esc(w)}</span>`
+// Meet: 'd:<duyulan>|altyazi|neden' = toplantı altyazısında doğrusu görünüyordu, '|baglam|' = Claude konuşmanın akışından tahmin etti
+function duzBaslik(f){ const [duyulan, kaynak, neden] = f.slice(2).split('|');
+  return 'Duyulan: ' + duyulan + (kaynak === 'baglam' ? ' · muhtemelen böyle demiştir' + (neden ? ' (' + neden + ')' : '') : kaynak === 'altyazi' ? ' · toplantı altyazısına göre düzeltildi' : ' · yapay zekâ düzeltti'); }
+function kelimeHtml(p){ return p.k.map(([t, w, f]) => f && f.startsWith('d:') ? `<span class="w duz${f.includes('|baglam|') ? ' tahmin' : ''}" data-t="${t}" title="${esc(duzBaslik(f))}">${esc(w)}</span>`
   : f === 's' ? `<span class="w sup" data-t="${t}" title="Ses modeli bu sözcükten emin değil; kayda bakın">${esc(w)}</span>` : `<span class="w" data-t="${t}">${esc(w)}</span>`).join(' '); }
 function oyYerlestir(kutu){ const c = $('#doc .cover'); if (c && !kutu.classList.contains('ses')) c.querySelector(':scope > img')?.remove(); const ku = $('#tKunye'); if (ku) ku.after(kutu); else ($('#doc .solk') || $('#doc')).prepend(kutu); }
 function okumaDuzeni(){ const doc = $('#doc'); if (!doc || doc.querySelector(':scope > .solk')) return; const sol = document.createElement('div'), sag = document.createElement('div'); sol.className = 'solk'; sag.className = 'sagk';
@@ -4449,7 +4458,7 @@ function ghKart(x, acik, gunsuz){
       ${ghBaglam(x)}${ghKaynakSatir(x)}<div class="gh-xk">${x.paylas_link && !x.alinti ? ghXKaynak(x) : ''}</div>
       <div class="gh-yorum" hidden>${soru ? `<small class="soru">Ghost soruyor: ${esc(x.soru)}</small>` : ''}${(x.yorumlar || []).length ? `<small>Önceki yorumunuz: “${esc(x.yorumlar.slice(-1)[0].yorum)}”</small>` : ''}${ghGir(soru ? 'Kendi karşılığınız ya da nasıl yazılmasını istediğiniz' : 'Ne değişsin? Ör. “çok uzun, ilk cümle yeter”, “böyle konuşmam, daha kuru”', 'data-a="yorum"', 'Yeniden yaz')}</div>
       <div class="gh-onay" ${GH.onay[k] ? '' : 'hidden'}><span>${li ? 'LinkedIn' : 'X'} yeni sekmede açıldı. Paylaştınız mı?</span><button class="ghb kucuk" type="button" data-a="payiptal">Henüz değil</button><button class="ghb kucuk" type="button" data-a="paydegis">Değiştirerek paylaştım</button><button class="ghb ana kucuk" type="button" data-a="payok">Bu haliyle paylaştım</button></div>
-      <div class="gh-alt"><button class="ghb kucuk" type="button" data-a="yorumac" title="Yorumunuza göre yeniden yazılır; Ghost tarzınızı öğrenir">${soru ? '<span class="gh-nokta pembe" title="Ghost’un bir sorusu var"></span>' : ''}Yorum yap</button><button class="ghb kucuk" type="button" data-a="neoldu" aria-haspopup="menu" title="Paylaştınız mı, nasıl paylaştınız, neden paylaşmadınız, ne düşünüyorsunuz: Ghost sizi böyle tanır">Ne oldu?</button><button class="ghb kucuk ikon" type="button" data-a="daha" title="Kopyala, değiştir, ayrıntılar, kaldır" aria-label="Diğer işlemler" aria-haspopup="menu">${bak ? '<span class="gh-rozet"></span>' : ''}<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button>
+      <div class="gh-alt"><button class="ghb kucuk" type="button" data-a="yorumac" title="Yorumunuza göre yeniden yazılır; Ghost tarzınızı öğrenir">${soru ? '<span class="gh-nokta pembe" title="Ghost’un bir sorusu var"></span>' : ''}Yorum yap</button><button class="ghb kucuk" type="button" data-a="neoldu" aria-haspopup="menu" title="Paylaştınız mı, nasıl paylaştınız, neden paylaşmadınız, ne düşünüyorsunuz: Ghost sizi böyle tanır">Geri bildir</button><button class="ghb kucuk ikon" type="button" data-a="daha" title="Kopyala, değiştir, ayrıntılar, kaldır" aria-label="Diğer işlemler" aria-haspopup="menu">${bak ? '<span class="gh-rozet"></span>' : ''}<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button>
         <span class="bos"></span><button class="ghb ana" type="button" data-a="paylas">${li ? 'LinkedIn’de paylaş' : x.yanit_to ? 'X’te yanıtla' : (x.zincir || []).length > 1 ? 'Zinciri paylaş' : 'X’te paylaş'}</button></div>
       <div class="gh-detay" ${GH.detay[k] ? '' : 'hidden'}>${ghDetay(x)}</div>
     </div></article>`;
@@ -4460,14 +4469,13 @@ function ghKaynakSatir(x){
   if (!k && !x.katki && !x.yayin) return '';
   const tarih = k && k.tarih ? (() => { const d = new Date(String(k.tarih).replace(' ', 'T')); return isNaN(d) ? k.tarih : d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long'}) + (String(k.tarih).length > 10 ? ' ' + d.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'}) : ''); })() : '';
   const parca = [];
-  if (k && (k.tur || k.baslik)) parca.push(`<span><b>${esc(k.tur ? k.tur[0].toLocaleUpperCase('tr') + k.tur.slice(1) : 'Kaynak')}:</b> ${esc(String(k.baslik || '').slice(0, 110))}${tarih ? ' · ' + esc(tarih) : ''}${k.tur === 'çalışma kaydı' && k.kanit ? ` · kayıt ${esc(k.kanit)}` : ''}</span>`);
+  const kis = (m, n) => { m = String(m || ''); return m.length <= n ? m : m.slice(0, m.lastIndexOf(' ', n) > n * 0.6 ? m.lastIndexOf(' ', n) : n) + '…'; };
+  if (k && (k.tur || k.baslik)) parca.push(`<span><b>${esc(k.tur ? k.tur[0].toLocaleUpperCase('tr') + k.tur.slice(1) : 'Kaynak')}:</b> ${esc(kis(k.baslik, 120))}${tarih ? ' · ' + esc(tarih) : ''}</span>`);
   if (x.kaynak_cumle) parca.push(`<span class="gh-kc"><b>Kaynakta:</b> “${esc(x.kaynak_cumle)}”</span>`);
   if (x.katki) parca.push(`<span><b>Sizin katkınız:</b> ${esc(x.katki)}</span>`);
   // köken (24 Ekim, editoryal yöntem): nereden keşfedildi, ne okundu, kimin beyanı, ne bilinmiyor, olay eskiyse
   if (k){
     const kes = [k.kesif_yayin ? 'dinlediğiniz yayında konuşuldu (' + k.kesif_yayin + ')' : '', k.kesif_bulten ? 'bülteninizde geçti (' + k.kesif_bulten + ')' : '', k.kesif_kantan ? k.kesif_kantan + ' seçkisinde' : '', k.kesif_link ? ghHost(k.kesif_link) + ' üzerinden; bağlantı asıl kaynağa gidiyor' : ''].filter(Boolean).join(' · ');
-    if (kes) parca.push(`<span><b>Keşif:</b> ${esc(kes)}</span>`);
-    if ((k.okunan || []).length) parca.push(`<span><b>Okunan:</b> ${esc(k.okunan.join(', '))}</span>`);
     if (k.beyan) parca.push(`<span><b>Beyan:</b> ${esc(k.beyan)} <i>(bağımsız doğrulanmadı)</i></span>`);
     if (k.eski_is && k.olay_tarihi) parca.push(`<span><b>Olay tarihi:</b> ${esc(k.olay_tarihi)}; yeni değil</span>`);
     if (k.sinir) parca.push(`<span><b>Bilinmeyen:</b> ${esc(k.sinir)}</span>`);
@@ -4501,6 +4509,11 @@ function ghDetay(x){
   const bicim = [({emoji: 'Emoji', minik: 'Minik not', gozlem: 'Gözlem', uzun: 'Uzun'})[x.bicim], ({ciddi: 'ciddi', eglenceli: 'eğlenceli', samimi: 'samimi'})[x.ton]].filter(Boolean).join(' · ');
   const gd = x.gundem || {}, et = [bicim, x.dayanak === 'gorus' ? 'görüşünüze dayanıyor' : x.dayanak ? 'size dayanıyor' : '', gd.trend ? 'Google’da yükseliyor' : '', gd.kaynak_sayisi > 1 ? gd.kaynak_sayisi + ' kaynak yazdı' : ''].filter(Boolean);
   if (et.length) h += `<p class="gh-etk">${et.map(esc).join(' · ')}</p>`;
+  const kk = x.kaynak && typeof x.kaynak === 'object' ? x.kaynak : null;   // nereden bulundu, ne okundu (kartta yer kaplamasın)
+  if (kk){ const kes = [kk.kesif_yayin ? 'dinlediğiniz yayında konuşuldu (' + kk.kesif_yayin + ')' : '', kk.kesif_bulten ? 'bülteninizde geçti (' + kk.kesif_bulten + ')' : '',
+      kk.kesif_kantan ? kk.kesif_kantan + ' seçkisinde' : '', kk.kesif_link ? ghHost(kk.kesif_link) + ' üzerinden; bağlantı asıl kaynağa gidiyor' : ''].filter(Boolean).join(' · ');
+    const ok = (kk.okunan || []).filter(o => o && o !== kk.tur).join(', ');
+    if (kes || ok) h += `<div class="gh-d"><b>Nereden geldi</b><p>${esc([kes, ok ? 'okunan: ' + ok : ''].filter(Boolean).join(' · '))}</p></div>`; }
   if (x.geri) h += `<div class="gh-d"><b>Geri dönüş</b><p>${x.geri.tur === 'iddia' ? `${esc(x.geri.tarih || '')} tarihli iddianıza dönüyor: “${esc(x.geri.iddia || '')}”` : `Süregelen esprinize dönüyor: ${esc(x.geri.ad || '')}`}${x.geri.url ? ` · <a href="${esc(x.geri.url)}" target="_blank" rel="noopener">eski gönderi ↗</a>` : ''}</p></div>`;
   if ((x.emsal || []).length) h += `<div class="gh-d"><b>Reklam arşivinizden emsal</b>${x.emsal.map(e => `<p>${esc(e.is)} · ${esc(e.neden)}</p>`).join('')}</div>`;
   if (x.kendi_yorum) h += `<div class="gh-d"><b>Sizin cevabınız (konu toplantısı)</b><p>“${esc(x.kendi_yorum)}”</p></div>`;
@@ -4520,7 +4533,7 @@ function ghDetay(x){
 /* ---- sol sütundaki canlı harita (tanıtım filmlerindeki düğüm şeması): Ghost'un beslendiği yerler ---- */
 function ghHarita(){
   const sg = (GH.k || {}).saglik || {}, f = GH.f || {}, oz = (GH.d || {}).ozet || {};
-  const D = [[46, 128, 'Haberler', sg.toplam ? `${sg.calisan}/${sg.toplam}` : '–', 'ses', ''], [154, 128, 'Fikirler', (f.notlar || []).length, 'defter', 'fikir'],
+  const D = [[46, 128, 'Haberler', sg.toplam ? `${sg.calisan} kaynak` : '–', 'ses', ''], [154, 128, 'Fikirler', (f.notlar || []).length, 'defter', 'fikir'],
              [46, 196, 'Görüşler', (f.gorusler || []).length, 'defter', 'gorus'], [154, 196, 'Paylaşılan', oz.paylasilan || 0, 'taslak', '']];
   const yol = ([x, y]) => `<path d="M100 58 C100 ${(58 + y) / 2}, ${x} ${(58 + y) / 2 - 10}, ${x} ${y - 14}"/>`;
   return `<svg viewBox="0 0 200 222" aria-hidden="true">${D.map(yol).join('')}</svg><div class="gh-h-merkez"><img src="/static/logo/ghost.svg" alt=""></div>
@@ -4597,15 +4610,16 @@ function ghToplanti(){
   if (t.durum === 'yaziliyor' || GH.t?.yaziliyor) return `<div class="gh-haz"><i class="spin"></i><span><b>Kararlarınızla yazılıyor</b> · ${t.konular.filter(k => k.cevap).length} konuda sizin cevabınız merkezde</span></div>`;
   const saat = new Date(t.son * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'});
   const sec = t.konular.filter(k => k.karar === 'yaz').length, gc = t.konular.filter(k => k.karar === 'gec').length;
-  return `<section class="gh-top" data-tid="${esc(t.id)}"><header><div><b>Konu toplantısı</b><small>${t.konular.length} konu · seçtikleriniz ve cevaplarınızla yazılır; ${saat}’e kadar karar vermezseniz hepsi yazılır.</small></div>
+  return `<section class="gh-top" data-tid="${esc(t.id)}"><header><div><b>Konu toplantısı</b><small>${t.konular.length} konu. “Geç” dedikleriniz yazılmaz; sorulara verdiğiniz cevap gönderinin merkezine girer. ${saat}’te kalanlar kendiliğinden yazılır.</small></div>
     <button class="ghb ana kucuk" type="button" data-g="tkbitir">Yazmaya başla${sec || gc ? ` (${sec} seçili, ${gc} geçildi)` : ''}</button></header>
     ${t.konular.map(k => `<div class="gh-tk ${k.karar || ''}" data-tk="${esc(k.id)}">
-      <div class="gh-tk-ust">${ghIk(k.alan)}<span>${k.tur === 'gorus' ? 'Görüşünüzü çağıran haber' : esc(ghAlan(k.alan)[2])}</span>${k.kesif ? `<small>${esc(k.kesif)}</small>` : ''}
+      <div class="gh-tk-ust">${ghIk(k.alan)}<span>${k.tur === 'gorus' ? 'Görüşünüzle ilgili haber' : esc(ghAlan(k.alan)[2])}</span>${k.kesif ? `<small>${esc(k.kesif)}</small>` : ''}
         <span class="sag"><button class="ghb kucuk${k.karar === 'yaz' ? ' secili' : ''}" type="button" data-g="tkyaz">Yaz</button><button class="ghb kucuk${k.karar === 'gec' ? ' secili' : ''}" type="button" data-g="tkgec">Geç</button></span></div>
       <a class="gh-tk-b" href="${esc(k.link || '#')}" target="_blank" rel="noopener">${esc(k.baslik)}</a>
-      <p>${k.tur === 'gorus' ? '<b>Görüşünüz:</b> ' : '<b>Ghost’un açısı:</b> '}${esc(k.aci || '')}</p>
-      ${(k.arsiv || []).map(a => `<p class="gh-tk-ar"><b>Arşivinizden:</b> ${a.link ? `<a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.kunye)}</a>` : esc(a.kunye)} · ${esc(a.neden)}</p>`).join('')}
-      ${k.karar === 'gec' ? '' : `<div class="gh-gir"><small class="soru">${esc(k.soru || 'Bu konuda sizin söyleyeceğiniz ne?')}</small><textarea rows="2" placeholder="Bir cümle yeter; cevabınız gönderinin çekirdeği olur">${esc(k.cevap || '')}</textarea><div><button class="ghb gh-mik" type="button" data-g="mik" title="Sesli söyleyin" aria-label="Sesli söyleyin">${GH_SVG.mik}</button><button class="ghb iki kucuk" type="button" data-g="tkcevap">${k.cevap ? 'Güncelle' : 'Kaydet'}</button></div></div>`}
+      <details class="gh-tk-d"><summary>${k.tur === 'gorus' ? 'Görüşünüz' : 'Önerdiğim açı'}${(k.arsiv || []).length ? ` · arşivinizden ${k.arsiv.length} benzer iş` : ''}</summary>
+      <p>${esc(k.aci || '')}</p>
+      ${(k.arsiv || []).map(a => `<p class="gh-tk-ar">${a.link ? `<a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.kunye)}</a>` : esc(a.kunye)} · ${esc(a.neden)}</p>`).join('')}</details>
+      ${k.karar === 'gec' ? '' : `<button class="gh-tk-soru" type="button" data-g="soruac" title="Cevaplamak için tıklayın">${esc(k.soru || 'Bu konuda sizin söyleyeceğiniz ne?')}${k.cevap ? ' <i>✓ cevapladınız</i>' : ''}</button><div class="gh-gir" ${k.cevap ? '' : 'hidden'}><textarea rows="2" placeholder="Bir cümle yeter; cevabınız gönderinin çekirdeği olur">${esc(k.cevap || '')}</textarea><div><button class="ghb gh-mik" type="button" data-g="mik" title="Sesli söyleyin" aria-label="Sesli söyleyin">${GH_SVG.mik}</button><button class="ghb iki kucuk" type="button" data-g="tkcevap">${k.cevap ? 'Güncelle' : 'Kaydet'}</button></div></div>`}
     </div>`).join('')}</section>`;
 }
 function ghGecilen(){ const g = new Date().toISOString().slice(0, 10); try{ return new Set(JSON.parse(localStorage.getItem('ghGec_' + g) || '[]')); }catch(e){ return new Set(); } }
@@ -4613,7 +4627,7 @@ function ghGecEkle(k){ const g = new Date().toISOString().slice(0, 10), s2 = ghG
 function ghSizden(){
   const f = GH.f || {}, Q = (f.sorular || {}).sorular || [], M = f.mac || {}, MN = f.mac_notlari || [];
   const acik = Q.filter(q => !q.cevap);
-  let h = `<section class="gh-kutu"><header><b>Size sorduklarım</b>${Q.length ? `<small>${Q.length - acik.length}/${Q.length}</small>` : ''}</header>`;
+  let h = `<section class="gh-kutu"><header><b>Size sorduklarım</b>${Q.length ? `<small>${acik.length ? acik.length + ' soru cevap bekliyor' : 'hepsi cevaplandı'}</small>` : ''}</header>`;
   h += Q.length ? Q.map((q, i) => q.cevap ? `<div class="gh-q tamam">${GH_SVG.tik}<span>${esc(q.soru)}</span></div>`
       : `<div class="gh-q"><button type="button" data-g="soruac">${esc(q.soru)}</button>${ghGir('Kendi cevabınız; bir iki cümle yeter', `data-g="sorugonder" data-i="${i}"`, 'Gönderiye çevir', true)}</div>`).join('')
     : f.calisiyor === 'sorular' ? '<p>Sorular hazırlanıyor…</p>' : '<p>Her sabah gününüze göre üç soru gelir.</p><button class="ghb kucuk" type="button" data-g="soryap">Şimdi sor</button>';
@@ -4778,15 +4792,17 @@ function ghGelisimHtml(){
   const r = g.rapor, a = g.aktif || {}, o = g.olcum || {}, ak = o.akibet || {}, is = g.isler || {}, calisan = Object.entries(is).filter(([, v]) => v.calisiyor).map(([k]) => k);
   const DG = {agirlik: 'Alan ağırlığı', x_gunluk: 'Günlük X hedefi', tur_ust: 'Tür sınırı', bicim_ust: 'Biçim sınırı', asama_kapat: 'Aşama kapatıldı', asama_ac: 'Aşama açıldı'};
   const AS = g.asamalar_ad || {};
+  const kt = t => String(t || '').replace(/kendi_arac/g, 'Kendi araçları').replace(/futbol_teknoloji/g, 'Futbol × teknoloji').replace(/teknoloji_ai/g, 'Teknoloji')
+    .replace(/populer_kultur/g, 'Popüler kültür').replace(/\bKişinin\b/g, 'Sizin').replace(/\bKişi\b/g, 'Siz');   // eski raporlarda kod adı ve üçüncü şahıs
   let h = `<header><div><b>Gelişim</b><small>Ghost her pazartesi kendi haftasını ölçer ve kendini ayarlar; kod gerektiren değişiklikleri size sorar.</small></div>
     <button class="ghb iki kucuk" type="button" data-g="gelDeg" ${calisan.length ? 'disabled' : ''}>${calisan.length ? esc(calisan[0][0].toLocaleUpperCase('tr') + calisan[0].slice(1)) + '…' : 'Şimdi değerlendir'}</button></header>`;
   h += `<div class="gh-sayilar"><span><b>${o.oneri || 0}</b>öneri · 7 gün</span><span><b>${(ak['olduğu gibi paylaşıldı'] || 0) + (ak['değiştirilerek paylaşıldı'] || 0)}</b>paylaşılan</span><span><b>${ak['dokunulmadı'] || 0}</b>dokunulmadan kalan</span><span><b>${o.kendi_yazdiklari || 0}</b>Ghost’suz kendi yazdığınız</span></div>`;
-  if (r) h += `<div class="gh-dersler"><small>${esc(ghTarih(r.zaman, true))} değerlendirmesi${r.geri_alindi ? ' · geri alındı' : ''}</small><p>${esc(r.ozet || '')}</p>
-      ${(r.degisiklikler || []).length ? `<ul>${r.degisiklikler.map(x => `<li>${esc(DG[x.tur] || x.tur)}${x.tur === 'agirlik' ? ' (' + esc(ghAlan(x.hedef)[2]) + ')' : x.tur === 'tur_ust' || x.tur === 'bicim_ust' ? ' (' + esc({gozlem: 'gözlem', minik: 'minik not', emoji: 'emoji'}[x.hedef] || x.hedef) + ')' : x.tur.startsWith('asama') ? ' (' + esc(AS[x.hedef] || x.hedef) + ')' : ''}: ${x.tur.startsWith('asama') ? '' : esc(String(x.eski ?? 'yok')) + ' → ' + esc(String(x.yeni)) + ' · '}${esc(x.neden || '')}</li>`).join('')}</ul>` : ''}
+  if (r) h += `<div class="gh-dersler"><small>${esc(ghTarih(r.zaman, true))} değerlendirmesi${r.geri_alindi ? ' · geri alındı' : ''}</small><p>${esc(kt(r.ozet))}</p>
+      ${(r.degisiklikler || []).length ? `<details class="gh-katla gh-ic"><summary>Ne değişti <small>${r.degisiklikler.length}</small></summary><ul>${r.degisiklikler.map(x => `<li>${esc(DG[x.tur] || x.tur)}${x.tur === 'agirlik' ? ' (' + esc(ghAlan(x.hedef)[2]) + ')' : x.tur === 'tur_ust' || x.tur === 'bicim_ust' ? ' (' + esc({gozlem: 'gözlem', minik: 'minik not', emoji: 'emoji'}[x.hedef] || x.hedef) + ')' : x.tur.startsWith('asama') ? ' (' + esc(AS[x.hedef] || x.hedef) + ')' : ''}: ${x.tur.startsWith('asama') ? '' : esc(String(x.eski ?? 'yok')) + ' → ' + esc(String(x.yeni)) + ' · '}${esc(kt(x.neden))}</li>`).join('')}</ul></details>` : ''}
       ${(r.degisiklikler || []).length && !r.geri_alindi ? `<button class="ghb kucuk" type="button" data-g="gelGeri" data-z="${r.zaman}">Bu ayarları geri al</button>` : ''}</div>`;
   else h += `<p class="gh-ipucu" style="margin-top:10px">İlk değerlendirme pazartesi sabahı; isterseniz şimdi başlatın.</p>`;
-  if ((a.notlar || []).length) h += `<p class="gh-ipucu" style="margin-top:12px"><b>Yazarken uyduğu notlar</b></p>${a.notlar.map((n, i) => `<div class="gh-sat"><div><p>${esc(n.metin)}</p><small>${n.yer === 'konu' ? 'konu seçimi' : n.yer === 'yazim' ? 'yazım' : 'konu ve yazım'}</small></div><div class="eyl"><button class="ghb kucuk" type="button" data-g="gelNot" data-i="${i}">Kaldır</button></div></div>`).join('')}`;
-  if (a.deney?.metin && a.deney.bitis * 1000 > Date.now()) h += `<p class="gh-ipucu" style="margin-top:10px"><b>Bu haftanın deneyi:</b> ${esc(a.deney.metin)}${a.deney.olcu ? ` <i>(${esc(a.deney.olcu)})</i>` : ''}</p>`;
+  if ((a.notlar || []).length) h += `<details class="gh-katla gh-ic"><summary>Yazarken uyduğu notlar <small>${a.notlar.length}</small></summary>${a.notlar.map((n, i) => `<div class="gh-sat"><div><p>${esc(kt(n.metin))}</p><small>${n.yer === 'konu' ? 'konu seçimi' : n.yer === 'yazim' ? 'yazım' : 'konu ve yazım'}</small></div><div class="eyl"><button class="ghb kucuk" type="button" data-g="gelNot" data-i="${i}">Kaldır</button></div></div>`).join('')}</details>`;
+  if (a.deney?.metin && a.deney.bitis * 1000 > Date.now()) h += `<p class="gh-ipucu" style="margin-top:10px"><b>Bu haftanın deneyi:</b> <span class="gh-2s" title="${esc(kt(a.deney.metin) + (a.deney.olcu ? ' · Ölçü: ' + a.deney.olcu : ''))}">${esc(kt(a.deney.metin))}</span></p>`;
   if ((a.ihmal || []).length) h += `<p class="gh-ipucu"><b>Az beslenen alan:</b> ${a.ihmal.map(k => esc(ghAlan(k)[2])).join(', ')}; keşifte öne alınıyor.</p>`;
   const K = a.kapali_asamalar || [];
   h += `<details class="gh-katla" style="margin:12px 0 0;padding:0;background:none"><summary style="padding:6px 0">Denetim aşamaları <small>${Object.keys(AS).length - K.length}/${Object.keys(AS).length} açık</small></summary>
@@ -4794,11 +4810,11 @@ function ghGelisimHtml(){
   const O = g.oneriler || [];
   if (O.length) h += `<p class="gh-ipucu" style="margin-top:12px"><b>Size sorduğu geliştirmeler</b> · kabul ettikleriniz bir sonraki geliştirme oturumunda yapılır</p>${O.map(x => `<div class="gh-sat"><div><p>${esc(x.baslik)}</p><small>${esc(x.neden || '')}${x.ne_yapilir ? ' · ' + esc(x.ne_yapilir) : ''}${x.link ? ` · <a href="${esc(x.link)}" target="_blank" rel="noopener">kaynak ↗</a>` : ''}</small></div><div class="eyl"><button class="ghb kucuk" type="button" data-g="gelOneri" data-id="${esc(x.id)}" data-k="0">Hayır</button><button class="ghb ana kucuk" type="button" data-g="gelOneri" data-id="${esc(x.id)}" data-k="1">Yapılsın</button></div></div>`).join('')}`;
   const Y = g.yerimi || {};
-  h += `<p class="gh-ipucu" style="margin-top:12px"><b>Yer imlerinizden okuduklarım</b> · X’te kendi sistemleriniz için bıraktıklarınız (GitHub listeleri, okumalar). ${Y.adet ? `${Y.adet} yer imi: ${Y.tur?.sistem || 0} araç ve yöntem, ${Y.tur?.okuma || 0} okuma${Y.bekleyen ? `, ${Y.bekleyen} tanesi okunacak` : ''}.` : '<a href="https://x.com/i/bookmarks" target="_blank" rel="noopener">Yer işaretleri sayfanızı</a> bir kez açın; uzantı okur.'}</p>`
-    + (Y.son_incelemeler || []).map(x => `<div class="gh-sat"><div><p><a href="${esc(x.adres)}" target="_blank" rel="noopener">${esc(x.baslik)}</a> <small>${x.tur === 'okuma' ? 'okuma' : 'araç / yöntem'} · uygunluk ${x.uygunluk}/5</small></p><small>${esc(x.okuma_notu || x.ozet)}${x.fikir ? ' <b>→</b> ' + esc(x.fikir) : ''}${x.okundu === false ? ' · içerik okunamadı' : ''}</small></div></div>`).join('');
+  h += `<p class="gh-ipucu" style="margin-top:12px" title="X’te kendi sistemleriniz için bıraktığınız GitHub listeleri ve okumalar"><b>Yer imlerinizden okuduklarım</b> · ${Y.adet ? `${Y.adet} yer imi: ${Y.tur?.sistem || 0} araç ve yöntem, ${Y.tur?.okuma || 0} okuma${Y.bekleyen ? `, ${Y.bekleyen} tanesi okunacak` : ''}.` : '<a href="https://x.com/i/bookmarks" target="_blank" rel="noopener">Yer işaretleri sayfanızı</a> bir kez açın; uzantı okur.'}</p>`
+    + ((Y.son_incelemeler || []).filter(x => x.uygunluk >= 3).sort((p, q) => q.uygunluk - p.uygunluk).slice(0, 4).map(x => `<div class="gh-sat"><div><p><a href="${esc(x.adres)}" target="_blank" rel="noopener">${esc(x.baslik)}</a> <small>${x.tur === 'okuma' ? 'okuma' : 'araç / yöntem'} · uygunluk ${x.uygunluk}/5</small></p><small class="gh-2s" title="${esc(x.ozet)}">${esc(x.fikir ? x.fikir : (x.okuma_notu || x.ozet))}</small></div></div>`).join('') || (Y.incelenen ? '<p class="gh-ipucu">Okunanlar arasında sisteminize güçlü katkı yapacak bir şey çıkmadı.</p>' : ''));
   const T = g.takip || {};
-  h += `<p class="gh-ipucu" style="margin-top:12px"><b>Dünyada neler değişiyor</b> · X, LinkedIn, Instagram, Claude ve benzeri araçlar; haftada bir taranır${T.tarih ? ` (son: ${esc(T.tarih)}, ${T.taranan || 0} haber)` : ''}. <button class="ghb kucuk" type="button" data-g="gelTakip">Şimdi tara</button></p>`
-    + ((T.maddeler || []).length ? T.maddeler.map(m => `<div class="gh-sat"><div><p><a href="${esc(m.link)}" target="_blank" rel="noopener">${esc(m.baslik)}</a></p><small>${esc(m.neden || '')}</small></div></div>`).join('') : '');
+  h += `<details class="gh-katla gh-ic"><summary>Dünyada neler değişiyor <small>${(T.maddeler || []).length || ''}</small></summary><p class="gh-ipucu"> · X, LinkedIn, Instagram, Claude ve benzeri araçlar; haftada bir taranır${T.tarih ? ` (son: ${esc(T.tarih)}, ${T.taranan || 0} haber)` : ''}. <button class="ghb kucuk" type="button" data-g="gelTakip">Şimdi tara</button></p>`
+    + ((T.maddeler || []).length ? T.maddeler.map(m => `<div class="gh-sat"><div><p><a href="${esc(m.link)}" target="_blank" rel="noopener">${esc(m.baslik)}</a></p><small>${esc(m.neden || '')}</small></div></div>`).join('') : '') + '</details>';
   return h;
 }
 
@@ -5658,7 +5674,7 @@ function kisacaHtml(v){
   const tg = toplantiZamani({baslik: v.baslik, olusturma: v.olusturma}), ben = (window.BEN_AD || '').split(' ')[0].toLocaleLowerCase('tr');
   const zt = sn => sn != null ? `<button type="button" class="zt" data-sn="${sn}">${zamanK(sn)}</button>` : '';
   const kanit = x => x.alinti ? `<q class="kanit${x.alinti_dogru === false ? ' supheli' : ''}" title="${x.alinti_dogru === false ? 'Bu alıntı transkriptte birebir bulunamadı; kayda bakın' : 'Söylendiği an'}">${esc(x.alinti)}</q>` : '';
-  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarih belirtilmedi</em>' : '')}${zt(x.sn)}${kanit(x)}</li>`;
+  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarihsiz</em>' : '')}${zt(x.sn)}${kanit(x)}</li>`;
   const bas = ad => ad.split(/\s+/).filter(Boolean).slice(0, 2).map(ilkHarf).join('');
   const benim = p => ben && p.ad.toLocaleLowerCase('tr').split(/\s+/)[0] === ben;
   const kisiHtml = (p, ki) => { const kalan = p.isler.filter(x => !x.bitti).length;
@@ -5675,7 +5691,7 @@ function kisacaHtml(v){
     + (x.sonra || []).map(z => `<span class="kzincir sonra ${z.iliski}">${z.iliski === 'teyit' ? `${zl(z)} yeniden onaylandı` : `${zl(z)} ${z.iliski === 'geri_aldi' ? 'geri alındı' : 'değişti'}`}${z.aciklama ? ' · ' + esc(z.aciklama) : ''}</span>`).join('');
   const gecersiz = x => (x.sonra || []).some(z => z.iliski !== 'teyit');
   const kararlar = (k.kararlar || []).length ? `<h4 style="margin-top:18px">Kararlar</h4><ul class="kliste">${k.kararlar.map(x => `<li class="${gecersiz(x) ? 'kgecersiz' : ''}"><span>${esc(x.karar)}</span>${x.kim ? `<em>${esc(x.kim)}</em>` : ''}${zt(x.sn)}${kanit(x)}${zincir(x)}</li>`).join('')}</ul>` : '';
-  const isler = digerK.length || belirsiz ? `<h4 style="margin-top:18px">İşler</h4>${benden ? '' : gorevDurumHtml(v)}<div class="kkisiler">${digerK.map(([p, ki]) => kisiHtml(p, ki)).join('')}${belirsiz}</div>` : '';
+  const isler = digerK.length || belirsiz ? `<h4 style="margin-top:18px">İşler</h4><div class="kkisiler">${digerK.map(([p, ki]) => kisiHtml(p, ki)).join('')}${belirsiz}</div>` : '';
   const oneriler = (k.oneriler || []).length ? `<h4 style="margin-top:18px">Öneriler <span class="pr-gri">(karar değil)</span></h4><ul class="kliste soluk">${k.oneriler.map(x => `<li><span>${esc(x.oneri)}</span>${x.kim ? `<em>${esc(x.kim)}</em>` : ''}${zt(x.sn)}</li>`).join('')}</ul>` : '';
   const sorular = (k.acik_sorular || []).length ? `<h4 style="margin-top:18px">Açık sorular</h4><ul class="kliste">${k.acik_sorular.map(x => `<li><span>${esc(x.soru)}</span>${x.kime ? `<em>${esc(x.kime)}</em>` : ''}${zt(x.sn)}</li>`).join('')}</ul>` : '';
   return `<div class="ktop"><h4>Kısaca</h4><button class="tiny" id="kisacaKopya" type="button">Kopyala</button></div>${k.ozet.map(p => `<p class="kp">${esc(p)}</p>`).join('')}`
@@ -5717,7 +5733,7 @@ function sinyalHtml(v){
   const as = y.amac_sonuc, kirik = (y.kirilmalar || []).filter(k => !k.onarildi);
   let h = '';
   if (y.amac) h += `<div class="sgamac ${as ? as.karsilandi : ''}"><small>Amacın</small><b>“${esc(y.amac)}”</b>${as ? `<span class="sgsonuc">${({evet: 'Tuttu', kismen: 'Kısmen tuttu', hayir: 'Tutmadı'})[as.karsilandi] || ''}</span><p>${esc(as.kanit || '')}${as.eksik ? ` <i>Eksik: ${esc(as.eksik)}</i>` : ''}</p>${as.sonraki ? `<p class="sgsonraki">→ ${esc(as.sonraki)}</p>` : ''}` : ''}</div>`;
-  if (kd.length) h += `<div class="sgblok"><h5>Kapsam dışı ${kd.length} istek · ~${Math.round(saat)} saat</h5>${kd.map(x => `<div class="sgsat">${z(x.zaman, x.sn)}<span><b>${esc(x.istek)}</b>${x.kim ? ` <em>${esc(x.kim)}</em>` : ''}<small>${esc(x.neden || '')}</small></span><span class="sgsaat">~${x.saat} sa</span></div>`).join('')}</div>`;
+  if (kd.length) h += `<div class="sgblok"><h5>Kapsam dışı ${kd.length} istek</h5>${kd.map(x => `<div class="sgsat">${z(x.zaman, x.sn)}<span><b>${esc(x.istek)}</b>${x.kim ? ` <em>${esc(x.kim)}</em>` : ''}<small>${esc(x.neden || '')}</small></span><span class="sgsaat">~${x.saat} sa</span></div>`).join('')}</div>`;
   if ((y.celiskiler || []).length) h += `<div class="sgblok kirmizi"><h5>Önceden şöyle denmişti</h5>${y.celiskiler.map(c => `<div class="sgsat">${z(c.zaman, c.sn)}<span><b>${esc(c.konu || '')}</b><small>Şimdi: “${esc(c.simdi || '')}”</small><small>Önce (${esc((c.once_toplanti || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, '').slice(0, 40))}): ${esc(c.once || '')}</small></span></div>`).join('')}</div>`;
   if (kirik.length) h += `<div class="sgblok"><h5>İlişkide kırılma</h5>${kirik.map(k => `<div class="sgsat">${z(k.zaman, k.sn)}<span><b><button type="button" class="sgkisi" data-kisi="${esc(k.kim || '')}">${esc(k.kim || '')}</button>: ${esc(k.sinyal || '')}</b>${k.alinti ? `<small>“${esc(k.alinti)}”</small>` : ''}${k.onarim ? `<span class="sgonar">Bir sonraki görüşmede: ${esc(k.onarim)}</span>` : ''}</span></div>`).join('')}</div>`;
   if ((y.tahminler || []).length) h += `<div class="sgblok"><h5>Tahminin</h5>${y.tahminler.map(t => `<div class="sgsat">${z(t.zaman, t.sn)}<span><b>${esc(t.tahmin)}</b><small>Güven %${Math.round((t.guven || 0.7) * 100)} · ${(() => { const g = new Date(toplantiZamani(v).getTime() + (t.bakilacak || 42) * 864e5); return g < new Date() ? 'sonucu belli olmalı; Toplantılar sayfasında “Tahminlerin”den işaretleyin' : g.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long'}) + ' gibi sorulacak'; })()}</small></span></div>`).join('')}</div>`;
@@ -5748,10 +5764,9 @@ async function toplantiSayfasiKur(temel, v, d){
   $('#tkSor').onclick = () => sohbetAc();
   const word = $('#doc .toolbar .split'); if (word) $('#tkDugme').append(word);
   const kop = $('#kopyala'); if (kop) $('#tkDugme').append(kop);
-  // 2026-10-24 sadeleştirme: Word · Kopyala · ⋯ (Düzenle, Couple'da iş aç). Couple'a tek tıkla iş: müşteri ve toplantı kendiliğinden seçili gelir
-  const dz = document.createElement('button'); dz.type = 'button'; dz.className = 'sbtn tkmenu'; dz.textContent = '⋯'; dz.title = 'Düzenle, Couple’da iş aç, kaldır'; dz.setAttribute('aria-label', dz.title);
+  // 2026-10-24 sadeleştirme: Word · Kopyala · ⋯ (Düzenle, Listeden kaldır). 25 Ekim: Couple kapandı, 'Couple’da iş aç' kaldırıldı
+  const dz = document.createElement('button'); dz.type = 'button'; dz.className = 'sbtn tkmenu'; dz.textContent = '⋯'; dz.title = 'Düzenle, kaldır'; dz.setAttribute('aria-label', dz.title);
   dz.onclick = ev => popover(ev.currentTarget, [['Düzenle…', () => toplantiDuzenle(temel)],
-    ['Couple’da iş aç', () => window.open(`${location.protocol}//${location.hostname}:8768/?toplanti=${encodeURIComponent(temel)}`, '_blank', 'noopener')],
     null, ['Listeden kaldır', () => toplantiKaldir(temel)]]);
   $('#tkDugme').append(dz);
   { const oy = $('#oynatici'); if (oy) ku.after(oy); }
@@ -6285,7 +6300,9 @@ function stCizgi(){
     if (Object.keys(state.jobs).length && !state.timer){ state.timer = setInterval(pollJobs, 1500); pollJobs(); } }catch(e){}
 })();
 </script>
-<script src="/static/studio_ek.js?v=17"></script>
-<script src="/static/meet_ek.js?v=8"></script>
+<script src="/static/studio_ek.js?v=18"></script>
+<script src="/static/meet_ek.js?v=9"></script>
+<script src="/static/teslim_ek.js?v=2"></script>
+<script src="/static/takip_ek.js?v=1"></script>
 </body>
 </html>

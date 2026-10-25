@@ -78,6 +78,8 @@ def ana():
     html = (Path(app.static_folder) / sayfa).read_text(encoding="utf-8")
     if sayfa == "index.html" and "note" not in URUNLER_KURULU:        # Meet kurulu değilse (yalnız Studio) Meet'in eki istenmez (2026-10-25)
         html = re.sub(r'<script src="/static/meet_ek\.js[^"]*"></script>\n?', "", html)
+    if sayfa == "index.html" and "atolye" not in URUNLER_KURULU:      # teslim kontrolü uçları couple_site'ta; Couple modülleri yoksa eki istenmez
+        html = re.sub(r'<script src="/static/teslim_ek\.js[^"]*"></script>\n?', "", html)
     html = _kabuk(html, sayfa)
     dil = str(ayarlar_oku().get("dil") or "")                         # arayüz dili (2026-10-25; boşsa tarayıcı dili, static/dil.js)
     html = html.replace("<html", f'<html data-urun="{urun}" data-urunler="{",".join(sorted(URUNLER_KURULU))}"' + (f' data-dil="{dil}"' if dil in ("tr", "en") else "") + f' data-dilv="{_dil_surumu()}"', 1)

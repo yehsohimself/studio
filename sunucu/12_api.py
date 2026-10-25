@@ -673,6 +673,8 @@ def _kelime_zamanlari(segler, duz=None):
         anahtar = w.strip(".,;:!?'\"”“").lower()
         for d in s.get("duzeltmeler") or []:
             if anahtar and anahtar in str(d.get("yeni", "")).lower().split():
+                if d.get("kaynak") in ("altyazi", "baglam"):       # Meet (2026-10-25): toplantı altyazısından ya da Claude'un bağlam tahmininden
+                    return "d:" + str(d.get("eski", "")).replace("|", " ") + "|" + d["kaynak"] + "|" + str(d.get("neden") or "").replace("|", " ")
                 return "d:" + str(d.get("eski", ""))
         if not s.get("duzeltmeler") and anahtar in duz:
             return "d:" + duz[anahtar]

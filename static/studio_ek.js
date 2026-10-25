@@ -5,7 +5,7 @@
    - Kurgu: paragrafları sürükleyip sırala, çıkar, önizle, geri al, kaydet, videosunu oluştur
    - Düzenlenmiş video panelinde altyazı görünümü önizlemesi (tek kare)
    - Kitaplıkta süzgeç ve sahnelerde (görüntüde) arama; İndirilenlerde temizleme önerisi
-   - Video ▾ / Word ▾ menülerine ekler (zip, kurgu, yayın paketi, Content ve Couple köprüsü), Sonraki adımlar
+   - Video ▾ / Word ▾ menülerine ekler (zip, kurgu, yayın paketi, Content köprüsü), Sonraki adımlar
    - Ayarlar → Sistem → Studio gelişimi (araç güncellemeleri, gelişmeler, öneriler, öğrenilenler) */
 (() => {
 if (typeof URUN === 'undefined' || URUN !== 'transcript') return;
@@ -305,8 +305,7 @@ popover = function(anchor, items, opts){   // eslint-disable-line no-global-assi
     const http = /^https?:/.test(v.link || '');
     items = [...items, null, ['Metinden kurgu… (sırala, çıkar, önizle)', kurguAc], ['Yayın paketi…', () => { sekmeSec('yayin', true); if (!v.yayin) yayinBaslat(temel); }],
       ['Görüntüde aranabilir yap', async () => { try{ await post('/api/sahne-dizin/' + encodeURIComponent(temel)); toast('Sahneler çıkarılıp betimleniyor (1-3 dk); sonra Kitaplık → Sahneler’de aranır'); }catch(e){ toast(e.message); } }],
-      ...(document.documentElement.dataset.misafir === '1' ? [] : [null, ...(http ? [['Content’te kendi versiyonunu yap ↗', () => window.open(port(8769) + '?link=' + encodeURIComponent(v.link) + '&istek=', '_blank')]] : []),
-      ['Couple’da iş aç ↗', () => window.open(port(8768) + '?toplanti=' + encodeURIComponent(temel), '_blank')]])];
+      ...(document.documentElement.dataset.misafir === '1' ? [] : [null, ...(http ? [['Content’te kendi versiyonunu yap ↗', () => window.open(port(8769) + '?link=' + encodeURIComponent(v.link) + '&istek=', '_blank')]] : [])])];
   }
   return _popover(anchor, items, opts);
 };
