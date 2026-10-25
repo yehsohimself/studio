@@ -6118,14 +6118,15 @@ const ST_DUGUM = {tx: ['Transkript', 'Kim, ne zaman, ne dedi.'], oz: ['Özet', '
   alt: ['Düzenlenmiş video', 'Altyazısı basılmış, paylaşmaya hazır.'], db: ['Dublaj', 'Aynı ses, başka dil.'], dl: ['Videoyu indir', 'Dosyası sizde kalsın.']};
 const ST_IK = {tx: 'M5 6h14M5 12h14M5 18h9', oz: 'M5 4h14v16H5zM8.5 9h7M8.5 13h4.5', alt: 'M3 6h18v12H3zM7 14h4M13 14h4', db: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3', dl: 'M12 4v11M7 10l5 5 5-5M5 20h14'};
 // 23 Ekim (ChatGPT brifi, Studio 4): işe göre hazır çıktı seçimleri; tek tık, zorunlu değil, sonra tek tek değiştirilebilir
-const ST_PAKET = [['arastirma', 'Araştırma', 'Transkript ve kaynağa bağlı özet', {tx: true, oz: true, alt: false, dl: false, db: false}],
-  ['musteri', 'Müşteri videosu', 'Altyazılı video, dosyası ve özet', {tx: true, oz: true, alt: true, dl: true, db: false}],
-  ['dil', 'Başka dile', 'Dublaj ve özet', {tx: true, oz: true, alt: false, dl: false, db: true}],
-  ['indir', 'Sadece indir', 'Yalnızca video dosyası', {tx: false, oz: false, alt: false, dl: true, db: false}]];
+// 2026-10-25 (kullanıcı: "menüdeki yazılar anlaşılmıyor"): kullanım adı yerine ne çıkacağı yazılır
+const ST_PAKET = [['arastirma', 'Transkript ve özet', 'Yazıya döker, özet çıkarır', {tx: true, oz: true, alt: false, dl: false, db: false}],
+  ['musteri', 'Altyazılı video', 'Transkript, özet, altyazılı video ve video dosyası', {tx: true, oz: true, alt: true, dl: true, db: false}],
+  ['dil', 'Dublaj', 'Transkript, özet ve başka dilde seslendirme', {tx: true, oz: true, alt: false, dl: false, db: true}],
+  ['indir', 'Sadece video dosyası', 'Yazıya dökmeden indirir', {tx: false, oz: false, alt: false, dl: true, db: false}]];
 function stPaketUygula(kod){ const p = ST_PAKET.find(x => x[0] === kod); if (!p) return; const d = p[3];
   state.tx = d.tx; state.oz = d.oz; state.alt = d.alt; state.dl = d.dl; store.set('db', d.db); ayarKaydet(); islemUygula(); try{ altSatirlar(); }catch(e){} stPaketCiz(); }
 function stPaketCiz(){ const r = $('#stPaket'); if (!r) return; const db = !!store.get('db', false);
-  r.innerHTML = '<span class="stp-b">Hazır seçim</span>' + ST_PAKET.map(([k, ad, ack, d]) => { const on = d.tx === !!state.tx && d.oz === !!state.oz && d.alt === !!state.alt && d.dl === !!state.dl && d.db === db;
+  r.innerHTML = '<span class="stp-b">Tek tıkla</span>' + ST_PAKET.map(([k, ad, ack, d]) => { const on = d.tx === !!state.tx && d.oz === !!state.oz && d.alt === !!state.alt && d.dl === !!state.dl && d.db === db;
     return `<button type="button" data-p="${k}" aria-pressed="${on}" title="${esc(ack)}">${esc(ad)}</button>`; }).join(''); }
 function stHaritaKur(m){
   const pk = document.createElement('div'); pk.className = 'st-paket'; pk.id = 'stPaket'; m.before(pk);
