@@ -78,7 +78,11 @@ def kes(urun, hedef, log=print):
     (hedef / "requirements.txt").write_text("\n".join(l for l in req if not any(l.startswith(c) for c in U["requirements_cikar"])) + "\n", encoding="utf-8")
     site = hedef / "site.py"
     site.write_text(site.read_text(encoding="utf-8").replace('"Video Hub.command"', f'"{yeni_ad}"').replace("Transkript sisteminin", f"{U['ad']} ürününün"), encoding="utf-8")
-    (hedef / "README.md").write_text(README[urun], encoding="utf-8"); kopyalanan.add("README.md")
+    gi = hedef / ".gitignore"
+    ek = "\n# kesilen depo: örnek medya ve ekran görüntüsü depoya girer (monorepo'da *.mp4/*.jpg dışarıdaydı)\n!static/*_ornek/*.mp4\n!docs/ekran.jpg\n"
+    if "!docs/ekran.jpg" not in gi.read_text(encoding="utf-8"):
+        gi.write_text(gi.read_text(encoding="utf-8") + ek, encoding="utf-8")
+    (hedef / "README.md").write_text(README[urun], encoding="utf-8"); kopyalanan.add("README.md"); kopyalanan.add("docs/ekran.jpg")
     (hedef / "docs").mkdir(exist_ok=True)
     (hedef / "docs" / "MIMARI.md").write_text(_mimari(urun), encoding="utf-8"); kopyalanan.add("docs/MIMARI.md")
     # fazlalıkları sil (yalnız bu betiğin yazdığı türden dosyalar; .git, veri klasörleri dokunulmaz)
@@ -106,6 +110,8 @@ def dogrula(hedef, log=print):
 
 
 README = {"studio": """# Studio
+
+![Studio](docs/ekran.jpg)
 
 Video linki ya da dosyası → transkript, özet, çeviri, altyazılı video, klip ve dikey Shorts, kendi sesiyle dublaj, yayın paketi.
 Her şey kendi Mac'inizde çalışır: ses tanıma Apple grafik işlemcisinde (mlx-whisper), konuşmacı ayırma bilgisayarda (sherpa-onnx),

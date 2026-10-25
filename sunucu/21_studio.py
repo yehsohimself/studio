@@ -543,6 +543,22 @@ def _studio_isaret(ad, anahtar):
     return True
 
 
+def _studio_gece_deneme(dublaj_da=False):
+    """Studio'nun asıl zincirini sabit sentetik örnek videoyla dener (duman_testi.py studio; pazar geceleri dublaj da). Sorun varsa bildirim.
+    2026-10-25: Ghost oturumunun 19'daki `_studio_gece_testi`'sinden devralındı (Studio ayrı depo; zamanlama bu döngüde, 05.00-07.00 site boşken)."""
+    kat = "studio_dublaj" if dublaj_da else "studio"
+    r = subprocess.run(["nice", "-n", "10", "/usr/bin/caffeinate", "-i", str(KLASOR / ".venv" / "bin" / "python"), str(KLASOR / "duman_testi.py"), kat],
+                       capture_output=True, text=True, timeout=3600, cwd=str(KLASOR))
+    try:
+        h = json.loads((KAYIT / ".duman.json").read_text(encoding="utf-8")).get(kat, {}).get("hatalar") or []
+    except Exception:  # noqa: BLE001
+        h = ["sonuç okunamadı"]
+    if h:
+        _bildir(f"Studio gece testi: {len(h)} sorun", h[0][:150])
+    print(f"Studio gece testi ({kat}): {'geçti' if not h else '; '.join(h)[:300]}", flush=True)
+    return {"hatalar": h, "cikis": r.returncode}
+
+
 def _studio_dongu():
     """Studio'nun kendini besleyen döngüsü. Her 10 dk: boştayken bir videoyu görüntü dizinine ekler. Gece 03.30-05.30: kendiliğinden
     güncellenen araçlar (deneme + geri dönüş). Pazartesi 08.30'dan sonra: araç taraması, gelişme takibi ve haftalık öz değerlendirme."""
@@ -574,6 +590,8 @@ def _studio_dongu():
             if bos and (3, 30) <= (simdi.tm_hour, simdi.tm_min) <= (5, 30) and _studio_isaret("studio_gece", time.strftime("%Y-%m-%d")):
                 import studio_gelisim
                 _studio_is("gelisim:gece", lambda log=print: studio_gelisim.otomatik_guncelle(log=log))
+            if bos and (5, 0) <= (simdi.tm_hour, simdi.tm_min) <= (7, 0) and _studio_isaret("studio_gece_deneme", time.strftime("%Y-%m-%d")):
+                _studio_is("gece testi", lambda log=print, _p=(simdi.tm_wday == 6): _studio_gece_deneme(_p))
             if bos and simdi.tm_wday == 0 and (simdi.tm_hour, simdi.tm_min) >= (8, 30) and _studio_isaret("studio_hafta", time.strftime("%G-%V")):
                 _studio_is("gelisim:tara", _gelisim_tara)
                 threading.Thread(target=lambda: (time.sleep(900), _bildir("Studio", "Haftalık gelişim raporu hazır: Ayarlar → Sistem")), daemon=True).start()
