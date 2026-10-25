@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Studio</title>
 <meta name="description" content="Video linkinden transkript, özet, çeviri ve altyazılı video. Her şey bu bilgisayarda.">
+<script src="/static/dil.js?v=4"></script>
 <link rel="manifest" href="/static/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/static/ikon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2631,6 +2632,7 @@
 
 <dialog class="sheet ayar" id="ayarlar"><h4 style="margin-bottom:6px">Ayarlar</h4>
     <h4 class="ayh">Genel</h4>
+  <div class="row"><div class="l">Arayüz dili<small>Language</small></div><div class="seg mini" id="ayDil"><button type="button" data-v="tr" aria-pressed="true">Türkçe</button><button type="button" data-v="en" aria-pressed="false">English</button></div></div>
 <div class="row"><div class="l">Özet çıkar<small>Transkript bitince özet, öne çıkanlar ve bölümler</small></div><button class="tog" id="ayOzet" role="switch" aria-checked="true" type="button"></button></div>
   <div class="row"><div class="l">Özetin dili<small>Türkçe ya da videonun kendi dili</small></div><div class="seg mini" id="ayOzetDili"><button type="button" data-v="tr" aria-pressed="true">Türkçe</button><button type="button" data-v="auto" aria-pressed="false">Videonun dili</button></div></div>
   <div class="row"><div class="l">Claude ile yaz<small id="ayClaudeNot"></small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end" id="ayClaudeAct"></div></div>
@@ -2758,9 +2760,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','
 function sure(sn){ sn = Math.round(sn||0); const h = Math.floor(sn/3600), m = Math.floor(sn%3600/60), s = sn%60; return h ? `${h} sa ${m} dk` : (m ? `${m} dk ${s} sn` : `${s} sn`); }
 function zamanK(sn){ sn = Math.round(sn||0); const h = Math.floor(sn/3600), m = Math.floor(sn%3600/60), s = sn%60; return h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
 function tarih(ts){ const d = new Date(ts*1000), n = new Date(); const gun = Math.floor((new Date(n.getFullYear(),n.getMonth(),n.getDate()) - new Date(d.getFullYear(),d.getMonth(),d.getDate()))/86400000);
-  const saat = d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-  if (gun === 0) return 'Bugün ' + saat; if (gun === 1) return 'Dün ' + saat; if (gun < 7) return d.toLocaleDateString('tr-TR',{weekday:'long'}) + ' ' + saat;
-  return d.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year: d.getFullYear()!==n.getFullYear() ? 'numeric' : undefined}); }
+  const saat = d.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'),{hour:'2-digit',minute:'2-digit'});
+  if (gun === 0) return 'Bugün ' + saat; if (gun === 1) return 'Dün ' + saat; if (gun < 7) return d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'),{weekday:'long'}) + ' ' + saat;
+  return d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'),{day:'numeric',month:'short',year: d.getFullYear()!==n.getFullYear() ? 'numeric' : undefined}); }
 function kaliteAd(k){ return k === 'mp3' ? 'MP3' : k === 'en' ? 'En iyi' : k === 'altyazili' ? 'Altyazılı' : k === 'klip' ? 'Klip' : k + 'p'; }
 function mbMetni(mb){ if (!mb) return ''; return mb >= 1000 ? (mb/1000).toFixed(1).replace('.', ',') + ' GB' : Math.max(1, Math.round(mb)) + ' MB'; }
 function boyutMetni(b){ return mbMetni((b||0)/1e6); }
@@ -3030,7 +3032,7 @@ function notBarGoster(acik, bas){ const b = $('#notBar'); if (!b || URUN !== 'no
 async function notListeCiz(){
   let l = []; try{ l = await (await fetch('/api/canli/notlar')).json(); }catch(e){ return; }
   l = l.filter(n => !notBarBas || n.ts >= notBarBas - 120);
-  $('#notListe').innerHTML = l.map(n => `<span class="nlc ${n.tur}"><b>${new Date(n.ts * 1000).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</b>${n.tur === 'isaret' ? '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>' : ''}${esc(n.metin || 'Önemli an')}<button type="button" data-sil="${esc(n.id)}" aria-label="Sil">×</button></span>`).join('');
+  $('#notListe').innerHTML = l.map(n => `<span class="nlc ${n.tur}"><b>${new Date(n.ts * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'})}</b>${n.tur === 'isaret' ? '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>' : ''}${esc(n.metin || 'Önemli an')}<button type="button" data-sil="${esc(n.id)}" aria-label="Sil">×</button></span>`).join('');
   $$('#notListe [data-sil]').forEach(x => x.onclick = async () => { await fetch('/api/canli/not', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({sil: x.dataset.sil})}); notListeCiz(); });
 }
 async function notEkle(tur){ const g = $('#notGir'); const metin = g.value.trim(); if (tur === 'not' && !metin) return;
@@ -3071,10 +3073,10 @@ const ADIM_KISA = [['kaynaklar', 'Kaynaklar'], ['secim', 'Seçim'], ['cozumleme'
 const PUAN_AD = {kanca: 'Kanca', brief_uyumu: 'Brief’e uyum', dogallik: 'Doğallık', ozgulluk: 'Özgüllük', uygulanabilirlik: 'Uygulanabilirlik', ozgunluk: 'Özgünlük', uyum: 'Mevzuat', abc: 'ABCD'};
 const OLCU_AD = {sure: 'Süre (sn)', kesme_dk: 'Kesme / dk', konusma_hizi: 'Konuşma (kelime/sn)', ilk_soz_sn: 'İlk söz (sn)', ekran_yazisi_orani: 'Ekran yazısı oranı', deger_onerisi_sn: 'Değer önerisi (sn)', marka_ilk_sn: 'Marka ilk görünüş (sn)'};
 const atJson = (u, govde, yontem) => fetch(u, {method: yontem || 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(govde || {})}).then(async r => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.hata || 'Olmadı'); return j; });
-const sayiTR = n => (n || 0).toLocaleString('tr-TR'), virgul = x => String(x).replace('.', ',');
+const sayiTR = n => (n || 0).toLocaleString(((window.DIL || {}).locale || 'tr-TR')), virgul = x => String(x).replace('.', ',');
 function atSekme(t){ atDurum.tab = t; $$('#atTab button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === t)); $$('#atolyeSec .atp').forEach(p => p.classList.toggle('hidden', p.dataset.p !== t)); }
 $$('#atTab button').forEach(b => b.onclick = () => { atSekme(b.dataset.v); if (b.dataset.v === 'cal' && atDurum.acik) atAc(atDurum.acik, true); });
-function atTarih(z){ return new Date(z * 1000).toLocaleString('tr-TR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}); }
+function atTarih(z){ return new Date(z * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}); }
 function atCalDurum(c){ return c.durum === 'bitti' ? `${c.video} video · ${c.akis} akış` : c.durum === 'hata' ? 'Olmadı' : (c.calisiyor ? (ADIM[c.adim] || 'Sürüyor') + '…' : 'Yarım kaldı'); }
 async function atolyeCiz(){
   let d; try{ d = await (await fetch('/api/atolye')).json(); }catch(e){ return; } atDurum.veri = d;
@@ -3142,7 +3144,7 @@ async function atKadrolarCiz(){
 }
 function atHavuzCiz(){
   const O = atDurum.veri?.ornekler || [], kutu = $('#atHavuz');
-  kutu.innerHTML = O.length ? '<div class="card atkart">' + O.map(o => `<div class="atcr"><span><a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.baslik || o.url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70))}</a> <span class="hint">· ${esc(platformOf(o.url)?.[1] || 'Video')}${o.zaman ? ' · ' + new Date(o.zaman * 1000).toLocaleDateString('tr-TR', {day:'numeric', month:'short'}) : ''}</span></span><span style="display:flex;gap:4px"><button class="tiny" data-kullan="${esc(o.url)}" type="button">Çalışmaya ekle</button><button class="tiny" data-sil="${esc(o.url)}" type="button" style="color:var(--red)">Kaldır</button></span></div>`).join('') + '</div>'
+  kutu.innerHTML = O.length ? '<div class="card atkart">' + O.map(o => `<div class="atcr"><span><a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.baslik || o.url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70))}</a> <span class="hint">· ${esc(platformOf(o.url)?.[1] || 'Video')}${o.zaman ? ' · ' + new Date(o.zaman * 1000).toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}) : ''}</span></span><span style="display:flex;gap:4px"><button class="tiny" data-kullan="${esc(o.url)}" type="button">Çalışmaya ekle</button><button class="tiny" data-sil="${esc(o.url)}" type="button" style="color:var(--red)">Kaldır</button></span></div>`).join('') + '</div>'
     : '<div class="emptyh">Havuz boş.</div>';
   $$('[data-sil]', kutu).forEach(b => b.onclick = async () => { await atJson('/api/atolye/ornek', {url: b.dataset.sil}, 'DELETE'); atolyeCiz(); });
   $$('[data-kullan]', kutu).forEach(b => b.onclick = () => { const t = $('#atLinkler'); if (!t.value.includes(b.dataset.kullan)) t.value = (t.value.trim() ? t.value.trim() + '\n' : '') + b.dataset.kullan; $('#atLinkDet').open = true; atLinkSay(); atSekme('yeni'); toast('Yeni çalışmanın örneklerine eklendi'); });
@@ -3317,7 +3319,7 @@ async function atAc(id, sessiz){
 async function markaCiz(){
   let g = []; try{ g = await (await fetch('/api/gecmis')).json(); }catch(e){}
   const liste = g.filter(x => x.marka && x.marka === MARKA_KOD);
-  $('#markaListe').innerHTML = liste.length ? liste.map(x => `<div class="mrow" data-t="${esc(x.temel)}"><span class="t"><b>${esc(x.baslik)}</b><small>${new Date(x.olusturma * 1000).toLocaleDateString('tr-TR', {day:'numeric', month:'long'})}${x.sure ? ' · ' + sure(x.sure) : ''}${x.marka_paket?.length ? ' · hazır: ' + x.marka_paket.map(p => ({kapak:'kapak', youtube:'YouTube', blog:'blog', shorts:'Shorts'})[p] || p).join(', ') : ' · paket henüz hazırlanmadı'}</small></span><button class="sbtn" type="button">Aç</button></div>`).join('') : '<div class="emptyh">Henüz bu seriye ait bir video yok. Kurgudan gelen videoyu yukarıya bırakın ya da kitaplıktan ekleyin.</div>';
+  $('#markaListe').innerHTML = liste.length ? liste.map(x => `<div class="mrow" data-t="${esc(x.temel)}"><span class="t"><b>${esc(x.baslik)}</b><small>${new Date(x.olusturma * 1000).toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long'})}${x.sure ? ' · ' + sure(x.sure) : ''}${x.marka_paket?.length ? ' · hazır: ' + x.marka_paket.map(p => ({kapak:'kapak', youtube:'YouTube', blog:'blog', shorts:'Shorts'})[p] || p).join(', ') : ' · paket henüz hazırlanmadı'}</small></span><button class="sbtn" type="button">Aç</button></div>`).join('') : '<div class="emptyh">Henüz bu seriye ait bir video yok. Kurgudan gelen videoyu yukarıya bırakın ya da kitaplıktan ekleyin.</div>';
   $$('#markaListe .mrow').forEach(r => r.onclick = () => sonucGoster(r.dataset.t));
 }
 $('#markaDosya').onclick = () => $('#markaFile').click();
@@ -3360,9 +3362,9 @@ function toplantiCiz(){
   const liste = hepsi.filter(x => !tMusteri || (x.musteri || 'Diğer') === tMusteri);
   if (!liste.length){ $('#tliste').innerHTML = '<div class="emptyh">Henüz toplantı kaydı yok. Bir toplantıya girdiğinizde kayıt kendiliğinden başlar; elle başlatmak için Kayıt’a basın.</div>'; return; }
   let html = '', sonGun = '';
-  liste.forEach(x => { const mz = /^(\d{4})-(\d{2})-(\d{2}) (\d{2})\.(\d{2})/.exec(x.baslik || ''); const d = mz ? new Date(+mz[1], mz[2]-1, +mz[3], +mz[4], +mz[5]) : new Date(x.olusturma * 1000); const gun = d.toLocaleDateString('tr-TR', {weekday:'long', day:'numeric', month:'long', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined});
+  liste.forEach(x => { const mz = /^(\d{4})-(\d{2})-(\d{2}) (\d{2})\.(\d{2})/.exec(x.baslik || ''); const d = mz ? new Date(+mz[1], mz[2]-1, +mz[3], +mz[4], +mz[5]) : new Date(x.olusturma * 1000); const gun = d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'long', day:'numeric', month:'long', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined});
     if (gun !== sonGun){ html += `<div class="tgun">${esc(gun)}</div>`; sonGun = gun; }
-    const saat = d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}); const konu = (x.baslik || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, '').replace(/ · [^·]+$/, '');
+    const saat = d.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}); const konu = (x.baslik || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, '').replace(/ · [^·]+$/, '');
     const kisiler = (x.katilimcilar && x.katilimcilar.length ? x.katilimcilar : Object.values(x.konusmacilar || {})).slice(0, 5).join(', ');
     html += `<div class="card tsat" data-t="${esc(x.temel)}"><span class="z">${saat}</span><span class="t"><b>${esc(konu || x.baslik)}</b><small>${[kisiler, x.sure ? sure(x.sure) : '', x.karar ? x.karar + ' karar' : '', x.yapilacak ? x.yapilacak + ' yapılacak' : '', x.adsiz ? `<span class="chip warn" title="Okuma görünümünde ad verin; sesi öğrenilir, bir daha sorulmaz">${x.adsiz} kişi adsız</span>` : ''].filter(Boolean).map(s => s.startsWith('<span') ? s : esc(s)).join(' · ')}</small></span><span class="r">${x.musteri && x.musteri !== 'Diğer' ? `<span class="kal">${esc(x.musteri)}</span>` : ''}${x.drive ? '<span class="kal" title="Drive’da">Drive</span>' : ''}</span></div>`; });
   $('#tliste').innerHTML = html;
@@ -3397,7 +3399,7 @@ async function sozCiz(sirketKod){
   if (SOZ.sek === 'tahmin') return tahminCiz(k, tahAcik, sirketKod);
   const l = SOZ.sek === 'sozlerin' ? benim : bekl, gor = SOZ.tumu ? l : l.slice(0, 5);
   const gunAd = o => { if (!o.son) return 'tarihsiz'; const d = new Date(o.son + 'T12:00'), b = new Date(); b.setHours(12, 0, 0, 0); const fark = Math.round((d - b) / 864e5);
-    return o.durum === 'gecikti' ? (fark === -1 ? 'dün' : `${-fark} gün gecikti`) : fark === 0 ? 'bugün' : fark === 1 ? 'yarın' : d.toLocaleDateString('tr-TR', {weekday:'short', day:'numeric', month:'short'}); };
+    return o.durum === 'gecikti' ? (fark === -1 ? 'dün' : `${-fark} gün gecikti`) : fark === 0 ? 'bugün' : fark === 1 ? 'yarın' : d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'short', day:'numeric', month:'short'}); };
   const gecikmis = benim.filter(o => o.durum === 'gecikti').length;
   k.innerHTML = `<div class="tsust"><div class="seg mini" id="tSozSek"><button type="button" data-v="sozlerin" aria-pressed="${SOZ.sek === 'sozlerin'}">Sizden <b>${benim.length}</b></button><button type="button" data-v="bekledigin" aria-pressed="${SOZ.sek === 'bekledigin'}">Başkalarından <b>${bekl.length}</b></button>${tahAcik.length ? `<button type="button" data-v="tahmin" aria-pressed="false">Tahminlerin <b>${tahAcik.length}</b></button>` : ''}</div>${gecikmis && SOZ.sek === 'sozlerin' ? `<span class="tsuyari">${gecikmis} iş gecikti</span>` : ''}</div>`
     + (l.length ? `<ul class="tsliste">${gor.map(o => `<li class="${o.durum}"><label><input type="checkbox" data-t="${esc(o.temel)}" data-k="${o.k}" data-i="${o.i}" title="Tamamlandı"></label><span class="tsis">${SOZ.sek === 'bekledigin' ? `<button type="button" class="tskisi" data-a="${esc(o.kim)}">${esc(o.kim)}</button> · ` : ''}${esc(o.is)}<button type="button" class="tskay" data-t="${esc(o.temel)}">${esc(o.konu)}</button></span><span class="tsgun">${o.durum === 'karar' ? 'kararınız' : esc(gunAd(o))}</span></li>`).join('')}</ul>`
@@ -3440,7 +3442,7 @@ function tahminCiz(k, acik, sirketKod){
   const sira = acik.slice().sort((a, b) => ((b.oneri ? 2 : 0) + ((a.bakilacak || '9') <= bugun ? 0 : 1)) - ((a.oneri ? 2 : 0) + ((b.bakilacak || '9') <= bugun ? 0 : 1)) || (a.bakilacak || '').localeCompare(b.bakilacak || ''));
   const isb = Object.entries(isabet).map(([m, x]) => `${esc(m)} %${Math.round(x.oran * 100)} (${x.adet})`).join(' · ');
   k.innerHTML = `<div class="tsust"><div class="seg mini" id="tSozSek"><button type="button" data-v="sozlerin" aria-pressed="false">Sizden</button><button type="button" data-v="bekledigin" aria-pressed="false">Başkalarından</button><button type="button" data-v="tahmin" aria-pressed="true">Tahminlerin <b>${acik.length}</b></button></div>${isb ? `<span class="hint">İsabet: ${isb}</span>` : ''}</div>`
-    + `<ul class="tsliste">${sira.map(t => { const zamani = (t.bakilacak || '9') <= bugun; return `<li class="${zamani ? 'bugun' : ''}"><span class="tsis">${esc(t.tahmin)}<button type="button" class="tskay" data-t="${esc(t.temel)}">${esc((t.toplanti || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, ''))} · güven %${Math.round((t.guven || .7) * 100)}</button>${t.oneri ? `<small class="tsoneri">Sonraki toplantıdan: “${esc(t.oneri.kanit || '')}” → ${({dogru: 'tutmuş', yanlis: 'tutmamış', kismen: 'kısmen'})[t.oneri.sonuc] || ''}</small>` : ''}</span><span class="tsbtn"><button type="button" data-id="${t.id}" data-s="dogru">Tuttu</button><button type="button" data-id="${t.id}" data-s="kismen">Kısmen</button><button type="button" data-id="${t.id}" data-s="yanlis">Tutmadı</button></span><span class="tsgun">${zamani ? 'sonucu belli' : esc(new Date(t.bakilacak + 'T12:00').toLocaleDateString('tr-TR', {day:'numeric', month:'short'}))}</span></li>`; }).join('')}</ul>`;
+    + `<ul class="tsliste">${sira.map(t => { const zamani = (t.bakilacak || '9') <= bugun; return `<li class="${zamani ? 'bugun' : ''}"><span class="tsis">${esc(t.tahmin)}<button type="button" class="tskay" data-t="${esc(t.temel)}">${esc((t.toplanti || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, ''))} · güven %${Math.round((t.guven || .7) * 100)}</button>${t.oneri ? `<small class="tsoneri">Sonraki toplantıdan: “${esc(t.oneri.kanit || '')}” → ${({dogru: 'tutmuş', yanlis: 'tutmamış', kismen: 'kısmen'})[t.oneri.sonuc] || ''}</small>` : ''}</span><span class="tsbtn"><button type="button" data-id="${t.id}" data-s="dogru">Tuttu</button><button type="button" data-id="${t.id}" data-s="kismen">Kısmen</button><button type="button" data-id="${t.id}" data-s="yanlis">Tutmadı</button></span><span class="tsgun">${zamani ? 'sonucu belli' : esc(new Date(t.bakilacak + 'T12:00').toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))}</span></li>`; }).join('')}</ul>`;
   k.classList.remove('hidden');
   $$('#tSozSek button').forEach(b => b.onclick = () => { SOZ.sek = b.dataset.v; SOZ.tumu = false; sozCiz(sirketKod); });
   k.querySelectorAll('.tskay').forEach(b => b.onclick = () => sonucGoster(b.dataset.t, {ozetOncelikli: true}));
@@ -3490,7 +3492,7 @@ async function izgaraCiz(){
   if (sirket && sirket.kod !== 'genel' && hepsi.length){
     const y = sirket.yorum, eski = !y || (Date.now() / 1000 - y.zaman > 86400 && hepsi.some(o => o.x.olusturma > y.zaman));
     yk.innerHTML = `<div class="ktop"><h4>Genel yorum</h4>${y ? `<button class="tiny" id="tYorumYenile" type="button">${sirket.yorum_hazirlaniyor ? 'Hazırlanıyor…' : 'Yenile'}</button>` : ''}</div>`
-      + (y ? `<div class="blogm ykisa" id="tYorumMetin">${mdHtml(y.metin)}</div><button class="tiny" id="tYorumAc" type="button">Devamını göster</button><p class="hint" style="margin:6px 0 0">${y.adet} toplantıya bakıldı · ${new Date(y.zaman * 1000).toLocaleString('tr-TR', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})}</p>` : `<p class="hint" style="display:flex;gap:8px;align-items:center"><span class="spin"></span>${esc(sirket.ad)} ile son toplantılarınız okunuyor; yarım dakika kadar sürer.</p>`);
+      + (y ? `<div class="blogm ykisa" id="tYorumMetin">${mdHtml(y.metin)}</div><button class="tiny" id="tYorumAc" type="button">Devamını göster</button><p class="hint" style="margin:6px 0 0">${y.adet} toplantıya bakıldı · ${new Date(y.zaman * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})}</p>` : `<p class="hint" style="display:flex;gap:8px;align-items:center"><span class="spin"></span>${esc(sirket.ad)} ile son toplantılarınız okunuyor; yarım dakika kadar sürer.</p>`);
     yk.classList.remove('hidden');
     const iste = async () => { await fetch(`/api/sirket/${sirket.kod}/yorum`, {method:'POST'}); const t = setInterval(async () => { await sirketlerYukle(true); const s2 = SIRKET.liste.find(x => x.kod === sirket.kod); if (!s2 || !s2.yorum_hazirlaniyor){ clearInterval(t); if (tSirket === sirket.kod) izgaraCiz(); } }, 4000); };
     if (eski && !sirket.yorum_hazirlaniyor) iste();
@@ -3512,7 +3514,7 @@ async function izgaraCiz(){
   if (false){ const z = new Date(sr.bas * 1000), dk = Math.round((sr.bas * 1000 - Date.now()) / 60000);
     const sm = ss ? Object.entries(ss.musteri_logolari || {}).find(([m]) => (sr.ad || '').toLocaleLowerCase('tr').includes(m.toLocaleLowerCase('tr'))) : null;
     const slogo2 = ss ? `<img class="tksl" src="${esc((sm && sm[1]) || ss.logo)}" alt="" title="${esc(ss.ad)}">` : '';
-    html += `<div class="tkart sira" role="button" tabindex="0" id="tSiraKart"><div class="tku"><span class="tkg">Sıradaki</span><span class="tks">${dk < 90 ? dk + ' dk sonra' : esc(z.toLocaleDateString('tr-TR', {weekday:'long'})) + ' ' + esc(z.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}))}</span></div><h3>${esc(sr.ad)}</h3><p>Toplantıdan 10 dakika önce önceki görüşmelerden açık işler ve bekleyen sorular burada hazır olur.</p><div class="tka"><span class="avs">${(sr.kisiler || []).slice(0, 4).map(k => `<i>${esc(basHarf(k))}</i>`).join('')}</span><span class="tksag">${(sr.kisiler || []).length > 4 ? `<span class="tkd">+${sr.kisiler.length - 4}</span>` : ''}${slogo2}</span></div></div>`; }
+    html += `<div class="tkart sira" role="button" tabindex="0" id="tSiraKart"><div class="tku"><span class="tkg">Sıradaki</span><span class="tks">${dk < 90 ? dk + ' dk sonra' : esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'long'})) + ' ' + esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}</span></div><h3>${esc(sr.ad)}</h3><p>Toplantıdan 10 dakika önce önceki görüşmelerden açık işler ve bekleyen sorular burada hazır olur.</p><div class="tka"><span class="avs">${(sr.kisiler || []).slice(0, 4).map(k => `<i>${esc(basHarf(k))}</i>`).join('')}</span><span class="tksag">${(sr.kisiler || []).length > 4 ? `<span class="tkd">+${sr.kisiler.length - 4}</span>` : ''}${slogo2}</span></div></div>`; }
   html += liste.map(o => tkartHtml(o, sirket)).join('');
   $('#tizgara').innerHTML = html || `<div class="emptyh">${sirket ? esc(sirket.ad) + ' ile henüz kayıtlı toplantı yok.' + ((sirket.musteriler || []).length ? ' ' + esc(sirket.musteriler.slice(0, 3).join(', ')) + ' konuşulan toplantılar kendiliğinden buraya gelir.' : '') : 'Henüz toplantı yok. Google Meet, Zoom ya da Teams toplantısına girdiğinizde kayıt kendiliğinden başlar.'}</div>`;
   tkartBagla();
@@ -3571,7 +3573,7 @@ function tOnayCiz(l){
   if (!l.length){ k.classList.add('hidden'); k.innerHTML = ''; return; }
   k.classList.remove('hidden');
   k.innerHTML = `<div class="tonh"><b>${l.length === 1 ? 'Bu kayıt bir toplantıya benzemiyor.' : `Bu ${l.length} kayıt toplantıya benzemiyor.`}</b><small>Toplantıysa ekleyin; özet, işler ve Drive klasörü o zaman hazırlanır.</small></div>`
-    + l.map(x => { const z = toplantiZamani(x); return `<div class="tonr" data-t="${esc(x.temel)}"><button type="button" class="tonad" title="Dinleyip kontrol etmek için açın"><b>${esc(toplantiKonu(x) || x.baslik)}</b><small>${esc(z.toLocaleDateString('tr-TR', {day:'numeric', month:'short'}))} · ${esc(z.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}))} · ${Math.max(1, Math.round((x.sure || 0) / 60))} dk${x.onay_neden ? ' · ' + esc(x.onay_neden) : ''}</small></button><span class="tonb"><button type="button" class="sbtn" data-k="0">Kaldır</button><button type="button" class="sbtn blue" data-k="1">Toplantı, ekle</button></span></div>`; }).join('');
+    + l.map(x => { const z = toplantiZamani(x); return `<div class="tonr" data-t="${esc(x.temel)}"><button type="button" class="tonad" title="Dinleyip kontrol etmek için açın"><b>${esc(toplantiKonu(x) || x.baslik)}</b><small>${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))} · ${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))} · ${Math.max(1, Math.round((x.sure || 0) / 60))} dk${x.onay_neden ? ' · ' + esc(x.onay_neden) : ''}</small></button><span class="tonb"><button type="button" class="sbtn" data-k="0">Kaldır</button><button type="button" class="sbtn blue" data-k="1">Toplantı, ekle</button></span></div>`; }).join('');
   k.querySelectorAll('.tonad').forEach(b => b.onclick = () => sonucGoster(b.closest('.tonr').dataset.t, {}));
   k.querySelectorAll('.tonb button').forEach(b => b.onclick = async () => { const t = b.closest('.tonr').dataset.t, kabul = b.dataset.k === '1';
     b.closest('.tonr').style.opacity = .45;
@@ -3612,7 +3614,7 @@ function tSorCevap(q){ const c = $('#tSorC'); if (!c) return;
   $('#tSorKapat').onclick = () => { TSOR.q = null; c.innerHTML = ''; }; }
 function tkartHtml({x, z}, sirket){ const sk = x => x.sirket || 'genel'; { const mus = (x.musteri && x.musteri !== 'Diğer') ? x.musteri : x.musteri_tahmin; const kr = srRenk((SIRKET.liste.find(s2 => s2.kod === sk(x)) || {}).renk || '#8E8E93'); const kisiler = toplantiKatilim(x);
     const srk = SIRKET.liste.find(s2 => s2.kod === sk(x)), slogo = !sirket && srk && srk.kod !== 'genel' ? (srk.logo ? `<img class="tksl" src="${esc(srk.logo)}" alt="" title="${esc(srk.ad)}">` : `<span class="tksl h" title="${esc(srk.ad)}">${esc(basHarf(srk.ad))}</span>`) : '';
-    return `<div class="tkart" role="button" tabindex="0" data-t="${esc(x.temel)}" style="--c:${esc(kr)}"><div class="tku"><span class="tkg">${esc(z.toLocaleDateString('tr-TR', {day:'numeric', month:'short'}))}</span><span class="tks">${esc(z.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}))}${x.sure ? ' · ' + Math.max(1, Math.round(x.sure / 60)) + ' dk' : ''}</span><button type="button" class="tkdaha" data-d="${esc(x.temel)}" title="Düzenle ya da kaldır" aria-label="Düzenle ya da kaldır">⋯</button></div>`
+    return `<div class="tkart" role="button" tabindex="0" data-t="${esc(x.temel)}" style="--c:${esc(kr)}"><div class="tku"><span class="tkg">${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))}</span><span class="tks">${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}${x.sure ? ' · ' + Math.max(1, Math.round(x.sure / 60)) + ' dk' : ''}</span><button type="button" class="tkdaha" data-d="${esc(x.temel)}" title="Düzenle ya da kaldır" aria-label="Düzenle ya da kaldır">⋯</button></div>`
       + `<h3>${esc(toplantiAdi(x))}</h3>${x.kisa ? `<p>${esc(x.kisa)}</p>` : '<p class="bos">Özet ilk açılışta hazırlanır.</p>'}`
       + `<div class="tka"><span class="tkkisi" title="${esc(kisiler.join(', '))}">${esc(kisiler.slice(0, 3).map(k => k.split(' ')[0]).join(', '))}${kisiler.length > 3 ? ` +${kisiler.length - 3}` : ''}</span><span class="tksag">${x.benim_is ? `<span class="tkis">${x.benim_is} işiniz</span>` : mus ? `<span class="tkm">${esc(mus)}</span>` : ''}${slogo}</span></div></div>`; } }
 /* Kişi profilleri (kisiler.py): şirket sayfasında kişiler satırı; tıklayınca kişinin sayfası (bilmen gereken, ondan beklediklerin, senden istedikleri) */
@@ -3642,7 +3644,7 @@ async function kapsamKartCiz(sirket){
   if (!oz || !oz.istekler.length){ k.classList.add('hidden'); return; }
   const tutar = d.gun_ucreti ? Math.round(oz.saat / (d.gun_saat || 8) * d.gun_ucreti) : 0;
   k.innerHTML = `<div class="ktop"><h4>Kapsam dışı istekler · son 30 gün</h4><button class="tiny" id="tKapsamEp" type="button" title="Ek işleri ayrı kalem olarak öneren kibar bir e-posta; Mail’de gönderilmemiş taslak olarak açılır">Ek iş e-postası</button></div>`
-    + `<div class="kpb"><b>~${Math.round(oz.saat)} saat</b>${tutar ? `<span>≈ ${tutar.toLocaleString('tr-TR')} ${esc(d.para)}</span>` : ''}<small>${oz.istekler.length} istek, anlaşılan işin dışında${tutar ? '' : ' · tutarı görmek için Ayarlar’da gün ücretinizi girin'}</small></div>`
+    + `<div class="kpb"><b>~${Math.round(oz.saat)} saat</b>${tutar ? `<span>≈ ${tutar.toLocaleString(((window.DIL || {}).locale || 'tr-TR'))} ${esc(d.para)}</span>` : ''}<small>${oz.istekler.length} istek, anlaşılan işin dışında${tutar ? '' : ' · tutarı görmek için Ayarlar’da gün ücretinizi girin'}</small></div>`
     + `<ul class="kpl">${oz.istekler.slice(0, 6).map(x => `<li><span><b>${esc(x.istek)}</b><small>${esc([x.kim, (x.toplanti || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, '').replace(/ · [^·]+$/, '')].filter(Boolean).join(' · '))}</small></span><em>~${x.saat} sa</em></li>`).join('')}</ul>`
     + (oz.istekler.length > 6 ? `<p class="hint" style="margin:6px 0 0">+${oz.istekler.length - 6} istek daha</p>` : '');
   k.classList.remove('hidden');
@@ -3716,15 +3718,15 @@ async function bugunCiz(){
     ogeler.push({z: new Date(b), ad: kay ? toplantiAdi(kay.x) : e.ad, kisiler: kay ? (kay.x.katilimcilar?.length ? kay.x.katilimcilar : Object.values(kay.x.konusmacilar || {})) : e.kisiler, kay: kay?.x, durum: kay ? 'kayit' : simdi < b ? 'sonra' : simdi <= s ? 'simdi' : 'gecti', b, s}); });
   kayitlar.filter(o => !kullanildi.has(o.x.temel)).forEach(o => ogeler.push({z: o.z, ad: toplantiAdi(o.x), kisiler: o.x.katilimcilar?.length ? o.x.katilimcilar : Object.values(o.x.konusmacilar || {}), kay: o.x, durum: 'kayit'}));
   ogeler.sort((a, b) => a.z - b.z);
-  const saat = z => z.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+  const saat = z => z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'});
   const ne = o => { if (o.durum === 'kayit'){ const x = o.kay; return [x.sure ? sure(x.sure) : '', x.karar ? x.karar + ' karar' : '', x.yapilacak ? x.yapilacak + ' yapılacak' : ''].filter(Boolean).join(' · '); }
     if (o.durum === 'sonra'){ const dk = Math.round((o.b - simdi) / 60000); return dk < 60 ? `${dk} dk sonra` : dk < 180 ? `${Math.floor(dk / 60)} sa ${dk % 60 ? dk % 60 + ' dk ' : ''}sonra` : ''; }
     if (o.durum === 'simdi') return 'şu an'; return 'kayıt yok'; };
-  let html = `<div class="tbh"><h3>${new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', weekday:'long'})}</h3></div>`;
+  let html = `<div class="tbh"><h3>${new Date().toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long', weekday:'long'})}</h3></div>`;
   if (!ogeler.length){
     const son = (state.tumListe || []).filter(x => x.toplanti).map(x => ({x, z: toplantiZamani(x)})).sort((a, b) => b.z - a.z)[0];
     const sr = bugunTakvim.sira, srz = sr ? new Date(sr.bas * 1000) : null;
-    html += `<div class="tbos">${bugunTakvim.bagli ? 'Bugün takvimde görüşme yok.' : 'Bugün henüz bir görüşme yok.'}${sr ? `<span class="srd">Sıradaki: <b>${esc(sr.ad)}</b> · ${esc(srz.toLocaleDateString('tr-TR', {weekday:'long'}))} ${esc(srz.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}))}</span>` : ''}${son ? ` <button class="textbtn" type="button" data-t="${esc(son.x.temel)}">En son: ${esc(toplantiKonu(son.x))} · ${son.z.toLocaleDateString('tr-TR', {day:'numeric', month:'long'})}</button>` : ''}</div>`;
+    html += `<div class="tbos">${bugunTakvim.bagli ? 'Bugün takvimde görüşme yok.' : 'Bugün henüz bir görüşme yok.'}${sr ? `<span class="srd">Sıradaki: <b>${esc(sr.ad)}</b> · ${esc(srz.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'long'}))} ${esc(srz.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}</span>` : ''}${son ? ` <button class="textbtn" type="button" data-t="${esc(son.x.temel)}">En son: ${esc(toplantiKonu(son.x))} · ${son.z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long'})}</button>` : ''}</div>`;
   } else {
     html += '<div class="tak">' + ogeler.map(o => `<div class="tako ${o.durum}" ${o.kay ? `data-t="${esc(o.kay.temel)}" role="button" tabindex="0"` : ''}><span class="z">${saat(o.z)}</span><span class="nk"></span><span class="t"><b>${esc(o.ad)}</b><small>${esc((o.kisiler || []).slice(0, 4).join(', '))}${(o.kisiler || []).length > 4 ? ` +${o.kisiler.length - 4}` : ''}</small></span><span class="r">${esc(ne(o))}</span></div>`).join('') + '</div>';
   }
@@ -3877,7 +3879,7 @@ function renderJobMedya(d, el){
   const kal = dl ? (d.kalite ? kaliteAd(d.kalite) : '') : [d.dikey ? 'dikey 9:16' : '', d.altyazisiz ? 'altyazısız' : (d.dil && d.dil !== 'orijinal' ? dilAdi(d.dil) + ' altyazı' : 'Orijinal altyazı'), d.altyazisiz ? '' : (d.stil === 'sade' ? 'sade' : 'kutulu')].filter(Boolean).join(' · ');
   if (d.durum === 'bitti'){ w = 100; st = `<span style="color:var(--green)">${dl ? 'İndi' : 'Hazır'}</span>`; sub = [d.boyut ? boyutMetni(d.boyut) : '', d.cozunurluk || (d.kalite === 'mp3' ? 'MP3' : '')].filter(Boolean).join(' · '); }
   else if (bitti){ st = `<span style="color:var(--red)">${d.durum==='hata' ? (dl ? 'İndirilemedi' : 'Üretilemedi') : 'Durduruldu'}</span>`; }
-  else if (d.durum === 'sirada'){ st = 'Sırada'; sub = (d.sira_no > 1 ? `${d.sira_no}. sırada` : 'önündeki iş bitince başlar') + (d.tahmini_bitis ? ` · tahmini bitiş ${new Date(d.tahmini_bitis * 1000).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}` : ''); ind = true; }
+  else if (d.durum === 'sirada'){ st = 'Sırada'; sub = (d.sira_no > 1 ? `${d.sira_no}. sırada` : 'önündeki iş bitince başlar') + (d.tahmini_bitis ? ` · tahmini bitiş ${new Date(d.tahmini_bitis * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'})}` : ''); ind = true; }
   else if (dl && d.adim === 2){ if (d.ilerleme > 0){ w = d.ilerleme; st = `İndiriliyor · ${d.ilerleme}%`; } else { st = 'İndiriliyor'; ind = true; }
     sub = [d.parca > 1 ? 'ses parçası' : '', d.hiz || '', d.eta ? `${d.eta} kaldı` : '', d.boyut_metni || ''].filter(Boolean).join(' · '); }
   else if (dl && d.adim === 3){ st = 'Birleştiriliyor'; w = 99; ind = true; sub = d.kalite === 'mp3' ? 'ses dönüştürülüyor' : 'görüntü ve ses mp4 olarak'; }
@@ -4375,7 +4377,7 @@ const ghBin = n => n >= 1e6 ? (n / 1e6).toFixed(1).replace('.', ',') + ' mn' : n
 const ghHost = u => { try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(e){ return ''; } };
 const ghPost = (u, b) => fetch(u, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(b || {})})
   .then(r => r.json().catch(() => ({})).then(j => ({...j, _ok: r.ok}))).catch(() => ({hata: 'Siteye ulaşılamadı', _ok: false}));
-const ghTarih = (t, saat) => new Date(t * 1000).toLocaleString('tr-TR', saat ? {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'} : {day: 'numeric', month: 'short'});
+const ghTarih = (t, saat) => new Date(t * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), saat ? {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'} : {day: 'numeric', month: 'short'});
 const ghAnahtar = x => x.temel + '#' + x.i;
 const GH_SVG = {mik: '<svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
   ok: '<svg class="ok" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>', tik: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
@@ -4455,7 +4457,7 @@ function ghKaynakSatir(x){
   // 2026-10-23 (ChatGPT brifi): hangi kaynaktan beslendiği, tarihi ve kullanıcının kattığı taslağın yanında; çalışma kaydı kanıtı görünür
   const k = x.kaynak && typeof x.kaynak === 'object' ? x.kaynak : null;
   if (!k && !x.katki && !x.yayin) return '';
-  const tarih = k && k.tarih ? (() => { const d = new Date(String(k.tarih).replace(' ', 'T')); return isNaN(d) ? k.tarih : d.toLocaleDateString('tr-TR', {day: 'numeric', month: 'long'}) + (String(k.tarih).length > 10 ? ' ' + d.toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}) : ''); })() : '';
+  const tarih = k && k.tarih ? (() => { const d = new Date(String(k.tarih).replace(' ', 'T')); return isNaN(d) ? k.tarih : d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long'}) + (String(k.tarih).length > 10 ? ' ' + d.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'}) : ''); })() : '';
   const parca = [];
   if (k && (k.tur || k.baslik)) parca.push(`<span><b>${esc(k.tur ? k.tur[0].toLocaleUpperCase('tr') + k.tur.slice(1) : 'Kaynak')}:</b> ${esc(String(k.baslik || '').slice(0, 110))}${tarih ? ' · ' + esc(tarih) : ''}${k.tur === 'çalışma kaydı' && k.kanit ? ` · kayıt ${esc(k.kanit)}` : ''}</span>`);
   if (x.kaynak_cumle) parca.push(`<span class="gh-kc"><b>Kaynakta:</b> “${esc(x.kaynak_cumle)}”</span>`);
@@ -4532,17 +4534,17 @@ function ghGunEkle(g, n){ const d = new Date(g + 'T12:00'); d.setDate(d.getDate(
 function ghGunNav(){
   const bugun = new Date().toLocaleDateString('sv'), g = GH.gun || bugun, ilk = ghGunEkle(bugun, -30);
   return `<div class="gh-gun"><button class="ghb kucuk ikon" type="button" data-g="gungit" data-n="-1" title="Önceki gün" aria-label="Önceki gün" ${g <= ilk ? 'disabled' : ''}>‹</button>`
-    + `<button class="ghb kucuk" type="button" data-g="takvim" title="Takvimden bir gün seçin">${GH.gun ? esc(new Date(g + 'T12:00').toLocaleDateString('tr-TR', {day: 'numeric', month: 'short'})) : 'Takvim'}</button>`
+    + `<button class="ghb kucuk" type="button" data-g="takvim" title="Takvimden bir gün seçin">${GH.gun ? esc(new Date(g + 'T12:00').toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'short'})) : 'Takvim'}</button>`
     + `<input type="date" class="gh-takvim" id="ghTakvim" value="${g}" min="${ilk}" max="${bugun}" tabindex="-1" aria-hidden="true">`
     + `<button class="ghb kucuk ikon" type="button" data-g="gungit" data-n="1" title="Sonraki gün" aria-label="Sonraki gün" ${GH.gun ? '' : 'disabled'}>›</button></div>`;
 }
 /* geçmiş bir günün önerileri (22 Ekim: "eski dönem önerilerine özellikle tıklayarak ulaşmalıyım; takvimden o güne geçebilmeliyim") */
 function ghGecmisGun(){
   const g = GH.gun, d = GH.d || {}, T = (d.taslaklar || []).filter(x => x.gun === g), P = (d.paylasilan || []).filter(x => x.gun === g), K0 = (d.kaldirilanlar || []).filter(x => x.gun === g).length;
-  const baslik = new Date(g + 'T12:00').toLocaleDateString('tr-TR', {day: 'numeric', month: 'long', weekday: 'long'});
+  const baslik = new Date(g + 'T12:00').toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long', weekday: 'long'});
   if (!(g in GH.kGun)){ GH.kGun[g] = null; fetch('/api/kesif?gun=' + g).then(r => r.json()).then(j => { GH.kGun[g] = j.kesif || {}; if (GH.gun === g) ghCiz(); }).catch(() => {}); }
   let h = `<header class="gh-bas"><div><h2>${esc(baslik)}. <span>${T.length + P.length + K0 ? `${T.length + P.length + K0} öneri` : 'Öneri yok.'}</span></h2>${P.length ? `<p>${P.length} paylaşıldı</p>` : ''}</div>${ghGunNav()}</header>`;
-  if (P.length) h += `<div class="gh-liste gh-zaman">${P.map(x => `<div class="gh-ok">${GH_SVG.tik}<span>${esc(x.metin)}</span><small>${new Date(x.paylasim_zaman * 1000).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}</small></div>`).join('')}</div>`;
+  if (P.length) h += `<div class="gh-liste gh-zaman">${P.map(x => `<div class="gh-ok">${GH_SVG.tik}<span>${esc(x.metin)}</span><small>${new Date(x.paylasim_zaman * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'})}</small></div>`).join('')}</div>`;
   if (T.length) h += `<div class="gh-liste">${T.map((x, i) => ghKart(x, GH.acik[ghAnahtar(x)] ?? i === 0, true)).join('')}</div>`;
   const K = (d.kaldirilanlar || []).filter(x => x.gun === g);
   if (K.length) h += `<details class="gh-kald"><summary>Kaldırılan öneriler (${K.length})</summary>${K.map(x => `<div class="gh-kald-s"><p>${esc(x.metin)}</p><small>${esc(ghAlan(x.alan)[2])}${x.neden ? ' · ' + esc(x.neden) : ''}</small><button class="ghb kucuk" type="button" data-g="gerigetir" data-t="${esc(x.temel)}" data-i="${x.i}">Geri getir</button></div>`).join('')}</details>`;
@@ -4574,7 +4576,7 @@ function ghBugun(){
   // bir seferde bir gönderi; sıradakiler altta kısa liste (tıklayınca öne gelir)
   const gec = ghGecilen(), sirali = [...bugun.filter(x => !gec.has(ghAnahtar(x))), ...bugun.filter(x => gec.has(ghAnahtar(x)))];
   const simdi = sirali.find(x => ghAnahtar(x) === GH.on) || sirali[0], kalan = sirali.filter(x => x !== simdi);
-  if (Px.length || simdi) h += `<div class="gh-liste gh-zaman">${Px.map(x => `<div class="gh-ok">${GH_SVG.tik}<span>${esc(x.metin)}</span><small>${new Date(x.paylasim_zaman * 1000).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}</small></div>`).join('')}${simdi ? ghKart(simdi, true) : ''}</div>`;
+  if (Px.length || simdi) h += `<div class="gh-liste gh-zaman">${Px.map(x => `<div class="gh-ok">${GH_SVG.tik}<span>${esc(x.metin)}</span><small>${new Date(x.paylasim_zaman * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'})}</small></div>`).join('')}${simdi ? ghKart(simdi, true) : ''}</div>`;
   if (simdi && kalan.length){ const G = kalan.slice(0, 5);
     h += `<section class="gh-sira2"><div class="gh-sira2-ust"><span class="gh-ara"><i></i>Sırada · ${kalan.length}</span><button class="ghb kucuk" type="button" data-g="gec" data-k="${esc(ghAnahtar(simdi))}" title="Şu anki gönderiyi sona atar">Bunu geç</button></div>
       ${G.map(x => `<button type="button" class="gh-sira2-b" data-g="ghon" data-k="${esc(ghAnahtar(x))}">${ghIk(x.alan)}<b>${esc(x.plan_dilim || ghAlan(x.alan)[2])}</b><span>${esc(String(x.metin || ''))}</span></button>`).join('')}
@@ -4592,7 +4594,7 @@ function ghBugun(){
 function ghToplanti(){
   const t = GH.t?.toplanti; if (!t || t.gun !== new Date().toLocaleDateString('sv') || t.durum === 'bitti') return '';
   if (t.durum === 'yaziliyor' || GH.t?.yaziliyor) return `<div class="gh-haz"><i class="spin"></i><span><b>Kararlarınızla yazılıyor</b> · ${t.konular.filter(k => k.cevap).length} konuda sizin cevabınız merkezde</span></div>`;
-  const saat = new Date(t.son * 1000).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'});
+  const saat = new Date(t.son * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'});
   const sec = t.konular.filter(k => k.karar === 'yaz').length, gc = t.konular.filter(k => k.karar === 'gec').length;
   return `<section class="gh-top" data-tid="${esc(t.id)}"><header><div><b>Konu toplantısı</b><small>${t.konular.length} konu · seçtikleriniz ve cevaplarınızla yazılır; ${saat}’e kadar karar vermezseniz hepsi yazılır.</small></div>
     <button class="ghb ana kucuk" type="button" data-g="tkbitir">Yazmaya başla${sec || gc ? ` (${sec} seçili, ${gc} geçildi)` : ''}</button></header>
@@ -4727,7 +4729,7 @@ function ghSecki(){
   if (!d.bagli) return `<section class="gh-sayfa-kart">${bas('Drive’daki “Günlük Okuma ve Yayın Seçkisi” her sabah buraya gelir; her konuda sizin karşılığınız sorulur. Ghost Drive’ı yalnızca okur.')}<p class="gh-ipucu">Bağlan’a basınca tarayıcıda Google onay sayfası açılır; “İzin ver”e basmanız yeterli.</p></section>`;
   const s = d.secki, Y = d.yazilan || {};
   if (!s) return `<section class="gh-sayfa-kart">${bas(d.calisiyor ? 'Okunuyor…' : 'Bugün için seçki yok. Yeni seçki gelince burada görünür.')}</section>`;
-  return `<section class="gh-sayfa-kart">${bas(esc(new Date(s.tarih + 'T12:00').toLocaleDateString('tr-TR', {day: 'numeric', month: 'long'})) + (s.ozet ? ' · ' + esc(s.ozet) : ''))}
+  return `<section class="gh-sayfa-kart">${bas(esc(new Date(s.tarih + 'T12:00').toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long'})) + (s.ozet ? ' · ' + esc(s.ozet) : ''))}
     ${(s.konular || []).map(x => { const an = `${s.tarih}:${x.no}`; return `<div class="gh-sat"><div><b>${esc(x.baslik)}</b><p>${esc(String(x.metin || '').slice(0, 300))}${String(x.metin || '').length > 300 ? '…' : ''}</p>${x.kanit_siniri ? `<small>Kanıt sınırı: ${esc(x.kanit_siniri)}</small>` : ''}
       ${Y[an] ? '<small class="yesil">Taslağı yazıldı · Taslaklar’da</small>' : ghGir('Bunun sizde bir karşılığı var mı? İşinizden ya da gözleminizden bir cümle', `data-g="seckigonder" data-an="${esc(an)}"`, 'Gönderiye çevir').replace('<div><button', `<div><button class="ghb kucuk sol" type="button" data-g="seckiyok" data-an="${esc(an)}">Karşılığım yok, yine de yaz</button><button`)}</div></div>`; }).join('')}</section>`;
 }
@@ -5500,12 +5502,12 @@ async function onBrifingCiz(){
   const s = d.siradaki; const kayit = s ? (d.kayitlar || []).find(x => x.id === s.id) : null;
   if (!s){ k.innerHTML = ''; return; }
   const dk = Math.round((s.bas * 1000 - Date.now()) / 60000);
-  const ne = dk > 0 ? (dk < 90 ? `${dk} dk sonra` : new Date(s.bas * 1000).toLocaleString('tr-TR', {weekday:'long', hour:'2-digit', minute:'2-digit'})) : 'başladı';
+  const ne = dk > 0 ? (dk < 90 ? `${dk} dk sonra` : new Date(s.bas * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'long', hour:'2-digit', minute:'2-digit'})) : 'başladı';
   if (document.activeElement && document.activeElement.id === 'obAmac') return;   // yazarken yenilenmesin
   const z = new Date(s.bas * 1000), bugunMu = z.toDateString() === new Date().toDateString();
-  const ne2 = dk <= 0 ? 'başladı' : dk < 90 ? `${dk} dk sonra` : bugunMu ? 'bugün' : z.toLocaleDateString('tr-TR', {weekday: 'long'});
+  const ne2 = dk <= 0 ? 'başladı' : dk < 90 ? `${dk} dk sonra` : bugunMu ? 'bugün' : z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday: 'long'});
   s.kisiler = [...new Set(s.kisiler || [])];
-  k.innerHTML = `<div class="ozet tsira"><div class="tsu"><span>Sıradaki · ${esc(ne2)} ${esc(z.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}))}</span><button class="tiny" id="obHazirla" type="button" title="Aynı kişilerle önceki toplantılardan açık işler ve bekleyen sorular">${kayit ? 'Yenile' : 'Hazırlık notu çıkar'}</button></div>`
+  k.innerHTML = `<div class="ozet tsira"><div class="tsu"><span>Sıradaki · ${esc(ne2)} ${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}</span><button class="tiny" id="obHazirla" type="button" title="Aynı kişilerle önceki toplantılardan açık işler ve bekleyen sorular">${kayit ? 'Yenile' : 'Hazırlık notu çıkar'}</button></div>`
     + `<h3>${esc(s.ad)}</h3>${s.kisiler.length ? `<p class="tsk">${esc(s.kisiler.slice(0, 5).join(', '))}${s.kisiler.length > 5 ? ` ve ${s.kisiler.length - 5} kişi` : ''}</p>` : ''}`
     + `<label class="obamac"><small>Bu toplantıdan ne çıkmalı?</small><input id="obAmac" type="text" maxlength="300" placeholder="Örn. çekim tarihi ve bütçe onayı" autocomplete="off"></label>`
     + (kayit ? `<div class="blogm">${mdHtml(kayit.metin)}</div>` : `<p class="hint" style="margin:4px 0 0">Toplantıdan 10 dakika önce, aynı kişilerle önceki görüşmelerin açık işleri burada olur.</p>`) + '</div>';
@@ -5537,7 +5539,7 @@ async function haftalikCiz(tur, hedef){
   kutu.innerHTML = `<div class="ozet"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h4>${ad}</h4><span style="display:flex;gap:6px;flex-wrap:wrap">`
     + (son ? `<a class="tiny" href="/ozet-indir/${encodeURIComponent(son.ad)}.docx" download>Word</a>` + (tur === 'musteri' ? `<button class="tiny" data-h="gonder" type="button">E-postayla gönder</button>` : '') : '')
     + `<button class="tiny" data-h="uret" type="button" ${calisiyor ? 'disabled' : ''}>${calisiyor ? 'Hazırlanıyor…' : (son ? 'Yenile' : 'Şimdi hazırla')}</button></span></div>`
-    + (son ? `<details><summary class="hint">${esc(son.baslik)} · ${new Date(son.tarih * 1000).toLocaleString('tr-TR', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})} · göstermek için tıklayın</summary><div class="blogm">${mdHtml(md)}</div></details>` : `<p class="hint" style="margin:4px 0 0">${aciklama}</p>`)
+    + (son ? `<details><summary class="hint">${esc(son.baslik)} · ${new Date(son.tarih * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})} · göstermek için tıklayın</summary><div class="blogm">${mdHtml(md)}</div></details>` : `<p class="hint" style="margin:4px 0 0">${aciklama}</p>`)
     + (d.durum.hata && d.durum.tur === tur && !calisiyor ? `<p class="hint" style="margin:6px 0 0">${esc(d.durum.hata)}</p>` : '') + '</div>';
   const u = kutu.querySelector('[data-h="uret"]'); if (u) u.onclick = async () => { u.disabled = true; u.textContent = 'Hazırlanıyor…';
     const r = await fetch('/api/haftalik/' + tur, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}); if (!r.ok){ const j = await r.json(); toast(j.hata || 'Başlatılamadı'); }
@@ -5550,7 +5552,7 @@ function notlarHtml(v){
   const brief = v.brief ? `<details class="brief"><summary><b>Brief</b> <span class="hint">· göstermek için tıklayın</span></summary><div style="display:flex;gap:6px;margin:8px 0"><a class="tiny" href="/indir/${encodeURIComponent(state.aktifTemel)}.brief.docx" download>Word</a><button class="tiny" id="briefKopya" type="button">Kopyala</button></div><div class="blogm">${mdHtml(v.brief.metin)}</div></details>` : '';
   if (!n) return ust + `<div class="yok"><span>Notlar henüz hazırlanmadı.</span></div>` + brief;
   const yap = (n.yapilacaklar || []).map(y => `<li>${esc(y.is)}${y.kim ? ` <span class="hint">— ${esc(y.kim)}</span>` : ''}${y.ne_zaman ? ` <span class="hint">(${esc(y.ne_zaman)})</span>` : ''}</li>`).join('');
-  return ust + (g ? `<div class="hint" style="margin:-4px 0 8px">${g.hata ? 'Gönderilemedi: ' + esc(g.hata) : 'Gönderildi: ' + esc(g.alici) + ' · ' + new Date(g.zaman * 1000).toLocaleString('tr-TR', {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})}</div>` : '')
+  return ust + (g ? `<div class="hint" style="margin:-4px 0 8px">${g.hata ? 'Gönderilemedi: ' + esc(g.hata) : 'Gönderildi: ' + esc(g.alici) + ' · ' + new Date(g.zaman * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})}</div>` : '')
     + (n.baglam ? `<h4>Bağlam</h4><p>${esc(n.baglam)}</p>` : '') + (n.konular?.length ? `<h4>Konuşulanlar</h4>${n.konular.map(k => `<p><b>${esc(k.baslik)}</b><br>${esc(k.ozet)}</p>`).join('')}` : '')
     + (n.kararlar?.length ? `<h4>Kararlar</h4><ul>${n.kararlar.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : '') + (yap ? `<h4>Yapılacaklar</h4><ul class="todo">${yap}</ul>` : '')
     + (n.acik_sorular?.length ? `<h4>Açık sorular</h4><ul>${n.acik_sorular.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : '') + (n.sonraki_adimlar?.length ? `<h4>Sonraki adımlar</h4><ul>${n.sonraki_adimlar.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : '') + brief;
@@ -5637,7 +5639,7 @@ new MutationObserver(() => { const acik = !$('#resultSec').classList.contains('h
 function gorece(ifade, tg){
   const t = String(ifade || '').trim(), bugun = new Date(); if (!tg || tg.toDateString() === bugun.toDateString()) return t;
   const kucuk = t.toLocaleLowerCase('tr'), gun = n => { const d = new Date(tg); d.setDate(d.getDate() + n); return d; };
-  const yaz = d => d.toLocaleDateString('tr-TR', {day: 'numeric', month: 'long', weekday: 'short'});
+  const yaz = d => d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long', weekday: 'short'});
   let d = null;
   if (/\bbugün|bu akşam|toplantıdan sonra\b/.test(kucuk)) d = gun(0);
   else if (/\byarın/.test(kucuk)) d = gun(1);
@@ -5666,7 +5668,7 @@ function kisacaHtml(v){
   const benden = benimK.length || sk.length ? `<h4 style="margin-top:18px">Sizden beklenenler</h4>${gorevDurumHtml(v)}<div class="kkisiler">${benimK.map(([p, ki]) => kisiHtml(p, ki)).join('')}`
     + (sk.length ? `<div class="kkisi"><div class="kkb"><span class="av">!</span><b>Kararınız bekleniyor</b></div><ul>${sk.map(x => `<li><span>${esc(x.konu)}</span>${zt(x.sn)}${kanit(x)}</li>`).join('')}</ul></div>` : '') + '</div>' : '';
   // Karar zinciri (karar_zinciri.py): bu karar öncekini değiştirdi/geri aldı/teyit etti; ya da sonraki bir toplantıda değişti
-  const gun = t => t ? new Date(t + 'T12:00').toLocaleDateString('tr-TR', {day: 'numeric', month: 'long'}) : '';
+  const gun = t => t ? new Date(t + 'T12:00').toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long'}) : '';
   const zl = z => `<a class="kzl" href="#t=${encodeURIComponent(z.temel)}" data-zt="${esc(z.temel)}" data-zsn="${z.sn ?? ''}" title="${esc(z.karar || '')}">${esc(gun(z.tarih))}</a>`;
   const zincir = x => (x.zincir || []).map(z => `<span class="kzincir ${z.iliski}">${({degistirdi: 'Değiştirdi', geri_aldi: 'Geri aldı', teyit: 'Teyit etti'})[z.iliski]}: ${zl(z)} kararı · ${esc(z.aciklama || z.karar || '')}</span>`).join('')
     + (x.sonra || []).map(z => `<span class="kzincir sonra ${z.iliski}">${z.iliski === 'teyit' ? `${zl(z)} yeniden onaylandı` : `${zl(z)} ${z.iliski === 'geri_aldi' ? 'geri alındı' : 'değişti'}`}${z.aciklama ? ' · ' + esc(z.aciklama) : ''}</span>`).join('');
@@ -5680,7 +5682,7 @@ function kisacaHtml(v){
 }
 /* Künye (2026-10-23, ChatGPT brifi Ortak 4): kaynak, ne zaman işlendi, son değişiklik, hangi yöntem/model, hangi Video Hub sürümü; salt okunur dışa aktarım bağlantıları */
 function kunyeHtml(v, temel){ const k = v.kunye; if (!k) return '';
-  const tz = t => t ? new Date(t * 1000).toLocaleString('tr-TR', {day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : '';
+  const tz = t => t ? new Date(t * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : '';
   const kay = k.kaynak || {}, e = encodeURIComponent(temel);
   const satir = (ad, deger) => deger ? `<div><dt>${esc(ad)}</dt><dd>${deger}</dd></div>` : '';
   return `<details class="kunye"><summary>Bu kayıt hakkında</summary><dl>`
@@ -5717,7 +5719,7 @@ function sinyalHtml(v){
   if (kd.length) h += `<div class="sgblok"><h5>Kapsam dışı ${kd.length} istek · ~${Math.round(saat)} saat</h5>${kd.map(x => `<div class="sgsat">${z(x.zaman, x.sn)}<span><b>${esc(x.istek)}</b>${x.kim ? ` <em>${esc(x.kim)}</em>` : ''}<small>${esc(x.neden || '')}</small></span><span class="sgsaat">~${x.saat} sa</span></div>`).join('')}</div>`;
   if ((y.celiskiler || []).length) h += `<div class="sgblok kirmizi"><h5>Önceden şöyle denmişti</h5>${y.celiskiler.map(c => `<div class="sgsat">${z(c.zaman, c.sn)}<span><b>${esc(c.konu || '')}</b><small>Şimdi: “${esc(c.simdi || '')}”</small><small>Önce (${esc((c.once_toplanti || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, '').slice(0, 40))}): ${esc(c.once || '')}</small></span></div>`).join('')}</div>`;
   if (kirik.length) h += `<div class="sgblok"><h5>İlişkide kırılma</h5>${kirik.map(k => `<div class="sgsat">${z(k.zaman, k.sn)}<span><b><button type="button" class="sgkisi" data-kisi="${esc(k.kim || '')}">${esc(k.kim || '')}</button>: ${esc(k.sinyal || '')}</b>${k.alinti ? `<small>“${esc(k.alinti)}”</small>` : ''}${k.onarim ? `<span class="sgonar">Bir sonraki görüşmede: ${esc(k.onarim)}</span>` : ''}</span></div>`).join('')}</div>`;
-  if ((y.tahminler || []).length) h += `<div class="sgblok"><h5>Tahminin</h5>${y.tahminler.map(t => `<div class="sgsat">${z(t.zaman, t.sn)}<span><b>${esc(t.tahmin)}</b><small>Güven %${Math.round((t.guven || 0.7) * 100)} · ${(() => { const g = new Date(toplantiZamani(v).getTime() + (t.bakilacak || 42) * 864e5); return g < new Date() ? 'sonucu belli olmalı; Toplantılar sayfasında “Tahminlerin”den işaretleyin' : g.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}) + ' gibi sorulacak'; })()}</small></span></div>`).join('')}</div>`;
+  if ((y.tahminler || []).length) h += `<div class="sgblok"><h5>Tahminin</h5>${y.tahminler.map(t => `<div class="sgsat">${z(t.zaman, t.sn)}<span><b>${esc(t.tahmin)}</b><small>Güven %${Math.round((t.guven || 0.7) * 100)} · ${(() => { const g = new Date(toplantiZamani(v).getTime() + (t.bakilacak || 42) * 864e5); return g < new Date() ? 'sonucu belli olmalı; Toplantılar sayfasında “Tahminlerin”den işaretleyin' : g.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long'}) + ' gibi sorulacak'; })()}</small></span></div>`).join('')}</div>`;
   return h ? `<h4>Sinyaller</h4>${h}` : `<h4>Sinyaller</h4><p class="hint" style="margin:0">Bu toplantıda kapsam dışı istek, çelişki, kırılma ya da tahmin yok.</p>`;
 }
 const TSEKMELER = [['ozet', 'Özet'], ['danisman', 'Size özel'], ['transkript', 'Transkript']];   // v21: Notlar Özet'e, Tarifler Size özel'e katıldı
@@ -5737,7 +5739,7 @@ async function toplantiSayfasiKur(temel, v, d){
   const ku = document.createElement('div'); ku.className = 'tkunye'; ku.id = 'tKunye';
   ku.innerHTML = `${(mlogo || srk?.logo) ? `<div class="tkmeta"><img src="${esc(mlogo || srk.logo)}" alt=""></div>` : ''}
     <h2>${esc(konu)}</h2>
-    <div class="tktarih">${esc(z.toLocaleDateString('tr-TR', {day:'numeric', month:'long', weekday:'long'}))} · ${esc(z.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}))} · ${Math.max(1, Math.round((v.sure || 0) / 60))} dk</div>
+    <div class="tktarih">${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long', weekday:'long'}))} · ${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))} · ${Math.max(1, Math.round((v.sure || 0) / 60))} dk</div>
     ${katil.length ? `<div class="tkkatil">${esc(katil.join(' · '))}</div>` : ''}
     <button class="tksor" id="tkSor" type="button"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Bu toplantıya sor</button>
     <div class="tkdugme" id="tkDugme"></div>`;
@@ -5890,6 +5892,8 @@ async function ayarlarAc(){
   const dlg = $('#ayarlar');
   $('#ayOzet').setAttribute('aria-checked', !!a.ozet); $('#ayAg').setAttribute('aria-checked', !!a.ag_paylasimi);
   $$('#ayOzetDili button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === a.ozet_dili));
+  $$('#ayDil button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === ((window.DIL || {}).dil || 'tr')));
+  $$('#ayDil button').forEach(b => b.onclick = () => { if (window.DIL) DIL.ayarla(b.dataset.v); });
   $('#ayModel').textContent = (a.ozet_hazir ? `Özet: ${a.ozet_model}` : `Özet: ${a.ozet_model} (hazır değil)`) + (a.ceviri_model ? ` · Çeviri: ${a.ceviri_model}` : '');
   const adres = `http://${a.ip}:${a.port}`; $('#ayAdres').textContent = adres; $('#ayAdresRow').classList.toggle('hidden', !a.ag_paylasimi);
   $('#ayAdresKopyala').onclick = () => kopyala(adres, 'Adres kopyalandı');
@@ -5960,10 +5964,10 @@ let claudeBekle = null;
 async function claudeKullanimCiz(){
   const satir = $('#ayClaudeKullanim'); if (!satir) return;
   let d; try{ d = await (await fetch('/api/claude/kullanim?gun=7')).json(); }catch(e){ return; }
-  const t = d.toplam || {}, bin = n => n >= 1000 ? (n / 1000).toLocaleString('tr-TR', {maximumFractionDigits: 0}) + ' bin' : String(n);
+  const t = d.toplam || {}, bin = n => n >= 1000 ? (n / 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {maximumFractionDigits: 0}) + ' bin' : String(n);
   satir.classList.toggle('hidden', !t.istek && !d.sinir);
   const isler = Object.entries(d.isler || {});
-  $('#ayClaudeKullanimNot').innerHTML = (d.sinir ? `<span style="color:var(--orange)">Abonelik kullanım sınırına ulaşıldı; ${new Date(d.sinir.bitis * 1000).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})} sonrasına kadar bilgisayardaki model kullanılıyor.</span><br>` : '')
+  $('#ayClaudeKullanimNot').innerHTML = (d.sinir ? `<span style="color:var(--orange)">Abonelik kullanım sınırına ulaşıldı; ${new Date(d.sinir.bitis * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'})} sonrasına kadar bilgisayardaki model kullanılıyor.</span><br>` : '')
     + `Son 7 günde ${t.istek || 0} istek · bugün ${t.bugun || 0}` + (isler.length ? ` · en çok: ${esc(isler.slice(0, 3).map(([k, v]) => `${k} (${v.istek})`).join(', '))}` : '')
     + (isler.length ? `<details style="margin-top:6px"><summary>İş iş göster</summary><table class="kultab">${isler.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v.istek} istek</td><td>${bin(v.giris + v.cikis)} birim</td></tr>`).join('')}</table></details>` : '');
 }
@@ -6006,7 +6010,7 @@ function pexelsCiz(a){
 async function sistemCiz(){
   const kutu = $('#aySistem'); if (!kutu) return;
   let d; try{ d = await (await fetch('/api/sistem-durum')).json(); }catch(e){ kutu.innerHTML = '<p class="hint">Sistem durumu okunamadı.</p>'; return; }
-  const zaman = t => t ? new Date(t * 1000).toLocaleString('tr-TR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '—';
+  const zaman = t => t ? new Date(t * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '—';
   const dm = d.duman || {}, son = Object.values(dm).sort((a, b) => b.zaman - a.zaman)[0];
   const dumanOk = son ? !Object.values(dm).some(x => (x.hatalar || []).length) : null;
   const k = d.kalite || {}, p = k.paylasim || {}, at = k.atolye || {}, tr = k.transkript || {}, b = d.butce || {}, i = d.isler || {}, oz = d.ozellik || {};
@@ -6057,7 +6061,7 @@ async function takvimCiz(a){
   let t = {}; try{ t = await (await fetch('/api/takvim')).json(); }catch(e){}
   const L = t.takvimler || [];
   not.innerHTML = (L.length ? L.map(k => `<span class="tk-satir${k.hata ? ' bozuk' : ''}"><b>${esc(k.ad)}</b> · ${k.hata ? 'Adres artık çalışmıyor; yenisini ekleyip bunu kaldırın' : `son 30 günde ${k.gorusme_30} görüşme`} <button class="textbtn" type="button" data-tk="${k.no}">Kaldır</button></span>`).join('') : (t.hata ? 'Okunamadı: ' + esc(t.hata) : ''))
-    + (t.yaklasan?.length ? `<span class="tk-satir">Sıradaki: ${esc(t.yaklasan[0].ad)} ${new Date(t.yaklasan[0].bas * 1000).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>` : '');
+    + (t.yaklasan?.length ? `<span class="tk-satir">Sıradaki: ${esc(t.yaklasan[0].ad)} ${new Date(t.yaklasan[0].bas * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'})}</span>` : '');
   not.querySelectorAll('[data-tk]').forEach(b => b.onclick = async () => { const r = await fetch('/api/takvim/kaldir', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({no: +b.dataset.tk})});
     const j = await r.json().catch(() => ({})); if (!r.ok){ toast(j.hata || 'Kaldırılamadı'); return; } a.takvim_bagli = (j.takvimler || []).length > 0; toast('Takvim kaldırıldı'); takvimCiz(a); });
   act.innerHTML = `<button class="sbtn" id="ayTakvimEkle" type="button">Takvim ekle</button>`;

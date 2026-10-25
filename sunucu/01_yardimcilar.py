@@ -117,6 +117,13 @@ def _devam_edebilir(v):
     return bool(re.match(r"^https?://", link)) or (bool(link) and Path(link).is_file())
 
 
+def _ozet_dili(ay=None):
+    """Özet dili: ayar `ozet_dili` (tr | auto); arayüz dili İngilizceyse ve özet dili varsayılan Türkçe kaldıysa İngilizce (2026-10-25)."""
+    ay = ay if ay is not None else ayarlar_oku()
+    od = ay.get("ozet_dili", "tr")
+    return "en" if ay.get("dil") == "en" and od == "tr" else od
+
+
 def mesgul_nedenler():
     """Yeniden başlatmayı bekletmesi gereken süren işler (boş liste = güvenli)."""
     n = []

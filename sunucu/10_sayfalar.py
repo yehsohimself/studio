@@ -55,6 +55,18 @@ def _kabuk(html, sayfa):
     return kabuk
 
 
+_dil_onb = {}
+
+
+def _dil_surumu():
+    """static/dil/en.json'un değişiklik zamanı → ?v= (tarayıcı sözlüğü yenilesin)."""
+    try:
+        y = Path(app.static_folder) / "dil" / "en.json"; m = int(y.stat().st_mtime)
+        return str(m)
+    except OSError:
+        return "0"
+
+
 @app.get("/")
 def ana():
     try:
@@ -67,7 +79,8 @@ def ana():
     if sayfa == "index.html" and "note" not in URUNLER_KURULU:        # Meet kurulu değilse (yalnız Studio) Meet'in eki istenmez (2026-10-25)
         html = re.sub(r'<script src="/static/meet_ek\.js[^"]*"></script>\n?', "", html)
     html = _kabuk(html, sayfa)
-    html = html.replace("<html", f'<html data-urun="{urun}" data-urunler="{",".join(sorted(URUNLER_KURULU))}"', 1)
+    dil = str(ayarlar_oku().get("dil") or "")                         # arayüz dili (2026-10-25; boşsa tarayıcı dili, static/dil.js)
+    html = html.replace("<html", f'<html data-urun="{urun}" data-urunler="{",".join(sorted(URUNLER_KURULU))}"' + (f' data-dil="{dil}"' if dil in ("tr", "en") else "") + f' data-dilv="{_dil_surumu()}"', 1)
     r = make_response(html)
     r.headers["Cache-Control"] = "no-cache"
     return r

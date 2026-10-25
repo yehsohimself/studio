@@ -169,7 +169,7 @@ async function kurguKaydet(ad, id){
   catch(e){ toast(e.message); return null; }
 }
 async function kurguOlustur(sec){
-  let k = KR.id ? await kurguKaydet(KR.ad, KR.id) : await kurguKaydet('Kurgu ' + new Date().toLocaleString('tr-TR', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}), '');
+  let k = KR.id ? await kurguKaydet(KR.ad, KR.id) : await kurguKaydet('Kurgu ' + new Date().toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}), '');
   if (!k) return;
   try{ await post('/api/kurgu/' + encodeURIComponent(aktif()), {olustur: k.id, ...sec}); toast('Kurgu videosu sıraya alındı; bitince İndirilenler’de'); isGoster(); }catch(e){ toast(e.message); }
 }
@@ -325,7 +325,7 @@ async function gelisimCiz(){
   let d; try{ d = await json('/api/studio-gelisim'); }catch(e){ return; }
   let g = $('#stGelisim'); if (!g){ g = document.createElement('div'); g.id = 'stGelisim'; kutu.after(g); }
   const ay = d.ayar || {};
-  const zaman = t => t ? new Date(t * 1000).toLocaleString('tr-TR', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : '—';
+  const zaman = t => t ? new Date(t * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : '—';
   const satir = (et, ic, act = '') => `<div class="row"><div class="l">${et}<small>${ic}</small></div>${act ? `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${act}</div>` : ''}</div>`;
   const tog = (id, ac) => `<button class="tog" type="button" role="switch" id="${id}" aria-checked="${ac}"></button>`;
   const A = Object.entries(d.araclar || {}), yeni = A.filter(([, x]) => x.yeni), cal = d.calisiyor || {};
@@ -362,7 +362,7 @@ async function davetCiz(){
   const kutu = $('#aySistem'); if (!kutu) return;
   let d; try{ d = await json('/api/davetler'); }catch(e){ return; }
   let g = $('#stDavet'); if (!g){ g = document.createElement('div'); g.id = 'stDavet'; ($('#stGelisim') || kutu).before(g); }
-  const zaman = t => t ? new Date(t * 1000).toLocaleString('tr-TR', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : 'henüz girmedi';
+  const zaman = t => t ? new Date(t * 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : 'henüz girmedi';
   const satir = (et, ic, act = '') => `<div class="row"><div class="l">${et}<small>${ic}</small></div>${act ? `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${act}</div>` : ''}</div>`;
   const aktif = d.kisiler.filter(k => k.aktif).length;
   g.innerHTML = `<h4 class="ayh">Davetler</h4>`

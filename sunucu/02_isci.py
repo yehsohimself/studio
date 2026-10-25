@@ -63,7 +63,7 @@ def _isci():
         if not ozet_ac:
             komut += ["--ozet-yok"]
         else:
-            komut += ["--ozet-dili", ay.get("ozet_dili", "tr")]
+            komut += ["--ozet-dili", _ozet_dili(ay)]
         if is_.get("goruntu"):
             komut += ["--goruntu"]
         if is_.get("ad"):

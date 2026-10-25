@@ -816,7 +816,7 @@ def ozet_cikar(temel):
         return jsonify({"hata": "Özet modeli hazır değil. Kurulum sürüyor olabilir; biraz sonra tekrar deneyin."}), 503
     if temel in ozet_calisan:
         return jsonify({"hata": "Bu transkriptin özeti zaten çıkarılıyor."}), 409
-    hedef = (request.get_json(silent=True) or {}).get("dil") or ayarlar_oku().get("ozet_dili", "tr")
+    hedef = (request.get_json(silent=True) or {}).get("dil") or _ozet_dili()
     ozet_calisan.add(temel)
     try:
         d = json.loads(t.with_suffix(".json").read_text(encoding="utf-8"))

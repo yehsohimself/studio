@@ -2,48 +2,61 @@
 
 ![Studio](docs/ekran.jpg)
 
-Video linki ya da dosyası → transkript, özet, çeviri, altyazılı video, klip ve dikey Shorts, kendi sesiyle dublaj, yayın paketi.
-Her şey kendi Mac'inizde çalışır: ses tanıma Apple grafik işlemcisinde (mlx-whisper), konuşmacı ayırma bilgisayarda (sherpa-onnx),
-yazı işleri kendi Claude aboneliğinizle (Claude Code girişi), yoksa Ollama'daki yerel modelle. Hiçbir video ya da metin bir sunucuya gitmez.
+Paste a video link or drop a file → transcript with speaker labels, summary, translation, subtitled video, clips and vertical Shorts,
+dubbing in the speaker's own voice, and a publishing kit (titles, description, thumbnail text). Everything runs on your own Mac:
+speech recognition on the Apple GPU (mlx-whisper), speaker separation on device (sherpa-onnx), writing with your own Claude
+subscription (Claude Code sign-in) or, without it, a local Ollama model. No video or text leaves the computer.
 
-## Ne yapar
+Interface in English or Turkish (Settings → General → Language; follows the browser language on first launch).
 
-- **Yazıya dökme:** YouTube, Instagram, TikTok, Vimeo ve benzeri linkler ya da yerel dosya; konuşmacı ayırma ve sesten tanıma; karışık dil;
-  Whisper'ın sessizlikte uydurduğu satırların elenmesi; kaldığı yerden devam; Word, metin, SRT çıktıları.
-- **Özet:** özet, öne çıkanlar, zaman damgalı bölümler, kararlar; soru-cevap ("Bu videoda X hakkında ne dendi?").
-- **Çeviri ve dublaj:** cümle cümle çeviri (iki dilli Word, çevrilmiş SRT); konuşmacının kendi sesiyle dublaj (Chatterbox, Apple GPU).
-- **Video:** altyazılı video (kutu, sade, karaoke, pop, vurgu stilleri), klip kesme, yüz takipli dikey kadraj (Shorts), metinden kurgu
-  (paragrafa tıkla → çıkar/sırala), sessizlik kesme, Final Cut / Premiere / DaVinci'ye aktarma.
-- **Yayın paketi:** başlık seçenekleri, açıklama ve bölümler, etiketler, kapak yazısı ve kapak görselleri, Shorts kesitleri, LinkedIn ve
-  Instagram metinleri; beğenilerinizden öğrenir.
-- **Kitaplık:** arama (metin ve görüntüde), kanal takibi (yeni videolar kendiliğinden yazıya dökülür), haftalık özet.
-- **Davet linki:** kapalı bir gruba (5 kişi, günde 3 video) Cloudflare tüneliyle paylaşım; davetliler yalnız kendi kayıtlarını görür.
-- **Kendini geliştirme:** araç sürümlerini izler ve güvenli olanları gece günceller, haftalık gelişme taraması, öz değerlendirme.
+## What it does
 
-## Kurulum (macOS, Apple işlemci)
+- **Transcribe:** YouTube, Instagram, TikTok, Vimeo and similar links, or local files; speaker separation and voice recognition;
+  mixed languages; filtering of the lines Whisper hallucinates in silence; resume after interruption; Word, text and SRT output.
+- **Summarize:** summary, highlights, timestamped chapters, decisions; ask questions about the video.
+- **Translate and dub:** sentence-by-sentence translation (bilingual Word, translated SRT); dubbing in the speaker's own voice
+  (Chatterbox on the Apple GPU).
+- **Video:** subtitled video (box, plain, karaoke, pop and emphasis styles), clip cutting, face-tracked vertical framing (Shorts),
+  text-based editing (click a paragraph → remove or reorder), silence removal, export to Final Cut / Premiere / DaVinci.
+- **Publishing kit:** title options, description and chapters, tags, thumbnail text and thumbnail images, Shorts cuts, LinkedIn and
+  Instagram copy; learns from what you like.
+- **Library:** search in text and in the picture, channel watch (new videos are transcribed automatically), weekly digest.
+- **Invite link:** share with a closed group (5 people, 3 videos a day) through a Cloudflare tunnel; guests only see their own records.
+- **Self-improvement:** tracks tool versions and installs safe updates at night, weekly scan of what changed in the field,
+  weekly self-review.
+
+## Install (macOS, Apple silicon)
 
 ```bash
 ./kurulum.sh
 .venv/bin/python site.py
 ```
 
-Tarayıcıda http://127.0.0.1:8765. Çift tıklamak için `Studio.command`. Betik Homebrew ile `ffmpeg`, `deno`, `uv` kurar, `.venv` ve paketleri
-hazırlar, `ayarlar.ornek.json` → `ayarlar.json`. İsteğe bağlı: Ollama + `gemma3:4b` (Claude yoksa yerel yazı modeli), `cloudflared` (davet
-linki). Whisper modeli ilk kullanımda iner (~1,6 GB).
+Open http://127.0.0.1:8765. Or double-click `Studio.command`. The script installs `ffmpeg`, `deno` and `uv` with Homebrew, creates
+`.venv` with the packages, and copies `ayarlar.ornek.json` → `ayarlar.json`. Optional: Ollama + `gemma3:4b` (local writing model when
+Claude is not signed in), `cloudflared` (invite links). The Whisper model downloads on first use (~1.6 GB).
 
-Claude ile yazım için Claude Code'un bu Mac'te girişli olması yeter (`claude auth login`); giriş yoksa her şey yerel modelle çalışır.
+For writing with Claude, Claude Code only needs to be signed in on this Mac (`claude auth login`); without it everything falls back to
+the local model.
 
-## Kişisel veri
+## Personal data
 
-Depoda yalnız kod ve şablon vardır. Adınız, hesaplarınız, marka stilleri ve bütün kayıtlar git dışı dosyalardadır (`ayarlar.json`,
-`profil/`, `markalar/`, kayıt ve çıktı klasörleri). `python sizinti.py` depoyu kişisel bilgi için tarar; commit kancası ve yeniden
-başlatma kapısı bunu zorunlu kılar.
+The repository holds code and templates only. Your name, accounts, brand styles and all records live in files outside git
+(`ayarlar.json`, `profil/`, `markalar/`, record and output folders). `python sizinti.py` scans the repo for personal data; a commit hook
+and the restart gate enforce it.
 
-## Geliştirme
+## Development
 
-`site.py` küçük bir yükleyicidir; kod `sunucu/00_… 24_….py` parçalarında aynı ad alanında çalışır. Testler: `.venv/bin/python -m pytest
-tests -q` ve `duman_testi.py hizli|birim|canli|studio`. Siteyi değiştirdikten sonra: `.venv/bin/python yeniden_baslat.py`. Mimari:
-[docs/MIMARI.md](docs/MIMARI.md). Bu depo, aynı motoru paylaşan kardeş ürünlerle (Meet, Ghost, Couple, Content, PT) birlikte geliştirilen
-bir çalışmadan kesilir; kardeş ürünler kurulu değilse kapalıdır.
+`site.py` is a small loader; the code runs in `sunucu/00_… 24_….py` parts within one namespace. Tests: `.venv/bin/python -m pytest
+tests -q` and `duman_testi.py hizli|birim|canli|studio`. After changing the server: `.venv/bin/python yeniden_baslat.py`. Architecture:
+[docs/MIMARI.md](docs/MIMARI.md). Code identifiers and comments are in Turkish; the UI is bilingual. This repo is cut from a larger
+workspace that develops sibling products (Meet, Ghost, Couple, Content, PT) on the same engine; siblings that are not installed are
+simply off.
 
-Lisans: MIT.
+License: MIT.
+
+---
+
+**Türkçe:** Video linki ya da dosyası → transkript, özet, çeviri, altyazılı video, klip ve dikey Shorts, kendi sesiyle dublaj, yayın
+paketi. Her şey kendi Mac'inizde çalışır; hiçbir video ya da metin dışarı gitmez. Kurulum: `./kurulum.sh` sonra `.venv/bin/python site.py`
+ve tarayıcıda http://127.0.0.1:8765. Arayüz dili Ayarlar → Genel → Arayüz dili.

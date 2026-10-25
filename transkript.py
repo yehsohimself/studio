@@ -41,6 +41,15 @@ TERIM_DUZELT = False      # --terim-duzelt ile açılır (gemma3:4b Türkçe kel
 
 import itertools
 import json
+
+
+def _t(metin):
+    """Belge başlıkları arayüz dilinde (dil.py; ayar `dil` == en ise İngilizce sözlük; 2026-10-25)."""
+    try:
+        import dil as _dil
+        return _dil.t(metin)
+    except Exception:  # noqa: BLE001
+        return metin
 import os
 import re
 import shutil
@@ -929,8 +938,8 @@ def yaz_txt(yol, veri, paragraflar):
         f.write(f"Kanal: {veri['kanal']}\n")
         f.write(f"Link: {veri['link']}\n")
         f.write("Tespit edilen dil: " + ", ".join(veri.get("diller") or [veri["dil"]]) + "\n")
-        f.write(f"Kaynak: {veri['kaynak']}\n")
-        f.write("Konuşmacılar: " + ", ".join(veri["etiket"].values()) + "\n")
+        f.write(f"{_t('Kaynak')}: {veri['kaynak']}\n")
+        f.write(_t("Konuşmacılar") + ": " + ", ".join(veri["etiket"].values()) + "\n")
         if veri["uyarilar"]:
             f.write("\nKontrol notları:\n")
             for u in veri["uyarilar"]:
@@ -1162,7 +1171,7 @@ def yaz_docx(yol, veri, paragraflar, yalniz_danisman=False):
             p = par(pg, 11, False, KOYU, sonra=6); p.paragraph_format.line_spacing = 1.3
         zk = lambda x: zaman_uzun(x["sn"], False) if x.get("sn") is not None else ""  # noqa: E731
         if ks.get("kararlar"):
-            par("Kararlar", 11, True, KOYU, once=6, sonra=3)
+            par(_t("Kararlar"), 11, True, KOYU, once=6, sonra=3)
             for x in ks["kararlar"]:
                 madde("•  ", x["karar"], " · ".join(e for e in (x.get("kim"), zk(x), *map(_zincir_metni, _zincirler(x))) if e))
         if ks.get("kisiler") or ks.get("belirsiz"):
@@ -1183,15 +1192,15 @@ def yaz_docx(yol, veri, paragraflar, yalniz_danisman=False):
     # Özet
     o = veri.get("ozet")
     if o:
-        par("Özet", 13, True, KOYU, once=14, sonra=4)
+        par(_t("Özet"), 13, True, KOYU, once=14, sonra=4)
         p = par(o["ozet"], 11, False, KOYU, sonra=6); p.paragraph_format.line_spacing = 1.3
         if o.get("maddeler"):
-            par("Öne çıkanlar", 11, True, KOYU, once=6, sonra=3)
+            par(_t("Öne çıkanlar"), 11, True, KOYU, once=6, sonra=3)
             for m in o["maddeler"]:
                 p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(2)
                 p.paragraph_format.left_indent, p.paragraph_format.first_line_indent = Cm(0.5), Cm(-0.5)
                 font_ayarla(p.add_run("•  "), 11, False, GRI); font_ayarla(p.add_run(m), 11)
-        for baslik_, anahtar, isaret in (("Kararlar", "kararlar", "•  "), ("Yapılacaklar", "yapilacaklar", "☐  ")):
+        for baslik_, anahtar, isaret in ((_t("Kararlar"), "kararlar", "•  "), (_t("Yapılacaklar"), "yapilacaklar", "☐  ")):
             if o.get(anahtar):
                 par(baslik_, 11, True, KOYU, once=6, sonra=3)
                 for m in o[anahtar]:
@@ -1199,7 +1208,7 @@ def yaz_docx(yol, veri, paragraflar, yalniz_danisman=False):
                     p.paragraph_format.left_indent, p.paragraph_format.first_line_indent = Cm(0.5), Cm(-0.5)
                     font_ayarla(p.add_run(isaret), 11, False, GRI); font_ayarla(p.add_run(m), 11)
         if o.get("bolumler"):
-            par("Bölümler", 11, True, KOYU, once=8, sonra=3)
+            par(_t("Bölümler"), 11, True, KOYU, once=8, sonra=3)
             sb = any(b["sn"] >= 3600 for b in o["bolumler"])
             for b in o["bolumler"]:
                 p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(2)
@@ -1210,7 +1219,7 @@ def yaz_docx(yol, veri, paragraflar, yalniz_danisman=False):
     # Kişisel: kariyer danışmanı notu (danisman.py) — kendi sayfasında
     dn = veri.get("danisman")
     if dn and yalniz_danisman:
-        h = doc.add_heading("Kişisel · Kariyer danışmanı notu", level=1)
+        h = doc.add_heading(_t("Kişisel · Kariyer danışmanı notu"), level=1)
         for r in h.runs:
             font_ayarla(r, 16, True, KOYU)
         par("Yalnızca senin için. Bu dosya Drive'a gönderilmez.", 9.5, False, GRI, sonra=8)
@@ -1245,7 +1254,7 @@ def yaz_docx(yol, veri, paragraflar, yalniz_danisman=False):
             par("Geçen seferlerden: " + dn["baglanti"], 10, False, GRI, once=8, sonra=4)
 
     if veri.get("goruntu"):
-        par("Görüntü notları", 13, True, KOYU, once=14, sonra=4)
+        par(_t("Görüntü notları"), 13, True, KOYU, once=14, sonra=4)
         sg = any(g["sn"] >= 3600 for g in veri["goruntu"])
         for g in veri["goruntu"]:
             if not (g.get("aciklama") or g.get("yazi")):
@@ -1279,7 +1288,7 @@ def yaz_docx(yol, veri, paragraflar, yalniz_danisman=False):
         font_ayarla(p.add_run("\n\t" + pp["metin"]), 11)
 
     # Düz metin: ayrı sayfada, gezinti bölmesinde görünen başlıkla
-    h = doc.add_heading("Düz metin", level=1)
+    h = doc.add_heading(_t("Düz metin"), level=1)
     h.paragraph_format.page_break_before = True
     for r in h.runs:
         font_ayarla(r, 16, True, KOYU)

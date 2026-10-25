@@ -289,6 +289,8 @@ def ayarlar_post():
         d["ozet"] = bool(v["ozet"])
     if v.get("ozet_dili") in ("tr", "auto"):
         d["ozet_dili"] = v["ozet_dili"]
+    if v.get("dil") in ("tr", "en"):                      # arayüz dili (2026-10-25)
+        d["dil"] = v["dil"]
     if "ag_paylasimi" in v:
         d["ag_paylasimi"] = bool(v["ag_paylasimi"])
     if "drive" in v:
