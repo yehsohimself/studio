@@ -14,7 +14,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-title" content="Studio">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233b63e6'/%3E%3Cpath d='M20 24v16M32 16v32M44 24v16' stroke='%23fff' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -4517,6 +4516,8 @@ function ghDetay(x){
   if (x.geri) h += `<div class="gh-d"><b>Geri dönüş</b><p>${x.geri.tur === 'iddia' ? `${esc(x.geri.tarih || '')} tarihli iddianıza dönüyor: “${esc(x.geri.iddia || '')}”` : `Süregelen esprinize dönüyor: ${esc(x.geri.ad || '')}`}${x.geri.url ? ` · <a href="${esc(x.geri.url)}" target="_blank" rel="noopener">eski gönderi ↗</a>` : ''}</p></div>`;
   if ((x.emsal || []).length) h += `<div class="gh-d"><b>Reklam arşivinizden emsal</b>${x.emsal.map(e => `<p>${esc(e.is)} · ${esc(e.neden)}</p>`).join('')}</div>`;
   if (x.kendi_yorum) h += `<div class="gh-d"><b>Sizin cevabınız (konu toplantısı)</b><p>“${esc(x.kendi_yorum)}”</p></div>`;
+  const kd = x.kaynak_denetimi;   // 25 Ekim: yorumun dayandığı olgu kaynakla tutarlı mı (ghost_kaynak)
+  if (kd && kd.kim_ne_yapti) h += `<div class="gh-d"><b>Kaynağa göre</b><p>${esc(kd.kim_ne_yapti)}</p>${x.kaynak_oncesi ? `<p><i>Kaynakla uyuşmayan kısım düzeltildi${(kd.sorunlar || []).length ? ': ' + esc(kd.sorunlar.map(z => z.not || z.iddia).join(' · ').slice(0, 300)) : ''}</i></p>` : ''}</div>`;
   if (x.not_provasi) h += `<div class="gh-d"><b>Topluluk Notu provası · risk ${x.not_provasi.risk}/5</b><p>${esc(x.not_provasi.neden || '')}${x.not_provasi.duzeltildi ? ' Bu yüzden metin düzeltildi.' : ''}</p></div>`;
   if (x.guclendi) h += `<div class="gh-d"><b>Güçlendirildi</b><p>Çekinceler kanıtın izin verdiği kadar azaltıldı. Önceki hâli: “${esc(x.guclendi)}”</p></div>`;
   if (x.neden_simdi) h += `<div class="gh-d"><b>Neden şimdi</b><p>${esc(x.neden_simdi)}</p></div>`;
@@ -4918,7 +4919,7 @@ async function ghEylem(a, b, el){
       : [['Henüz X’te açtığınız bir gönderi yok', null]]), ['Gönderi bağlantısı yapıştır…', () => popover(b, [], {input: {placeholder: 'X gönderisinin bağlantısı (x.com/…/status/…)', onEnter: v => yaz('/alinti', {url: v}, 'Bu gönderiyi alıntılayan bir tepki olarak yeniden yazılıyor…')}})], ['X’te bu konuyu ara ↗', () => { window.open('https://x.com/search?q=' + encodeURIComponent(ara) + '&f=live', '_blank'); toast('Uygun bir gönderiyi açın; sonra buraya dönüp Alıntıla’ya yeniden basın', null, null, 8000); }]]); }
   if (a === 'soruac'){ const g = el.querySelector('.gh-soru .gh-gir'); g.hidden = !g.hidden; if (!g.hidden) g.querySelector('textarea').focus(); return; }
   if (a === 'dayanak'){ const v = b.closest('.gh-gir').querySelector('textarea').value.trim(); if (v.length < 8){ toast('Bir iki cümle yazın'); return; } b.closest('.gh-gir').querySelector('textarea').value = ''; return yaz('/dayanak', {yorum: v}, 'Sizin karşılığınızla yeniden yazılıyor…'); }
-  if (a === 'kaldir') return popover(b, [['Neden kaldırıyorsunuz?', null], ['Konu ilgimi çekmiyor', () => ghKaldir(x, 'konu uymuyor')], ['Bu ben değilim', () => ghKaldir(x, 'ben değilim')], ['Cümleler kötü', () => ghKaldir(x, 'yazım kötü')], ['Bilgi yanlış ya da eksik', () => ghKaldir(x, 'bilgi yanlış')], ['Bugün paylaşmak istemiyorum', () => ghKaldir(x, 'bugün değil')], ['Sadece kaldır', () => ghKaldir(x, '')]]);
+  if (a === 'kaldir') return popover(b, [['Neden kaldırıyorsunuz?', null], ['Konu ilgimi çekmiyor', () => ghKaldir(x, 'konu uymuyor')], ['Konu iyi ama söylenen bariz ya da zayıf', () => ghKaldir(x, 'açı zayıf')], ['Bu ben değilim', () => ghKaldir(x, 'ben değilim')], ['Cümleler kötü', () => ghKaldir(x, 'yazım kötü')], ['Bilgi yanlış ya da eksik', () => ghKaldir(x, 'bilgi yanlış')], ['Bugün paylaşmak istemiyorum', () => ghKaldir(x, 'bugün değil')], ['Sadece kaldır', () => ghKaldir(x, '')]]);
   if (a === 'degistir'){ const istek = (ph, fn) => () => popover(b, [], {input: {placeholder: ph, onEnter: fn}});
     return popover(b, [['Daha kısa', () => yaz('/yeniden', {talimat: 'kisa'}, 'Kısaltılıyor…')], ['Daha keskin', () => yaz('/yeniden', {talimat: 'keskin'}, 'Keskinleştiriliyor…')],
       (x.zincir || []).length ? ['Tek gönderiye çevir', () => yaz('/yeniden', {talimat: 'tek'}, 'Birleştiriliyor…')] : ['Zincire çevir', () => yaz('/yeniden', {talimat: 'zincir'}, 'Zincire çevriliyor…')], null,
@@ -4926,7 +4927,7 @@ async function ghEylem(a, b, el){
       ['Kendi isteğimle…', istek('Ne değişsin? Ör. “daha ironik bitir”', v => yaz('/yeniden', {talimat: v}, 'Yeniden yazılıyor…'))]]); }
 }
 async function ghKaldir(x, neden){ const r = await ghApi(x, {gizli: true, neden}); if (!r._ok){ toast(r.hata || 'Olmadı'); return; } paylasimlarCiz();
-  toast({'konu uymuyor': 'Kaldırıldı; benzer konular daha az gelecek', 'ben değilim': 'Kaldırıldı; bu bakışı sizin sesiniz saymayacağım', 'yazım kötü': 'Kaldırıldı; bu cümle kuruluşundan kaçınılacak',
+  toast({'konu uymuyor': 'Kaldırıldı; benzer konular daha az gelecek', 'açı zayıf': 'Kaldırıldı; konu değil, söylenen şey zayıftı diye not edildi', 'ben değilim': 'Kaldırıldı; bu bakışı sizin sesiniz saymayacağım', 'yazım kötü': 'Kaldırıldı; bu cümle kuruluşundan kaçınılacak',
     'yazım benzemiyor': 'Kaldırıldı; bu cümle kuruluşundan kaçınılacak', 'bilgi yanlış': 'Kaldırıldı; bilgi hatası olarak not edildi (zevkiniz sayılmadı)', 'bugün değil': 'Kaldırıldı; bundan bir şey öğrenilmedi'}[neden] || 'Kaldırıldı', 'Geri al', async () => { await ghApi(x, {gizli: false}); paylasimlarCiz(); }, 7000); }
 
 /* ---- sayfa eylemleri ---- */
@@ -4945,7 +4946,7 @@ async function ghMik(btn, hedef){
   rec.start(); toast('Dinliyorum; bitince yeniden basın', null, null, 4000);
 }
 // Toplu ret de öğretsin (24 Ekim): tek dokunuşluk hazır nedenler; 'ses' kaldırılanları 'bu ben değilim' örneği yapar, 'tur' türleri karıştırtır
-const GH_RED_NEDEN = [['Konular sıkıcı', () => ghTurRed('', 'konu')], ['Ses bana benzemiyor', () => ghTurRed('', 'ses')], ['Hepsi aynı tür', () => ghTurRed('', 'tur')]];
+const GH_RED_NEDEN = [['Konular sıkıcı', () => ghTurRed('', 'konu')], ['Konular iyi, söylenenler bariz', () => ghTurRed('', 'aci')], ['Ses bana benzemiyor', () => ghTurRed('', 'ses')], ['Hepsi aynı tür', () => ghTurRed('', 'tur')]];
 async function ghTurRed(neden, neden_tur){
   const r = await ghPost('/api/kesif/yenile', {begenmedim: true, neden, neden_tur: neden_tur || ''}); if (!r._ok){ toast(r.hata || 'Olmadı'); return; }
   toast(`${r.kaldirilan || 0} öneri kaldırıldı. Yeni öneriler araştırılıyor; birkaç dakika sürer, hazır oldukça burada belirir.`, null, null, 9000); setTimeout(paylasimlarCiz, 1200);
@@ -6286,7 +6287,7 @@ function stCizgi(){
       m.before($('#modehint')); stHaritaKur(m); }
     if (URUN === 'atolye'){ const h2 = $('#atolyeSec .sh h2'); if (h2) h2.textContent = URUNLER.atolye.ad; }
     $$('#yuz button').forEach(b => b.hidden = !URUNLER[URUN].yuz.includes(b.dataset.v)); document.body.classList.add('urun-' + URUN);
-    const g = document.createElement('div'); g.className = 'urunler'; const KURULU = (document.documentElement.dataset.urunler || '').split(',').filter(Boolean); g.innerHTML = Object.entries(URUNLER).filter(([k, u]) => (u.menude !== false || k === URUN) && (!KURULU.length || KURULU.includes(k) || k === URUN)).map(([k, u]) => `<a href="${location.protocol}//${location.hostname}:${u.port}/" class="${k === URUN ? 'on' : ''}"><img src="/static/logo/${k}.svg" alt="">${u.ad}</a>`).join('');
+    const g = document.createElement('div'); g.className = 'urunler'; const KURULU = (document.documentElement.dataset.urunler || '').split(',').filter(Boolean); g.innerHTML = Object.entries(URUNLER).filter(([k, u]) => (u.menude !== false || k === URUN) && (!KURULU.length || KURULU.includes(k) || k === URUN)).map(([k, u]) => `<a href="${k === URUN ? location.origin + '/' : ((location.protocol === 'https:' && /\.ts\.net$/.test(location.hostname) ? 'http:' : location.protocol) + '//' + location.hostname + ':' + u.port + '/')}" class="${k === URUN ? 'on' : ''}"><img src="/static/logo/${k}.svg" alt="">${u.ad}</a>`).join('');
     const ub = document.createElement('button'); ub.type = 'button'; ub.className = 'urunbtn'; ub.setAttribute('aria-label', 'Diğer ürünler'); ub.title = 'Diğer ürünler';
     ub.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>'; const mg = document.createElement('span'); mg.className = 'markaGrup'; $('.brand').before(mg); mg.append($('.brand'), ub, g);
     ub.onclick = e => { e.stopPropagation(); g.classList.toggle('acik'); }; document.addEventListener('click', e => { if (!e.target.closest('.urunbtn,.urunler')) g.classList.remove('acik'); });

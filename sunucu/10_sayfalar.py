@@ -80,6 +80,13 @@ def ana():
         html = re.sub(r'<script src="/static/meet_ek\.js[^"]*"></script>\n?', "", html)
     if sayfa == "index.html" and "atolye" not in URUNLER_KURULU:      # teslim kontrolü uçları couple_site'ta; Couple modülleri yoksa eki istenmez
         html = re.sub(r'<script src="/static/teslim_ek\.js[^"]*"></script>\n?', "", html)
+    if sayfa == "index.html" and urun != "transcript" and (Path(app.static_folder) / f"{urun}.webmanifest").exists():
+        # telefonda ana ekrana eklenince ürünün kendi adı ve simgesi (2026-10-25; Meet "Studio" adı ve simgesiyle ekleniyordu)
+        ad = json.loads((Path(app.static_folder) / f"{urun}.webmanifest").read_text(encoding="utf-8")).get("short_name") or urun
+        html = (html.replace('href="/static/manifest.webmanifest"', f'href="/static/{urun}.webmanifest"')
+                .replace('href="/static/ikon-180.png"', f'href="/static/{urun}-ikon-180.png"')
+                .replace('name="apple-mobile-web-app-title" content="Studio"', f'name="apple-mobile-web-app-title" content="{ad}"')
+                .replace("<title>Studio</title>", f"<title>{ad}</title>", 1))
     html = _kabuk(html, sayfa)
     dil = str(ayarlar_oku().get("dil") or "")                         # arayüz dili (2026-10-25; boşsa tarayıcı dili, static/dil.js)
     html = html.replace("<html", f'<html data-urun="{urun}" data-urunler="{",".join(sorted(URUNLER_KURULU))}"' + (f' data-dil="{dil}"' if dil in ("tr", "en") else "") + f' data-dilv="{_dil_surumu()}"', 1)
