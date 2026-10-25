@@ -6129,14 +6129,12 @@ function stPaketCiz(){ const r = $('#stPaket'); if (!r) return; const db = !!sto
   r.innerHTML = '<span class="stp-b">Tek tıkla</span>' + ST_PAKET.map(([k, ad, ack, d]) => { const on = d.tx === !!state.tx && d.oz === !!state.oz && d.alt === !!state.alt && d.dl === !!state.dl && d.db === db;
     return `<button type="button" data-p="${k}" aria-pressed="${on}" title="${esc(ack)}">${esc(ad)}</button>`; }).join(''); }
 function stHaritaKur(m){
-  const pk = document.createElement('div'); pk.className = 'st-paket'; pk.id = 'stPaket'; m.before(pk);
-  pk.addEventListener('click', e => { const b = e.target.closest('button[data-p]'); if (b) stPaketUygula(b.dataset.p); });
-  document.addEventListener('click', e => { if (e.target.closest('#sonuc .chipb, #stHarita')) setTimeout(stPaketCiz, 50); });
+  // 2026-10-25: "Tek tıkla" hazır seçim satırı KALDIRILDI (kullanıcı: "altta zaten aynı seçenekler var, ikili yaratıyor"); şema tek seçim yeri. ST_PAKET kodu duruyor.
   const h = document.createElement('div'); h.className = 'st-harita bos'; h.id = 'stHarita'; m.before(h);
   const d = document.createElement('details'); d.className = 'st-ayar'; d.open = true;   // kullanıcı: "ayrıntılı ayarlar varsayılan açık gelsin"
   d.innerHTML = '<summary tabindex="-1"><span>Ayrıntılı ayarlar</span></summary>'; m.before(d); d.appendChild(m);
   d.addEventListener('toggle', () => { if (!d.open) d.open = true; });
-  stGrupla(); stPaketCiz();
+  stGrupla();
   const cta = $('.composer .cta'); if (cta){ d.before(cta); cta.appendChild($('#modehint')); }   // sıra: şema → Başlat (+ ne hazırlanacak, süre) → ayrıntılı ayarlar
   const izle = () => stHaritaCiz();
   new MutationObserver(izle).observe($('#sonuc'), {attributes: true, subtree: true, attributeFilter: ['aria-pressed', 'disabled']});
