@@ -1,0 +1,132 @@
+/* Studio geliştirmeleri (2026-10-24): yerinde düzeltme, yayın paketi, kurgu, altyazı önizlemesi, kitaplık süzgeci, sahne araması, temizlik, gelişim.
+   Tasarım kuralları CLAUDE.md'deki gibi: .sbtn (ikincil), .sbtn.plain/.tiny (üçüncül), .sbtn.blue (tek birincil); yumuşak yüzeyler. */
+
+/* yerinde düzeltme */
+.para .ed{position:absolute;right:34px;top:14px;opacity:0;transition:opacity .15s;border:0;background:var(--surface2);color:var(--muted);width:28px;height:28px;border-radius:8px;display:grid;place-items:center;cursor:pointer}
+.para:hover .ed,.para:focus-within .ed{opacity:1}
+.para .ed svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.doc.secim .para .ed,.doc.kes .para .ed,.doc.kurgu .para .ed{display:none}
+.para.duzen .x{outline:none;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--acc);border-radius:10px;padding:8px 10px;margin:4px -10px 0;white-space:pre-wrap}
+.para .edbar{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.para .edbar .sp{flex:1}
+
+/* yayın paketi */
+#yayinKutu .yp-ust{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+#yayinKutu .yp-ust p{margin:0;flex:1;min-width:220px;color:var(--ink2);font-size:14px;line-height:1.5}
+#yayinKutu .yp-b{margin-top:14px}
+#yayinKutu .yp-b>h5{margin:0 0 6px;font-size:12.5px;font-weight:600;color:var(--muted);display:flex;gap:8px;align-items:center}
+#yayinKutu .yp-b>h5 .sp{flex:1}
+#yayinKutu .yp-s{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--hair)}
+#yayinKutu .yp-s:first-of-type{border-top:0}
+#yayinKutu .yp-s .m{flex:1;min-width:0;font-size:14.5px;line-height:1.5;white-space:pre-wrap}
+#yayinKutu .yp-s .m small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+#yayinKutu .yp-s .acts{display:flex;gap:2px;flex-shrink:0}
+#yayinKutu .yp-s .acts button{border:0;background:transparent;color:var(--muted);font-size:13px;padding:4px 7px;border-radius:7px;cursor:pointer}
+#yayinKutu .yp-s .acts button:hover{background:var(--fill);color:var(--ink)}
+#yayinKutu .yp-s .acts button.on{color:var(--acc)}
+#yayinKutu .yp-et{display:flex;flex-wrap:wrap;gap:6px}
+#yayinKutu .yp-et span{background:var(--surface);border:1px solid var(--hair2);border-radius:980px;padding:3px 10px;font-size:13px}
+#yayinKutu .yp-kapak{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:8px}
+#yayinKutu .yp-kapak a{display:block;border-radius:10px;overflow:hidden;line-height:0;border:1px solid var(--hair2)}
+#yayinKutu .yp-kapak img{width:100%;aspect-ratio:16/9;object-fit:cover}
+#yayinKutu .yp-z{font-variant-numeric:tabular-nums;color:var(--link);border:0;background:transparent;cursor:pointer;padding:0;font:inherit}
+#yayinKutu .yp-ilerle{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14px}
+#yayinKutu .yp-ilerle .pbar{flex:1;max-width:240px}
+
+/* kurgu (metinden düzenleme) */
+.doc.kurgu .para{cursor:grab;user-select:none;transition:background .15s}
+.doc.kurgu .para:hover{background:var(--surface2);margin:0 -12px;padding-left:12px;padding-right:12px;border-radius:10px}
+.doc.kurgu .para.cik .x,.doc.kurgu .para.cik .n{text-decoration:line-through;opacity:.4}
+.doc.kurgu .para.cik{background:rgba(255,59,48,.06);margin:0 -12px;padding-left:12px;padding-right:12px;border-radius:10px}
+.doc.kurgu .para.tasindi .n::after{content:" · yeri değişti";color:var(--acc);font-weight:500;font-size:12px}
+.doc.kurgu .para.calan{box-shadow:inset 3px 0 0 var(--acc)}
+.doc.kurgu .para.ustune{box-shadow:inset 0 2px 0 var(--acc)}
+.doc.kurgu .para.altina{box-shadow:inset 0 -2px 0 var(--acc)}
+.doc.kurgu .para .cp,.doc.kurgu .para .dot{pointer-events:none}
+.doc.kurgu .para.surukle{opacity:.35}
+#kurgubar .ikon{border:0;background:var(--fill);color:var(--ink);width:32px;height:32px;border-radius:9px;display:grid;place-items:center;cursor:pointer}
+#kurgubar .ikon:disabled{opacity:.35;cursor:default}
+#kurgubar .ikon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+/* altyazı önizlemesi (Düzenlenmiş video paneli) */
+.alt-onz{flex-basis:100%;display:flex;flex-direction:column;gap:6px;align-items:flex-start;margin-top:4px}
+.alt-onz .kare{position:relative;width:min(100%,360px);border-radius:10px;overflow:hidden;background:var(--fill);line-height:0;min-height:60px}
+.alt-onz .kare.dikey{width:150px}
+.alt-onz img{width:100%;height:auto!important;max-height:none!important;display:block;transition:opacity .2s}
+.alt-onz img.yuk{opacity:.45}
+.alt-onz .hint{line-height:1.45;font-size:12.5px}
+
+/* kitaplık süzgeci ve sahne araması */
+.st-suz{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-4px 0 16px}
+.st-suz .ara{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:var(--fill);border-radius:10px;padding:0 10px;height:36px}
+.st-suz .ara svg{width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2}
+.st-suz .ara input{border:0;background:transparent;outline:none;flex:1;font:inherit;font-size:14px;color:var(--ink);min-width:0}
+.st-suz .sel{height:36px}
+.st-suz .seg.mini button{white-space:nowrap}
+.st-suz .say{font-size:12.5px;color:var(--muted)}
+.st-sahne{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.st-sahne .sc{border:1px solid var(--hair2);border-radius:12px;overflow:hidden;background:var(--surface);cursor:pointer;text-align:left;padding:0;color:var(--ink);font:inherit}
+.st-sahne .sc img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--fill)}
+.st-sahne .sc .b{padding:8px 10px 10px;font-size:13px;line-height:1.4}
+.st-sahne .sc .b b{display:block;font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-sahne .sc .b span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.st-sahne-ust{display:flex;gap:10px;align-items:center;margin:0 0 10px;font-size:13.5px;color:var(--muted)}
+.st-sahne-ust .sp{flex:1}
+
+/* indirilenleri temizleme önerisi */
+.st-temiz{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--surface2);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.st-temiz span{flex:1;min-width:200px;color:var(--ink2)}
+
+/* Ayarlar → Sistem → Studio gelişimi */
+#stGelisim .row .l small a{color:var(--link)}
+#stGelisim .gl-arac{display:grid;gap:2px;margin-top:4px}
+#stGelisim .gl-oneri{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+@media (max-width:640px){
+  .para .ed{opacity:1;right:30px}
+  .alt-onz{flex-direction:column;align-items:stretch}
+  .alt-onz .kare,.alt-onz .kare.dikey{width:100%}
+  .alt-onz .kare.dikey{max-width:200px}
+}
+
+/* kurgu çubuğu: düğmeler tek satıra sığsın; bildirim çubuğun üstüne binmesin */
+#kurgubar{max-width:min(94vw,920px);flex-wrap:nowrap}
+#kurgubar #krT{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+body:has(#kurgubar.show) #toast,body:has(.klipbar.show) #toast{bottom:92px}
+@media (max-width:760px){ #kurgubar{flex-wrap:wrap} }
+
+/* ---------------------------------------------------------------- UI/UX geçişi (2026-10-24) */
+/* okuma görünümü: sağ sütun sekmeleri (Meet'in .tsek görünümü) */
+#doc.st-sekmeli .sagk > [data-stsek]{display:none}
+#doc.st-sekmeli[data-stsek="ozet"] .sagk > [data-stsek="ozet"],
+#doc.st-sekmeli[data-stsek="metin"] .sagk > [data-stsek="metin"],
+#doc.st-sekmeli[data-stsek="yayin"] .sagk > [data-stsek="yayin"],
+#doc.st-sekmeli[data-stsek="klip"] .sagk > [data-stsek="klip"]{display:block}
+#doc.st-sekmeli[data-stsek="metin"] .sagk > .tamMetin{display:none}
+#doc.st-sekmeli .sagk > #paylasimKutu:empty,#doc.st-sekmeli .sagk > #markaKutu:empty{display:none!important}
+#doc.st-sekmeli #stSek{margin-bottom:8px}
+#doc.kurgu #stSek{display:none}
+#doc.st-sekmeli[data-stsek="metin"] .sagk > #paras{margin-top:4px}
+/* kapak: rozetler yerine tek satır bilgi */
+#doc .cover .chips.st-meta{display:block;font-size:13.5px;line-height:1.6;color:var(--muted);margin-top:6px}
+#doc .cover .chips.st-meta i{font-style:normal;margin:0 3px;opacity:.6}
+#doc .cover .chips.st-meta a{color:var(--link);text-decoration:none}
+#doc .cover .chips.st-meta span{white-space:nowrap}
+/* yayın paketi: simge düğmeler, telefonda düğmeler metnin altına */
+#yayinKutu .yp-s .acts button svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
+#yayinKutu .yp-s .acts button{display:grid;place-items:center;min-width:30px;height:28px}
+#yayinKutu .yp-s .acts button[data-a="kopya"]{font-weight:500;color:var(--link)}
+/* yüzen "Sor" ile "Başa dön" üst üste binmesin */
+body:has(#resultSec:not(.hidden)) .totop{bottom:84px}
+/* ana sayfa: seçilmemiş çıktının satırı gösterilmez (şemadan açılır; açılınca ayarları burada gelir) */
+body.urun-transcript .st-grup:has(> .chipb[aria-pressed="false"]){display:none}
+/* video daha önce yazıya dökülmüşse tek birincil düğme "Aç" olur; Yazıya dök ikincil kalır */
+body.st-mevcut #go{background:var(--fill)!important;color:var(--ink)!important;box-shadow:none!important}
+@media (max-width:640px){
+  #yayinKutu .yp-s{flex-wrap:wrap}
+  #yayinKutu .yp-s .m{flex-basis:100%}
+  #yayinKutu .yp-s .acts{margin-left:auto}
+  #doc.st-sekmeli #stSek{margin:0 -16px 8px;padding-left:16px;padding-right:16px}
+}
+body.st-mevcut #mevcutAc{background:#2D5BFF!important;color:#fff!important;border:0!important;padding:0 16px!important;height:32px;border-radius:9px;font-weight:600}
+#doc.st-sekmeli #stSek{top:var(--st-ust,56px)}
