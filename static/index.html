@@ -2456,6 +2456,7 @@
   </div>
   <div style="display:flex;gap:2px;align-items:center">
     <button class="navbtn" id="ayarBtn" aria-label="Ayarlar" title="Ayarlar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    <button class="navbtn" id="dilBtn" type="button" aria-label="Dil / Language" title="Türkçe / English" style="font-weight:600;font-size:12px;letter-spacing:.04em">EN</button>
     <button class="navbtn" id="theme" aria-label="Görünümü değiştir"><svg id="themeIco" viewBox="0 0 24 24"></svg></button>
   </div>
 </div><div class="offline" id="offline">Bağlantı yok. Site yeniden başlıyor olabilir; düzelmezse “Studio” dosyasına çift tıklayın.</div></nav>
@@ -6277,6 +6278,7 @@ function stCizgi(){
     ub.onclick = e => { e.stopPropagation(); g.classList.toggle('acik'); }; document.addEventListener('click', e => { if (!e.target.closest('.urunbtn,.urunler')) g.classList.remove('acik'); });
     $('.brand').onclick = e => { e.preventDefault(); location.assign(location.origin + '/'); }; }
   yuzSec(store.get('yuz_' + URUN, URUNLER[URUN].acik));
+  (() => { const b = $('#dilBtn'); if (!b || !window.DIL) return; b.textContent = DIL.dil === 'tr' ? 'EN' : 'TR'; b.onclick = () => DIL.ayarla(DIL.dil === 'tr' ? 'en' : 'tr'); })();   // üst çubukta TR/EN (2026-10-25, kullanıcı: ana sayfadan seçilsin)
   { const sa = new Date().getHours(); const g = sa < 6 ? 'İyi geceler' : sa < 12 ? 'Günaydın' : sa < 18 ? 'İyi günler' : 'İyi akşamlar'; const yaz = t => ['#selam', '#tSelam'].forEach(q => { if ($(q)) $(q).textContent = t; }); yaz(g); fetch('/api/ayarlar').then(r => r.json()).then(a => { window.BEN_AD = a.benim_adim || ''; if (a.benim_adim) yaz(g + ', ' + a.benim_adim.split(' ')[0]); }).catch(() => {}); }
   await gecmisYukle(); indirilenlerYukle(); takipYukle(); hashAc();
   try{ const r = await fetch('/api/isler'); const l = (await r.json()).filter(kullaniciIsi);
