@@ -149,10 +149,20 @@ def indir(dosya):
 @app.get("/disa/<temel>.<uz>")
 def disa_aktar(temel, uz):
     """Ek çıktı biçimleri: vtt (web altyazısı), md (Obsidian/Notion için Markdown: künye, özet, kararlar, bölümler, konuşmacılı metin) ve
-    json (salt okunur sade şema `video-hub/kayit@1`, başka araçlar okusun diye). Tarayıcıda açılır; ?indir=1 ile dosya olarak iner (vtt hep iner)."""
+    json (salt okunur sade şema `video-hub/kayit@1`, başka araçlar okusun diye), html (2026-10-27: tek dosyalık paylaşılabilir sayfa).
+    Tarayıcıda açılır; ?indir=1 ile dosya olarak iner (vtt hep iner)."""
     t = _temel_dogrula(temel)
-    if uz not in ("vtt", "md", "json"):
+    if uz not in ("vtt", "md", "json", "html"):
         abort(404)
+    if uz == "html":
+        vt = json.loads(t.with_suffix(".json").read_text(encoding="utf-8"))
+        r = make_response(_disa_html(temel, vt))
+        r.headers["Content-Type"] = "text/html; charset=utf-8"
+        if request.args.get("indir"):
+            from urllib.parse import quote
+            ad = re.sub(r'[\\/:*?"<>|]+', " ", vt["veri"].get("baslik") or temel).strip()[:80]
+            r.headers["Content-Disposition"] = f"attachment; filename*=UTF-8''{quote(ad + '.html')}"
+        return r
     if uz == "json":
         r = make_response(json.dumps(_disa_veri(temel), ensure_ascii=False, indent=1))
         r.headers["Content-Type"] = "application/json; charset=utf-8"
@@ -218,3 +228,53 @@ def disa_aktar(temel, uz):
     return r
 
 
+def _disa_html(temel, vt):
+    """Tek dosyalık, internetsiz de açılan okuma sayfası (2026-10-27): başlık, özet, öne çıkanlar, bölümler ve konuşmacılı metin.
+    E-postayla ya da mesajla gönderilir; alıcının Studio'su olması gerekmez. YouTube videolarında zamanlar videonun o anını açar.
+    Kişisel not (danışman), toplantı sinyalleri ve Asana bağlantıları girmez."""
+    from html import escape as e
+    v = vt["veri"]
+    baslik = v.get("baslik") or temel
+    link = v.get("link") or ""
+    yt = re.search(r"(?:youtu\.be/|v=|shorts/)([\w-]{11})", link)
+    def zl(sn):
+        z = _zaman(sn, sn >= 3600)
+        return f'<a class="z" href="https://youtu.be/{yt.group(1)}?t={int(sn)}" target="_blank" rel="noopener">{z}</a>' if yt else f'<span class="z">{z}</span>'
+    oz = v.get("ozet") if isinstance(v.get("ozet"), dict) else {}
+    ks = v.get("kisaca") or {}
+    bilgi = " · ".join(x for x in [v.get("kanal") or "", f"{int((v.get('sure') or 0) // 60)} dk" if v.get("sure") else "",
+                                    time.strftime("%d.%m.%Y", time.localtime(v.get("olusturma") or time.time()))] if x)
+    B = [f'<header><h1>{e(baslik)}</h1><p class="m">{e(bilgi)}' + (f' · <a href="{e(link)}" target="_blank" rel="noopener">Kaynağı aç ↗</a>' if link.startswith("http") else "") + "</p></header>"]
+    if ks.get("ozet"):
+        B.append("<section><h2>Kısaca</h2>" + "".join(f"<p>{e(x)}</p>" for x in ks["ozet"]) + "</section>")
+    if oz.get("ozet"):
+        B.append(f"<section><h2>Özet</h2><p>{e(oz['ozet'])}</p>" + (("<h3>Öne çıkanlar</h3><ul>" + "".join(f"<li>{e(x)}</li>" for x in oz["maddeler"]) + "</ul>") if oz.get("maddeler") else "") + "</section>")
+    kararlar = [k.get("karar") for k in ks.get("kararlar") or [] if k.get("karar")] or oz.get("kararlar") or []
+    if kararlar:
+        B.append("<section><h2>Kararlar</h2><ul>" + "".join(f"<li>{e(str(x))}</li>" for x in kararlar) + "</ul></section>")
+    if oz.get("bolumler"):
+        B.append("<section><h2>Bölümler</h2><ol class=\"bol\">" + "".join(f"<li>{zl(b.get('sn', 0))} {e(b.get('baslik', ''))}</li>" for b in oz["bolumler"]) + "</ol></section>")
+    paras = paragrafla(vt["segmentler"], v["etiket"])
+    tek = len({p["ad"] for p in paras}) <= 1
+    satir = lambda p: ('<div class="p"><div class="h">' + ("" if tek else f"<b>{e(p['ad'])}</b> · ") + zl(p["bas"]) +   # noqa: E731
+                       f'</div><p>{e(p["metin"])}</p></div>')
+    B.append('<section><div class="tb"><h2>Metin</h2><input id="q" type="search" placeholder="Metinde ara" aria-label="Metinde ara"></div><div id="m">'
+             + "".join(satir(p) for p in paras) + "</div></section>")
+    return ("<!doctype html><html lang=\"" + e(str(v.get("dil") or "tr")) + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            f"<title>{e(baslik)}</title><style>"
+            ":root{--bg:#fbfbf9;--fg:#1c1c1e;--mu:#6e6e73;--hair:#e5e5e2;--ac:#2D5BFF;--mark:#fff3b0}"
+            "@media (prefers-color-scheme:dark){:root{--bg:#0e0e11;--fg:#ececf0;--mu:#9a9aa3;--hair:#26262c;--ac:#7FB2FF;--mark:#5b4a00}}"
+            "*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}"
+            "main{max-width:720px;margin:0 auto;padding:40px 20px 80px}h1{font-size:30px;line-height:1.2;margin:0 0 8px;letter-spacing:-.02em}"
+            "h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin:36px 0 10px}h3{font-size:15px;margin:18px 0 6px}"
+            ".m{color:var(--mu);margin:0;font-size:14px}a{color:var(--ac)}ul,ol{padding-left:20px}li{margin:4px 0}"
+            ".bol{list-style:none;padding:0}.bol li{display:flex;gap:10px}.z{font-variant-numeric:tabular-nums;font-size:13px;color:var(--ac);text-decoration:none}"
+            ".p{padding:10px 0;border-top:1px solid var(--hair)}.p p{margin:4px 0 0}.h{font-size:13px;color:var(--mu)}"
+            ".tb{display:flex;justify-content:space-between;align-items:center;gap:12px}.tb h2{margin-bottom:10px}"
+            "input{font:inherit;font-size:14px;padding:7px 12px;border-radius:10px;border:1px solid var(--hair);background:transparent;color:inherit;width:min(260px,50vw)}"
+            "mark{background:var(--mark);color:inherit;border-radius:3px}footer{margin-top:48px;color:var(--mu);font-size:13px}"
+            "</style></head><body><main>" + "".join(B) +
+            "<footer>Studio ile hazırlandı. Yazıya dökme otomatik yapılmıştır; küçük hatalar olabilir.</footer></main><script>"
+            "const q=document.getElementById('q'),ps=[...document.querySelectorAll('#m .p')];ps.forEach(p=>p._t=p.querySelector('p').textContent);"
+            "q.oninput=()=>{const s=q.value.trim().toLocaleLowerCase();ps.forEach(p=>{p.hidden=!!s&&!p._t.toLocaleLowerCase().includes(s)})};"
+            "</script></body></html>")

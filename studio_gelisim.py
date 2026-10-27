@@ -33,7 +33,7 @@ ARACLAR = {
     "python-docx": (PY, "python-openxml/python-docx", "Word belgeleri", "ice"),
     "mlx-whisper": (PY, "ml-explore/mlx-examples", "Ses tanıma (Apple grafik işlemcisi)", "tam"),
     "mlx": (PY, "ml-explore/mlx", "Apple grafik işlemcisi altyapısı", "tam"),
-    "sherpa-onnx": (PY, "k2-fsa/sherpa-onnx", "Konuşmacı ayırma", "tam"),
+    "sherpa-onnx": (PY, "k2-fsa/sherpa-onnx", "Konuşmacı ayırma", "konusmaci"),
     "faster-whisper": (PY, "SYSTRAN/faster-whisper", "Ses tanıma yedeği ve sessizlik bulma", "tam"),
     "mlx-audio": (PY_TTS, "Blaizzy/mlx-audio", "Dublaj seslendirmesi (Apple grafik işlemcisi)", "ice"),
 }
@@ -235,9 +235,14 @@ def _dene(paket, tur, log):
         if tur == "ice":
             r = subprocess.run([str(py), "-c", f"import {ICE.get(paket, paket.replace('-', '_'))}"], capture_output=True, text=True, timeout=120)
             return r.returncode == 0
-        if tur == "tam":                                   # Türkçe ses üretip yazıya dökme (duman_testi tam, ~1-2 dk)
+        if tur in ("tam", "konusmaci"):                    # Türkçe ses üretip yazıya dökme (duman_testi tam, ~1-2 dk)
             r = subprocess.run([str(PY), str(KLASOR / "duman_testi.py"), "tam"], capture_output=True, text=True, timeout=900, cwd=str(KLASOR))
-            return r.returncode == 0
+            if r.returncode != 0:
+                return False
+            if tur == "konusmaci":                         # iki kişilik sabit örnek toplantı: konuşmacılar hâlâ ayrılıyor mu (Claude'suz, ~30 sn)
+                r = subprocess.run([str(PY), str(KLASOR / "duman_testi.py"), "meet"], capture_output=True, text=True, timeout=900, cwd=str(KLASOR))
+                return r.returncode == 0
+            return True
     except Exception as e:  # noqa: BLE001
         log(f"Deneme yapılamadı: {e}")
         return False
@@ -285,6 +290,32 @@ def guncelle(paket, log=print):
             d["araclar"][paket]["yeni"] = False
     yaz(d)
     return kayit
+
+
+IZLENEN = ("sherpa-onnx", "mlx-whisper", "mlx", "faster-whisper")   # çıktıyı etkileyenler
+
+
+def surum_degisimi_dene(log=print):
+    """2026-10-27 (gelişim önerisi "Büyük güncellemeden sonra konuşmacı ayırmayı otomatik deneme"): ses tanıma/konuşmacı ayırma araçları
+    Studio'nun dışında (elle, terminalden) güncellenirse de fark edilir; o aracın denemesi bir kez çalışır. Geçmezse sonuç kaydedilir ve
+    döner (site bildirim gösterir); eski sürüme kendiliğinden dönülmez, çünkü önceki ortamın yedeği yok. Döner: [{paket, eski, yeni, tamam}]."""
+    d = oku(); onceki = d.setdefault("izlenen_surumler", {}); sonuc = []
+    for paket in IZLENEN:
+        py, _depo, ne, tur = ARACLAR[paket]
+        simdi = _surum(paket, py)
+        if not simdi:
+            continue
+        eski = onceki.get(paket)
+        if eski and eski != simdi:
+            log(f"{paket} {eski} → {simdi} (Studio dışında güncellenmiş); deneniyor...")
+            ok = _dene(paket, tur, log)
+            k = {"zaman": time.time(), "paket": paket, "eski": eski, "yeni": simdi, "ne": ne, "tamam": ok, "dis": True,
+                 "mesaj": f"{ne}: {eski} → {simdi}" + ("" if ok else " · deneme geçmedi, sonuçları kontrol edin")}
+            d["guncellemeler"] = (d.get("guncellemeler", []) + [k])[-30:]
+            sonuc.append(k)
+        onceki[paket] = simdi
+    yaz(d)
+    return sonuc
 
 
 def otomatik_guncelle(log=print):

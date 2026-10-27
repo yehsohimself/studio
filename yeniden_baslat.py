@@ -14,6 +14,36 @@ import urllib.error
 import urllib.request
 
 SITE = "http://127.0.0.1:8765"
+KAPILAR = range(8765, 8772)
+
+
+def yabanci_kapilar():
+    """Sitenin kapılarını (8765-8771) siteden BAŞKA bir program tutuyor mu? 26 Ekim: başka bir çalışmanın açtığı `python -m http.server 8765`
+    yüzünden yeniden başlatılan site kapıyı alamadı ve bütün ürünler kapalı kaldı. Döner: ["8765: Python -m http.server 8765 (klasör)"]."""
+    out = []
+    try:
+        r = subprocess.run(["/usr/sbin/lsof", "-nP", "-iTCP", "-sTCP:LISTEN", "-Fpn"], capture_output=True, text=True, timeout=10)
+    except Exception:  # noqa: BLE001
+        return out
+    pid, gor = None, set()
+    for satir in r.stdout.splitlines():
+        if satir.startswith("p"):
+            pid = satir[1:]
+        elif satir.startswith("n") and pid:
+            try:
+                kapi = int(satir.rsplit(":", 1)[-1])
+            except ValueError:
+                continue
+            if kapi not in KAPILAR or (pid, kapi) in gor:
+                continue
+            gor.add((pid, kapi))
+            komut = subprocess.run(["/bin/ps", "-o", "command=", "-p", pid], capture_output=True, text=True).stdout.strip()
+            if "site.py" in komut:
+                continue
+            cwd = subprocess.run(["/usr/sbin/lsof", "-a", "-p", pid, "-d", "cwd", "-Fn"], capture_output=True, text=True).stdout
+            klasor = next((x[1:] for x in cwd.splitlines() if x.startswith("n")), "")
+            out.append(f"{kapi}: {komut[-80:]} (süreç {pid}{', klasör ' + klasor if klasor else ''})")
+    return out
 
 
 def nedenler():
@@ -59,6 +89,12 @@ def main():
             if time.time() > bitis:
                 print("Süre doldu; site yeniden BAŞLATILMADI.", flush=True); raise SystemExit(2)
             time.sleep(10)
+    yab = yabanci_kapilar()
+    if yab:
+        print("Sitenin kapılarını başka bir program tutuyor; yeniden başlatılsaydı site açılamazdı. Site yeniden BAŞLATILMADI:", flush=True)
+        for x in yab:
+            print("  " + x, flush=True)
+        raise SystemExit(4)
     subprocess.run(["/bin/launchctl", "kickstart", "-k", f"gui/{os.getuid()}/com.yehso.transkript"], check=False)
     for _ in range(30):
         time.sleep(1)
@@ -72,7 +108,9 @@ def main():
                 return
         except Exception:  # noqa: BLE001
             continue
-    print("Site 30 sn içinde yanıt vermedi; site.log'a bakın.", flush=True); raise SystemExit(1)
+    yab = yabanci_kapilar()
+    print("Site 30 sn içinde yanıt vermedi; " + ("kapıyı başka program tutuyor: " + "; ".join(yab) if yab else "site.log'a bakın."), flush=True)
+    raise SystemExit(1)
 
 
 if __name__ == "__main__":

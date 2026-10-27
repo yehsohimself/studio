@@ -812,28 +812,59 @@ def _yz_baglam(veri):
 
 @app.post("/api/ozet/<temel>")
 def ozet_cikar(temel):
-    """Var olan bir transkript için özet üretir (ya da yeniler)."""
+    """Var olan bir transkript için özet üretir (ya da yeniler). 2026-10-27: {bicim: kisa|ayrintili|madde|"", not, varsayilan}
+    eski özet `veri.ozet_gecmis`'e (en çok 5) girer; `varsayilan` seçilen biçimi sonraki videolar için Ayarlar'a yazar."""
     t = _temel_dogrula(temel)
     if not ozet_modulu.hazir():
         return jsonify({"hata": "Özet modeli hazır değil. Kurulum sürüyor olabilir; biraz sonra tekrar deneyin."}), 503
     if temel in ozet_calisan:
         return jsonify({"hata": "Bu transkriptin özeti zaten çıkarılıyor."}), 409
-    hedef = (request.get_json(silent=True) or {}).get("dil") or _ozet_dili()
+    g = request.get_json(silent=True) or {}
+    hedef = g.get("dil") or _ozet_dili()
+    bicim = g.get("bicim")
+    if bicim is not None:
+        bicim = str(bicim) if str(bicim) in ozet_modulu.BICIMLER else ""
     ozet_calisan.add(temel)
     try:
         d = json.loads(t.with_suffix(".json").read_text(encoding="utf-8"))
         with _yz_baglam(d["veri"]):
-            o = ozet_modulu.ozet_uret(paragrafla(d["segmentler"], d["veri"]["etiket"]), d["veri"].get("dil", "tr"), hedef, log=lambda *_: None)
+            o = ozet_modulu.ozet_uret(paragrafla(d["segmentler"], d["veri"]["etiket"]), d["veri"].get("dil", "tr"), hedef,
+                                      log=lambda *_: None, bicim=bicim, istek=str(g.get("not") or "")[:400])
         if not o:
             return jsonify({"hata": "Özet üretilemedi."}), 500
-        d["veri"]["ozet"] = o
         with kilit:
+            d = json.loads(t.with_suffix(".json").read_text(encoding="utf-8"))   # model çalışırken yapılan ad/çeviri değişiklikleri kaybolmasın
+            if d["veri"].get("ozet"):
+                eski = dict(d["veri"]["ozet"]); eski.setdefault("zaman", time.time())
+                d["veri"]["ozet_gecmis"] = ([eski] + list(d["veri"].get("ozet_gecmis") or []))[:5]
+            o["zaman"] = time.time()
+            d["veri"]["ozet"] = o
             ciktilari_yaz(t, d["veri"], d["segmentler"])
-        return jsonify({"tamam": True, "ozet": o})
+            if g.get("varsayilan") and bicim is not None and not (globals().get("_misafir_istek") and _misafir_istek()):   # davetli sahibin ayarını değiştirmesin
+                a = ayarlar_oku(); a["ozet_bicim"] = bicim; ayarlar_yaz(a)
+        return jsonify({"tamam": True, "ozet": o, "ozet_gecmis": d["veri"].get("ozet_gecmis") or []})
     except Exception as e:  # noqa: BLE001
         return jsonify({"hata": f"Özet çıkarılamadı: {e}"}), 500
     finally:
         ozet_calisan.discard(temel)
+
+
+@app.post("/api/ozet/<temel>/geri")
+def ozet_geri(temel):
+    """Önceki özet sürümüne dön: seçilen sürüm özet olur, şimdiki geçmişe girer."""
+    t = _temel_dogrula(temel)
+    i = int((request.get_json(silent=True) or {}).get("i", 0))
+    with kilit:
+        d = json.loads(t.with_suffix(".json").read_text(encoding="utf-8"))
+        gecmis = list(d["veri"].get("ozet_gecmis") or [])
+        if not 0 <= i < len(gecmis):
+            return jsonify({"hata": "Bu sürüm yok."}), 404
+        secilen = gecmis.pop(i)
+        if d["veri"].get("ozet"):
+            gecmis.insert(0, d["veri"]["ozet"])
+        d["veri"]["ozet"], d["veri"]["ozet_gecmis"] = secilen, gecmis[:5]
+        ciktilari_yaz(t, d["veri"], d["segmentler"])
+    return jsonify({"tamam": True, "ozet": secilen, "ozet_gecmis": gecmis[:5]})
 
 
 @app.post("/api/ceviri/<temel>")

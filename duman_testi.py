@@ -36,7 +36,7 @@ def hizli():
         r = subprocess.run([PY, "-m", "py_compile", str(f)], capture_output=True, text=True)
         if r.returncode:
             hatalar.append(f"{f.name}: derlenmiyor: {r.stderr.strip().splitlines()[-1][:200]}")
-    _adlar = [a.strip() for a in "atolye, atolye_bilgi, atolye_kaynak, atolye_analiz, paylasim, claude_yaz, ozet, marka, yedek, ghost_gelisim, ghost_hikaye, ghost_yanit, couple, couple_site, couple_kaynak, couple_takip, couple_video, studio_duzelt, yayin, sahne_dizin, studio_gelisim, pt, pt_beslenme, pt_hareket, pt_rota, pt_site, pt_sohbet, pt_saglik, pt_yemek, pt_form, pt_kanit, pt_push, pt_koc, pt_kart, pt_gorsel, pt_storyboard, pt_youtube, pt_ses".split(",") if a.strip()]
+    _adlar = [a.strip() for a in "atolye, atolye_bilgi, atolye_kaynak, atolye_analiz, paylasim, claude_yaz, ozet, marka, yedek, ghost_gelisim, ghost_hikaye, ghost_yanit, couple, couple_site, couple_kaynak, couple_takip, couple_video, studio_duzelt, yayin, sahne_dizin, studio_gelisim, pt, pt_beslenme, pt_hareket, pt_rota, pt_site, pt_sohbet, pt_saglik, pt_yemek, pt_form, pt_kanit, pt_push, pt_koc, pt_kart, pt_gorsel, pt_storyboard, pt_youtube, pt_ses, pt_oyun, pt_kitaplik, pt_hizli, pt_anatomi, pt_programlar".split(",") if a.strip()]
     _adlar = [a for a in _adlar if (KLASOR / f"{a}.py").exists()]            # kesilen depoda bazı ürünler yok (2026-10-25)
     modul = "import " + ", ".join(_adlar)
     r = subprocess.run([PY, "-c", f"import sys; sys.path.insert(0, {str(KLASOR)!r}); {modul}"], capture_output=True, text=True, cwd=str(KLASOR))

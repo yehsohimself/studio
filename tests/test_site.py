@@ -151,3 +151,38 @@ def test_kapak_adresi_yalniz_http(kok):
     h = kok / "kapak_deneme.jpg"
     ns["_kapak_indir_hedef"](h, "file:///etc/hosts")
     assert not h.exists()
+
+
+def test_paylasilabilir_sayfa(istemci, kok):
+    """2026-10-27: tek dosyalık HTML; başlık, metin ve YouTube zaman bağlantıları; kaçış yapılır."""
+    transkript_yaz(kok, "transkript_tr_sayfa", baslik="Borç <script>alert(1)</script>")
+    r = istemci.get("/disa/transkript_tr_sayfa.html")
+    assert r.status_code == 200 and r.headers["Content-Type"].startswith("text/html")
+    h = r.get_data(as_text=True)
+    assert "Kredi kartı borcu" in h and "youtu.be/abc12345678?t=" in h and "<script>alert(1)" not in h
+    assert "attachment" in istemci.get("/disa/transkript_tr_sayfa.html?indir=1").headers.get("Content-Disposition", "")
+
+
+def test_ozet_onceki_surume_don(istemci, kok):
+    """Özet geçmişinden bir sürüme dönülür; şimdiki özet geçmişe girer."""
+    import json
+    transkript_yaz(kok, "transkript_tr_ozetg")
+    yol = kok / "transkript_tr_ozetg.json"
+    d = json.loads(yol.read_text(encoding="utf-8"))
+    d["veri"]["ozet"] = {"ozet": "Yeni özet.", "maddeler": []}
+    d["veri"]["ozet_gecmis"] = [{"ozet": "Eski özet.", "maddeler": [], "bicim": "kisa"}]
+    yol.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+    r = istemci.post("/api/ozet/transkript_tr_ozetg/geri", json={"i": 0})
+    assert r.status_code == 200 and r.get_json()["ozet"]["ozet"] == "Eski özet."
+    d = json.loads(yol.read_text(encoding="utf-8"))
+    assert d["veri"]["ozet"]["ozet"] == "Eski özet." and d["veri"]["ozet_gecmis"][0]["ozet"] == "Yeni özet."
+    assert istemci.post("/api/ozet/transkript_tr_ozetg/geri", json={"i": 5}).status_code == 404
+
+
+def test_kurulum_denetimi(istemci):
+    j = istemci.get("/api/kurulum").get_json()
+    assert {a["kod"] for a in j["adimlar"]} >= {"ffmpeg", "model", "yazi", "disk"} and "hazir" in j
+
+
+def test_davetli_kurulum_denetimini_gormez(misafir_istemci):
+    assert misafir_istemci.get("/api/kurulum", base_url=M).status_code in (401, 403)

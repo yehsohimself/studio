@@ -2610,6 +2610,7 @@
       <div class="gh-sek" id="ghSek" role="tablist">
         <button type="button" role="tab" data-s="bugun"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Bugün<i></i></button>
         <button type="button" role="tab" data-s="taslak"><svg viewBox="0 0 24 24"><path d="M5 6.5h14M5 12h14M5 17.5h9"/></svg>Taslaklar<i></i></button>
+        <button type="button" role="tab" data-s="blog"><svg viewBox="0 0 24 24"><path d="M5 19.5l1-4L16.5 5a2.1 2.1 0 0 1 3 3L9 18.5z"/><path d="M14.5 7l3 3M5 19.5h14"/></svg>Blog<i></i></button>
         <button type="button" role="tab" data-s="defter"><svg viewBox="0 0 24 24"><path d="M6 3.5h10.5a2.5 2.5 0 0 1 2.5 2.5v14.5H8.5A2.5 2.5 0 0 1 6 18z"/><path d="M6 18a2.5 2.5 0 0 1 2.5-2.5H19M10 8h5"/></svg>Defter<i></i></button>
         <button type="button" role="tab" data-s="ses"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Sesiniz<i></i></button>
       </div>
@@ -2684,7 +2685,7 @@
   <div class="row"><div class="l">Telefonda tek kart<small id="ayGhTekNot"></small></div><button class="sbtn" id="ayGhTekKopyala" type="button">Adresi kopyala</button></div>
   <div class="row"><div class="l">Takip edilen kanallarda otomatik<small>Yeni videolar yazıya dökülünce paylaşmaya değer fikirler kendiliğinden aranır (en çok 3).</small></div><button class="tog" id="ayPyOto" role="switch" aria-checked="true" type="button"></button></div>
   <div class="row"><div class="l">Yazım tarzınız<small>Taslaklar bu tarife göre yazılır; dilediğiniz gibi düzenleyin.</small></div><textarea id="ayPyTarz" rows="4" style="width:280px;max-width:55%;font:inherit;font-size:13px;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea></div>
-  <div class="row"><div class="l">Örnek paylaşımlarınız<small>Kendi yazdığınız birkaç gönderiyi yapıştırın (aralarına boş satır). Ses ve ritim buradan öğrenilir.</small></div><textarea id="ayPyOrnek" rows="5" placeholder="Bir gönderi…&#10;&#10;Bir gönderi daha…" style="width:280px;max-width:55%;font:inherit;font-size:13px;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea></div>
+  <div class="row"><div class="l">Örnek paylaşımlarınız<small>Kendi yazdığınız birkaç gönderiyi yapıştırın; aralarına tek başına --- satırı koyun (gönderi içindeki boş satırlar korunur). Ses ve ritim buradan öğrenilir.</small></div><textarea id="ayPyOrnek" rows="5" placeholder="Bir gönderi…&#10;---&#10;Bir gönderi daha…" style="width:280px;max-width:55%;font:inherit;font-size:13px;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea></div>
   <h4 class="ayh">Paylaşım</h4>
   <div class="row"><div class="l">Aynı ağdaki cihazlara aç<small id="ayAgNot">Aynı Wi‑Fi’daki telefon ve bilgisayarlar siteyi kullanabilir.</small></div><button class="tog" id="ayAg" role="switch" aria-checked="false" type="button"></button></div>
   <div class="row" id="ayUygulamaRow"><div class="l">Telefonda uygulama gibi kullan<small id="ayUygulamaNot"></small></div><button class="sbtn" id="ayTelefonKopyala" type="button">Adresi kopyala</button></div>
@@ -4379,6 +4380,7 @@ const gorulen = new Set(store.get('gorulen', []));
    Bir kutuya yazarken sayfa yenilenmez (yazılan kaybolmasın). */
 const GH_ALAN = [[/futbol ve tek|futbol_tek/i, 'device-mobile', 'Futbol × teknoloji'], [/futbol/i, 'shield-star', 'Futbol'], [/kendi|araç/i, 'package', 'Kendi araçları'],
   [/popüler|populer|kültür/i, 'popcorn', 'Popüler kültür'], [/hikâye|hikaye/i, 'scroll', 'Hikâye'], [/toplum/i, 'users-three', 'Toplum'],
+  [/reklamcılık|reklamcilik|sektör/i, 'megaphone', 'Reklamcılık'], [/gusto|zevk/i, 'wine', 'Gusto'],
   [/kreatif|marka|reklam/i, 'paint-brush', 'Kreatif'], [/yapay|teknoloji/i, 'sparkle', 'Teknoloji']];
 const ghAlan = ad => GH_ALAN.find(([r]) => r.test(ad || '')) || [null, 'chats-circle', ad ? String(ad).split(/[ ,]/)[0] : 'Fikir'];
 const ghIk = ad => `<i class="gh-ik" style="--ik:url(/static/ikon/${ghAlan(ad)[1]}.svg)"></i>`;
@@ -4394,7 +4396,7 @@ const GH_SVG = {mik: '<svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 
 const GH = {gun: null, kGun: {}, sekme: store.get('gSekme', 'bugun'), dsek: store.get('gDsek', 'fikir'), plat: '', alan: '', ara: '', d: null, k: null, f: null,
   kartlar: [], acik: {}, detay: {}, onay: {}, storyHepsi: false, bekliyor: false};
 if (location.hash === '#defter'){ GH.sekme = 'defter'; GH.dsek = 'gorus'; history.replaceState(null, '', location.pathname); }   // Meet'ten gelen "görüş bekliyor" bağlantısı
-if (!['bugun', 'taslak', 'defter', 'ses'].includes(GH.sekme)) GH.sekme = 'bugun';
+if (!['bugun', 'taslak', 'blog', 'defter', 'ses'].includes(GH.sekme)) GH.sekme = 'bugun';
 
 /* ---- veri ve çizim ---- */
 async function paylasimlarCiz(){            // ad korunuyor: kitaplık yenilemesi de bunu çağırıyor
@@ -4422,7 +4424,7 @@ function ghCiz(zorla){
     b.querySelector('i').textContent = s === 'bugun' ? (kalan || '') : s === 'taslak' ? (T.length || '') : s === 'defter' ? (aday || '') : '';
     b.title = s === 'bugun' ? (kalan ? `Bugün paylaşılacak ${kalan} gönderi` : '') : s === 'taslak' ? `${T.length} taslak` : s === 'defter' ? (aday ? `${aday} yeni görüş onayınızı bekliyor` : '') : ''; });
   GH.kartlar = [];
-  $('#ghSayfa').innerHTML = ({bugun: ghBugun, taslak: ghTaslak, defter: ghDefter, ses: ghSes}[GH.sekme] || ghBugun)();
+  $('#ghSayfa').innerHTML = ({bugun: ghBugun, taslak: ghTaslak, blog: ghBlog, defter: ghDefter, ses: ghSes}[GH.sekme] || ghBugun)();
   $('#ghYan').innerHTML = ghSizden() + ghStoryKutu();
   $('#ghHarita').innerHTML = ghHarita();
   $$('#gh .gh-oge.acik .gh-metin').forEach(ghBoy);
@@ -4517,6 +4519,8 @@ function ghDetay(x){
   if ((x.emsal || []).length) h += `<div class="gh-d"><b>Reklam arşivinizden emsal</b>${x.emsal.map(e => `<p>${esc(e.is)} · ${esc(e.neden)}</p>`).join('')}</div>`;
   if (x.kendi_yorum) h += `<div class="gh-d"><b>Sizin cevabınız (konu toplantısı)</b><p>“${esc(x.kendi_yorum)}”</p></div>`;
   const kd = x.kaynak_denetimi;   // 25 Ekim: yorumun dayandığı olgu kaynakla tutarlı mı (ghost_kaynak)
+  if (x.ilk_taslak && x.ilk_taslak !== x.metin && !x.ilk_daha_iyi) h += `<div class="gh-d"><b>Ghost'un ilk yazdığı</b><p>“${esc(x.ilk_taslak)}”</p><p><i>Denetimlerden sonra bugünkü hâline geldi.</i></p><button class="ghb kucuk" type="button" data-a="ilkhal">İlk hâli daha iyi</button></div>`;
+  if (x.duzenleme?.tur === 'sinirli') h += `<div class="gh-d"><b>Yalnızca istediğiniz değişiklik</b><p>${esc((x.duzenleme.notlar || []).join(' · ') || 'Metniniz korundu.')}</p>${(x.kendi_taslak || x.onceki) ? `<p><i>Sizin metniniz: “${esc((x.kendi_taslak || x.onceki).slice(0, 600))}”</i></p>` : ''}</div>`;
   if (kd && kd.kim_ne_yapti) h += `<div class="gh-d"><b>Kaynağa göre</b><p>${esc(kd.kim_ne_yapti)}</p>${x.kaynak_oncesi ? `<p><i>Kaynakla uyuşmayan kısım düzeltildi${(kd.sorunlar || []).length ? ': ' + esc(kd.sorunlar.map(z => z.not || z.iddia).join(' · ').slice(0, 300)) : ''}</i></p>` : ''}</div>`;
   if (x.not_provasi) h += `<div class="gh-d"><b>Topluluk Notu provası · risk ${x.not_provasi.risk}/5</b><p>${esc(x.not_provasi.neden || '')}${x.not_provasi.duzeltildi ? ' Bu yüzden metin düzeltildi.' : ''}</p></div>`;
   if (x.guclendi) h += `<div class="gh-d"><b>Güçlendirildi</b><p>Çekinceler kanıtın izin verdiği kadar azaltıldı. Önceki hâli: “${esc(x.guclendi)}”</p></div>`;
@@ -4750,6 +4754,33 @@ function ghSecki(){
       ${Y[an] ? '<small class="yesil">Taslağı yazıldı · Taslaklar’da</small>' : ghGir('Bunun sizde bir karşılığı var mı? İşinizden ya da gözleminizden bir cümle', `data-g="seckigonder" data-an="${esc(an)}"`, 'Gönderiye çevir').replace('<div><button', `<div><button class="ghb kucuk sol" type="button" data-g="seckiyok" data-an="${esc(an)}">Karşılığım yok, yine de yaz</button><button`)}</div></div>`; }).join('')}</section>`;
 }
 
+/* ---- Blog (ghost_blog.py, 26 Ekim): blog için konu önerileri. Asıl mesele sektörel, tema yalnız giriş; her öneri belirli soru, başlangıç,
+   bilinmeyen; blog yeni açıldığı için ilk yazılar genelden ---- */
+function ghBlogYukle(){
+  fetch('/api/ghost/blog').then(r => r.json()).then(j => { GH.blog = j; if (GH.sekme === 'blog') ghCiz();
+    clearTimeout(GH.blogZ); if (j.calisiyor) GH.blogZ = setTimeout(ghBlogYukle, 5000); }).catch(() => { GH.blog = {hata: 'Yüklenemedi', oneriler: []}; ghCiz(); });
+}
+function ghBlog(){
+  if (GH.blog === undefined){ GH.blog = null; ghBlogYukle(); }
+  const d = GH.blog || {}, H = d.oneriler || [], L = H.filter(o => GH.blogTum || o.durum !== 'gec'), gecen = H.length - H.filter(o => o.durum !== 'gec').length;
+  return `<header class="gh-bas"><div><h2>Blog</h2></div></header>
+    <section class="gh-sayfa-kart"><header><div><b>Yazı konusu önerileri</b><small>Blogunuz için. Asıl mesele hep sektörel; futbol, film, şehir gibi bir tema yalnızca giriş. Blog yeni açıldı: ilk yazılar nişten değil, daha genel bir meseleden başlar.</small></div></header>
+    ${ghGir('İsteğe bağlı yön: “markalar ve arşiv”, “bağımsız çalışma”, “daha genel olsun”', `data-g="blogyenile" ${d.calisiyor ? 'disabled' : ''}`, d.calisiyor ? 'Hazırlanıyor…' : 'Yeni öneriler')}
+    ${d.hata ? `<p class="gh-ipucu">${esc(d.hata)}</p>` : ''}
+    ${GH.blog === null ? '<p class="gh-ipucu">Yükleniyor…</p>' : L.length ? L.map(ghBlogKart).join('')
+      : `<p class="gh-ipucu">${d.calisiyor ? 'Son günlerin keşif ve seçki malzemesinden konular çıkarılıyor; bir iki dakika sürer.' : 'Henüz öneri yok. “Yeni öneriler”e basın.'}</p>`}
+    ${gecen ? `<button class="ghb kucuk" type="button" data-g="blogtum">${GH.blogTum ? 'Geçtiklerimi gizle' : `Geçtiklerimi göster (${gecen})`}</button>` : ''}</section>`;
+}
+function ghBlogKart(o){
+  const k = o.kaynak, sat = (a, v) => v ? `<p><strong>${a}:</strong> ${esc(v)}</p>` : '';
+  return `<div class="gh-sat" data-bid="${esc(o.id)}"><div>
+    <small>${esc(ghTarih(o.zaman, true))}${o.durum ? ' · ' + ({begendim: 'bunu yazarım dediniz', gec: 'geçtiniz', yazildi: 'yazıldı'})[o.durum] : ''}</small>
+    <b>${esc(o.soru)}</b>${sat('Asıl mesele', o.cekirdek)}${sat('Tema', o.tema)}${sat('Başlangıç', o.baslangic)}${sat('Henüz bilinmeyen', o.bilinmeyen)}${sat('Neden ilk yazılara uygun', o.neden_genel)}
+    ${o.kendi ? `<p><strong>Sizin cevabınız:</strong> “${esc(o.kendi)}”</p>` : ''}
+    ${k ? `<small>Kaynak: ${k.link ? `<a href="${esc(k.link)}" target="_blank" rel="noopener">${esc(k.baslik)}</a>` : esc(k.baslik)}${k.ad ? ' · ' + esc(k.ad) : ''}</small>` : ''}
+  </div><div class="eyl"><button class="ghb ${o.durum === 'begendim' ? 'ana' : 'iki'} kucuk" type="button" data-g="blogkarar" data-d="begendim" aria-pressed="${o.durum === 'begendim'}">Bunu yazarım</button><button class="ghb kucuk" type="button" data-g="blogkarar" data-d="gec" aria-pressed="${o.durum === 'gec'}">Geç</button></div></div>`;
+}
+
 /* ---- Sesiniz ---- */
 function ghSes(){
   ghYukle('perf', '/api/x/performans'); ghYukle('terc', '/api/ghost/tercihler');
@@ -4793,7 +4824,7 @@ function ghGelisimHtml(){
   const r = g.rapor, a = g.aktif || {}, o = g.olcum || {}, ak = o.akibet || {}, is = g.isler || {}, calisan = Object.entries(is).filter(([, v]) => v.calisiyor).map(([k]) => k);
   const DG = {agirlik: 'Alan ağırlığı', x_gunluk: 'Günlük X hedefi', tur_ust: 'Tür sınırı', bicim_ust: 'Biçim sınırı', asama_kapat: 'Aşama kapatıldı', asama_ac: 'Aşama açıldı'};
   const AS = g.asamalar_ad || {};
-  const kt = t => String(t || '').replace(/kendi_arac/g, 'Kendi araçları').replace(/futbol_teknoloji/g, 'Futbol × teknoloji').replace(/teknoloji_ai/g, 'Teknoloji')
+  const kt = t => String(t || '').replace(/kendi_arac/g, 'Kendi araçları').replace(/futbol_teknoloji/g, 'Futbol × teknoloji').replace(/teknoloji_ai/g, 'Teknoloji').replace(/reklamcilik/g, 'Reklamcılık')
     .replace(/populer_kultur/g, 'Popüler kültür').replace(/\bKişinin\b/g, 'Sizin').replace(/\bKişi\b/g, 'Siz');   // eski raporlarda kod adı ve üçüncü şahıs
   let h = `<header><div><b>Gelişim</b><small>Ghost her pazartesi kendi haftasını ölçer ve kendini ayarlar; kod gerektiren değişiklikleri size sorar.</small></div>
     <button class="ghb iki kucuk" type="button" data-g="gelDeg" ${calisan.length ? 'disabled' : ''}>${calisan.length ? esc(calisan[0][0].toLocaleUpperCase('tr') + calisan[0].slice(1)) + '…' : 'Şimdi değerlendir'}</button></header>`;
@@ -4850,6 +4881,8 @@ async function ghEylem(a, b, el){
   const k = ghAnahtar(x), ta = el.querySelector('.gh-metin'), metin = () => ta.value.trim(), li = x.platform === 'linkedin';
   const yaz = async (yol, govde, mesaj) => { el.classList.add('isliyor'); toast(mesaj, null, null, 60000); const r = await ghApi(x, govde, yol); el.classList.remove('isliyor');
     if (!r._ok || r.hata){ toast(r.hata || 'Olmadı; bir daha deneyin'); return; } toast('Yeni hâli hazır'); GH.acik[k] = true; paylasimlarCiz(); };
+  if (a === 'ilkhal'){ const r = await ghApi(x, {metin: x.ilk_taslak, eski: x.metin, ilk_daha_iyi: true});
+    toast(r._ok ? 'İlk hâline döndü; denetimlerin bunu bozduğu not edildi' : r.hata || 'Olmadı'); GH.acik[k] = true; paylasimlarCiz(); return; }
   if (a === 'ac'){ const ac = !el.classList.contains('acik'); el.classList.toggle('acik', ac); GH.acik[k] = ac; el.querySelector('.gh-ust').setAttribute('aria-expanded', ac); if (ac){ ghBoy(ta); ghXYukle(el, x); } return; }
   if (a === 'daha'){ const bak = !!b.querySelector('.gh-rozet');
     return popover(b, [['Kopyala', () => ghEylem('kopya', b, el)], ['Daha kısa', () => yaz('/yeniden', {talimat: 'kisa'}, 'Kısaltılıyor…')], ['Daha keskin', () => yaz('/yeniden', {talimat: 'keskin'}, 'Keskinleştiriliyor…')], ['Son cümleyi parlat…', () => ghEylem('parlat', b, el)],
@@ -4982,6 +5015,13 @@ async function ghSayfaEylem(g, b){
     case 'arsivara': { const q = ($('#ghArsivQ')?.value || '').trim(); if (q.length < 3){ toast('En az bir kelime yazın'); return; } GH.arsivQ = q; GH.arsivR = null; ghCiz(true);
       const r = await fetch('/api/reklam-arsivi?q=' + encodeURIComponent(q)).then(x => x.json()).catch(() => ({})); GH.arsivR = r.sonuclar || []; return ghCiz(true); }
     case 'arsivac': GH.arsivAcik = GH.arsivAcik === b.dataset.i ? null : b.dataset.i; return ghCiz(true);
+    case 'blogyenile': { b.disabled = true; const r = await ghPost('/api/ghost/blog', {yon: deger()}); if (!r._ok || r.hata){ toast(r.hata || 'Olmadı'); b.disabled = false; return; }
+      toast('Blog konuları hazırlanıyor; bir iki dakika sürer', null, null, 6000); const t = kutu(); if (t) t.value = '';
+      GH.blog = {...(GH.blog || {}), calisiyor: true}; ghCiz(true); clearTimeout(GH.blogZ); GH.blogZ = setTimeout(ghBlogYukle, 4000); return; }
+    case 'blogkarar': { const id = b.closest('[data-bid]').dataset.bid, o = (GH.blog?.oneriler || []).find(x => x.id === id) || {}, d = o.durum === b.dataset.d ? null : b.dataset.d;
+      b.disabled = true; const r = await ghPost('/api/ghost/blog', {id, durum: d}); b.disabled = false; if (!r._ok || r.hata){ toast(r.hata || 'Kaydedilemedi'); return; }
+      Object.assign(o, r.oneri); if (d === 'gec') toast('Geçildi; sonraki önerilerde bu yönden kaçınılır'); return ghCiz(true); }
+    case 'blogtum': GH.blogTum = !GH.blogTum; return ghCiz(true);
     case 'fkyaz': { b.disabled = true; return bitir(await ghPost('/api/ghost/fikir-karti/yaz', {anahtar: b.dataset.a}), 'Görüşünüz bu habere tepki olarak yazılıyor'); }
     case 'yenile': return popover(b, [['Yeni öneri getir', () => ghSayfaEylem('kesif', b)], null, ['Bunları beğenmediyseniz neden?', null], ...GH_RED_NEDEN,
       ['Nedensiz yenile', () => ghTurRed('')], null, ['Ya da kendi cümlenizle yazıp ↩', null]], {input: {placeholder: 'Ör. “daha çok futbol ve kültür”', onEnter: v => ghTurRed(v)}});
@@ -5057,7 +5097,7 @@ async function ghYaz(){ const g = $('#ghGirdi').value.trim(), b = $('#ghYaz'); i
   const r = await ghPost('/api/ghost/yaz', {girdi: g}); b.textContent = 'Yaz';
   if (!r._ok){ toast(r.hata || 'Olmadı', null, null, 7000); ghIpucu(); return; }
   $('#ghGirdi').value = ''; $('#ghGirdi').style.height = ''; ghIpucu();
-  if (r.tur === 'x' || r.tur === 'yazi_link'){ GH.sonuc = {temel: r.temel, p: null}; ghSonucCek(); ghSekme('bugun'); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+  if (r.tur === 'x' || r.tur === 'yazi_link' || r.tur === 'taslak'){ GH.sonuc = {temel: r.temel, p: null, tur: r.tur}; ghSonucCek(); ghSekme('bugun'); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   toast(r.tur === 'video' ? 'Video yazıya dökülüyor; taslak hazır olunca Bugün’de görünür' : 'Taslak yazılıyor; bir iki dakika sürer', null, null, 6000); setTimeout(paylasimlarCiz, 800); }
 // 23 Ekim: bağlantı verilince Ghost karar verir (alıntıla / fikri kendi gönderine çevir / geç); sonuç Bugün'ün en üstünde "Bağlantınız için"
 async function ghSonucCek(){ const S = GH.sonuc; if (!S) return;
@@ -5067,6 +5107,11 @@ async function ghSonucCek(){ const S = GH.sonuc; if (!S) return;
   S.adim = (j?.log || []).slice(-1)[0] || ''; ghCiz(); setTimeout(ghSonucCek, 4000); }
 function ghSonucKutu(){ const S = GH.sonuc; if (!S) return '';
   const kapat = `<button class="ghb kucuk" type="button" data-g="sonuckapat">Kapat</button>`;
+  if (S.tur === 'taslak'){ const T = S.p?.taslaklar || [], dz = T[0]?.duzenleme || {};
+    if (!S.p) return `<section class="gh-sonuc"><header><b>Taslağınız.</b> <span class="pr-gri">Düzenleniyor…</span>${kapat}</header><div class="gh-haz"><i class="spin"></i><span>Yalnızca istediğiniz değişiklik yapılıyor; metninizin geri kalanı korunuyor</span></div></section>`;
+    return `<section class="gh-sonuc"><header><b>Taslağınız.</b> <span class="pr-gri">İstediğiniz değişiklik yapıldı.</span>${kapat}</header>`
+      + ((dz.notlar || []).length ? `<p class="gh-sonuc-neden">${(dz.notlar || []).map(esc).join(' · ')}</p>` : '')
+      + `<div class="gh-liste">${T.map((x, n) => ghKart(x, n === 0)).join('')}</div></section>`; }
   if (!S.p) return `<section class="gh-sonuc"><header><b>Bağlantınız için.</b> <span class="pr-gri">Ghost bakıyor…</span>${kapat}</header><div class="gh-haz"><i class="spin"></i><span>İçerik okunuyor, ne diyerek paylaşacağınıza karar veriliyor</span></div></section>`;
   const k = S.p.karar || {}, T = S.p.taslaklar || [];
   const yol = {alinti: 'Alıntılayın ve şunu deyin', fikir: 'Fikri kendi gönderinize çevirin', gec: 'Bunu paylaşmanızı önermem', hata: 'Okunamadı'}[k.mod] || '';
@@ -5955,7 +6000,7 @@ async function ayarlarAc(){
     await fetch('/api/ayarlar', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({danisman: v})}); toast(v ? 'Her toplantıdan sonra danışman notu hazırlanacak' : 'Danışman notu kapandı'); };
   $('#ayClaudeTop').onclick = async () => { const v = $('#ayClaudeTop').getAttribute('aria-checked') !== 'true'; $('#ayClaudeTop').setAttribute('aria-checked', v); a.claude_toplanti = v;
     await fetch('/api/ayarlar', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({claude_toplanti: v})}); toast(v ? 'Toplantılarda Claude açık' : 'Toplantılar yalnızca bu bilgisayarda işlenecek'); };
-  try{ const px = await (await fetch('/api/x-profil')).json(); $('#ayPyTarz').value = px.tarz || ''; $('#ayPyOrnek').value = (px.ornekler || []).join('\n\n'); $('#ayPyOto').setAttribute('aria-checked', px.takip_otomatik !== false); $('#ayPyHer').setAttribute('aria-checked', px.her_video !== false);
+  try{ const px = await (await fetch('/api/x-profil')).json(); $('#ayPyTarz').value = px.tarz || ''; $('#ayPyOrnek').value = (px.ornekler || []).join('\n---\n'); $('#ayPyOto').setAttribute('aria-checked', px.takip_otomatik !== false); $('#ayPyHer').setAttribute('aria-checked', px.her_video !== false);
     $('#ayPyHer').onclick = () => { const v = $('#ayPyHer').getAttribute('aria-checked') !== 'true'; $('#ayPyHer').setAttribute('aria-checked', v); pyKaydet({her_video: v}); };
     const pyKaydet = async (b) => { await fetch('/api/x-profil', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(b)}); toast('Kaydedildi'); };
     $('#ayPyTarz').onchange = () => pyKaydet({tarz: $('#ayPyTarz').value}); $('#ayPyOrnek').onchange = () => pyKaydet({ornekler: $('#ayPyOrnek').value});
@@ -6301,8 +6346,8 @@ function stCizgi(){
     if (Object.keys(state.jobs).length && !state.timer){ state.timer = setInterval(pollJobs, 1500); pollJobs(); } }catch(e){}
 })();
 </script>
-<script src="/static/studio_ek.js?v=18"></script>
-<script src="/static/meet_ek.js?v=9"></script>
+<script src="/static/studio_ek.js?v=25"></script>
+<script src="/static/meet_ek.js?v=13"></script>
 <script src="/static/teslim_ek.js?v=2"></script>
 <script src="/static/takip_ek.js?v=1"></script>
 </body>

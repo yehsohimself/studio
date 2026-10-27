@@ -428,3 +428,35 @@ def goster(temel):
     return jsonify({"tamam": True})
 
 
+# ----------------------------------------------------------------------------- Claude bağlantısı (2026-10-27: 07_ghost.py'den taşındı; tek başına
+# kurulan Studio'da yoktu, Ayarlar'daki "Claude'a bağlan" ve kullanım satırı 404 alıyordu)
+@app.get("/api/claude")
+def claude_get():
+    import claude_yaz
+    return jsonify({**claude_yaz.durum(zorla=True), "model": claude_yaz.model()})
+
+
+@app.get("/api/claude/kullanim")
+def claude_kullanim():
+    import claude_yaz
+    gun = min(31, max(1, int(request.args.get("gun") or 7)))
+    return jsonify(claude_yaz.kullanim_ozeti(gun))
+
+
+@app.post("/api/claude/baglan")
+def claude_baglan():
+    """Giriş penceresini Terminal'de açar; kullanıcı tarayıcıda onaylar. 2026-10-27: betik kurulum klasörüne göre her seferinde yazılır
+    (eski 'Claude'a Giriş.command' ev klasöründeki sabit yolu kullanıyordu; GitHub'dan başka yere kurulan Studio'da yoktu)."""
+    import claude_yaz
+    prog = claude_yaz.program()
+    if not prog:
+        return jsonify({"hata": "Claude programı bulunamadı. Claude masaüstü uygulamasını ya da Claude Code'u kurun.",
+                        "hata_en": "Claude was not found. Install the Claude desktop app or Claude Code."}), 404
+    komut = KAYIT / ".claude_giris.command"
+    durum = KAYIT / ".claude_durum.json"
+    komut.write_text("#!/bin/zsh\nclear\necho ''\necho '  Claude · giriş / sign in'\necho '  Tarayıcıda açılan sayfada onaylayın, sonra bu pencereyi kapatın.'\n"
+                     "echo '  Approve in the browser page that opens, then close this window.'\necho ''\n"
+                     f"'{prog}' auth login\nrm -f '{durum}'\n", encoding="utf-8")
+    komut.chmod(0o700)
+    subprocess.Popen(["/usr/bin/open", str(komut)])
+    return jsonify({"tamam": True})

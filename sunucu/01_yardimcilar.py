@@ -144,6 +144,8 @@ def mesgul_nedenler():
         n.append("Ghost defteri hazırlanıyor")
     if globals().get("kesif_durum", {}).get("calisiyor"):
         n.append("Ghost keşfi sürüyor")
+    if globals().get("blog_durum", {}).get("calisiyor"):
+        n.append("Ghost blog konuları hazırlanıyor")
     if any(x.get("calisiyor") for x in list(globals().get("atolye_durum", {}).values())):
         n.append("atölye çalışması sürüyor")
     if ozet_calisan or klip_calisan:

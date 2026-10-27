@@ -297,7 +297,8 @@ popover = function(anchor, items, opts){   // eslint-disable-line no-global-assi
   const v = veri(), temel = aktif();
   if (anchor?.id === 'dosyaMenu' && temel){
     const tur = (v.turemisler || []).length;
-    items = [...items, null, ['Hepsi tek dosyada (zip)', () => { location.href = '/zip/' + encodeURIComponent(temel) + '.zip'; toast('Zip hazırlanıyor'); }],
+    items = [['Paylaşılabilir sayfa (tek dosya)', () => { location.href = '/disa/' + encodeURIComponent(temel) + '.html?indir=1'; toast('Sayfa indiriliyor; e-postayla ya da mesajla gönderebilirsiniz'); }],
+      ['Sayfayı önizle ↗', () => window.open('/disa/' + encodeURIComponent(temel) + '.html', '_blank')], null, ...items, null, ['Hepsi tek dosyada (zip)', () => { location.href = '/zip/' + encodeURIComponent(temel) + '.zip'; toast('Zip hazırlanıyor'); }],
       ...(tur ? [[`Hepsi + üretilen ${tur} video (zip)`, () => { location.href = '/zip/' + encodeURIComponent(temel) + '.zip?video=1'; toast('Zip hazırlanıyor; videolar büyükse biraz sürer'); }]] : []),
       ...(v.yayin ? [['Yayın paketi (Word)', () => indirDosya(temel + '.yayin.docx', 'Yayın paketi')]] : [])];
   }
@@ -431,13 +432,141 @@ if ($('.nav') || $('header')){ ustOlc(); try{ new ResizeObserver(ustOlc).observe
 function mevcutBak(){ document.body.classList.toggle('st-mevcut', !!$('#mevcutAc')); }
 if ($('#notice')) new MutationObserver(mevcutBak).observe($('#notice'), {childList: true, subtree: true});
 
+/* ---------------------------------------------------------------- 11) mini oynatıcı ve klavye kısayolları (2026-10-27)
+   Oynatıcı eskiden ekranın üstünde 42vh yer kaplayarak yapışık kalıyor, aşağıdaki kartların ve sekmelerin üstüne biniyordu.
+   Artık yerinde durur; okurken geçilince sol alt köşede küçük oynatıcı olur (aynı öğe, video yeniden yüklenmez). */
+function miniOyKur(){
+  const oy = $('#oynatici'); if (!oy || oy._mini) return; oy._mini = true;
+  const yapisik = () => { const s = oy.closest('.solk'); return !!s && getComputedStyle(s).position === 'sticky'; };   // geniş ekranda sol sütun zaten görünür kalır
+  const yer = document.createElement('div'); yer.className = 'oy-yer'; oy.before(yer);
+  const isaret = document.createElement('div'); isaret.className = 'oy-isaret'; oy.after(isaret);
+  const kapat = document.createElement('button'); kapat.type = 'button'; kapat.className = 'oy-kapat'; kapat.title = 'Küçük oynatıcıyı kapat'; kapat.setAttribute('aria-label', 'Küçük oynatıcıyı kapat'); kapat.textContent = '×';
+  kapat.onclick = e => { e.stopPropagation(); oy.classList.add('mini-gizli'); try{ OY.tur === 'yt' ? OY.p?.pauseVideo?.() : OY.p?.pause?.(); }catch(_){ } };
+  oy.appendChild(kapat);
+  const io = new IntersectionObserver(([g]) => {
+    const mini = !g.isIntersecting && g.boundingClientRect.top < 80 && !yapisik();
+    if (mini === oy.classList.contains('mini')) return;
+    yer.style.height = mini ? oy.offsetHeight + 'px' : '0';
+    oy.classList.toggle('mini', mini); if (!mini) oy.classList.remove('mini-gizli');
+  }, {rootMargin: '-80px 0px 0px 0px'});
+  io.observe(isaret);
+}
+/* Tek kişinin konuştuğu videoda (çoğu YouTube videosu) "Konuşmacı 1 · %100" satırı ve her paragraftaki ad tekrar eden gürültü:
+   satır tek ad kutusuna iner, paragraf adları gizlenir (ad verilirse yine görünür). */
+function tekKonusmaci(v){
+  const adlar = new Set((state.sonuc?.paragraflar || []).map(p => p.ad)); const doc = $('#doc'); if (!doc) return;
+  const tek = adlar.size === 1, genel = tek && /^Konuşmacı \d+$/.test([...adlar][0]);
+  doc.classList.toggle('tekkon', tek); doc.classList.toggle('tekgenel', genel && !v.toplanti);
+  const r = $('#adUygula')?.closest('.r2'); if (r && genel){ const l = r.querySelector('.lbl'); if (l) l.textContent = 'Konuşan'; const i = r.querySelector('.spk input'); if (i){ i.placeholder = 'Adını yazın'; i.title = 'Konuşanın adını yazıp kaydedin; sesi de öğrenilir'; } }
+}
+/* ---------------------------------------------------------------- 12) özeti yenile ▾ (2026-10-27; gelişim önerisi "Özeti ilk seferde doğru yap")
+   Tek "Özeti yenile" yerine biçim (kısa / ayrıntılı / madde madde / kendi notunuz), eski sürüme dönme ve seçilen biçimi varsayılan yapma. */
+const OZET_BICIM = {kisa: 'Daha kısa', ayrintili: 'Daha ayrıntılı', madde: 'Madde madde'};
+async function ozetYenile(temel, v, govde, b){
+  b.disabled = true; b.textContent = 'Özet yazılıyor…'; toast('Özet yeniden yazılıyor');
+  try{ const j = await post('/api/ozet/' + encodeURIComponent(temel), govde);
+    if (aktif() !== temel) return; v.ozet = j.ozet; v.ozet_gecmis = j.ozet_gecmis; $('#ozetKutu').innerHTML = ozetHtml(v); ozetBagla(temel, v);
+    toast(govde.varsayilan ? 'Özet hazır; bundan sonraki videolarda da bu biçim' : 'Özet hazır · önceki sürüm saklandı'); }
+  catch(e){ toast(e.message || 'Özet yazılamadı'); b.disabled = false; b.textContent = 'Özeti yenile ▾'; }
+}
+function ozetMenuKur(temel, v){
+  const b = $('#ozetCikar'); if (!b || !v.ozet || b._menu) return; b._menu = true; b.textContent = 'Özeti yenile ▾'; b.setAttribute('aria-haspopup', 'menu');
+  const gecmis = v.ozet_gecmis || [];
+  if (v.ozet.bicim || v.ozet.istek){ const s = document.createElement('span'); s.className = 'hint'; s.textContent = [OZET_BICIM[v.ozet.bicim], v.ozet.istek ? '“' + v.ozet.istek.slice(0, 60) + '”' : ''].filter(Boolean).join(' · '); b.before(s); }
+  b.onclick = e => { e.stopPropagation(); const k = (bicim, ek = {}) => () => ozetYenile(temel, v, {bicim, ...ek}, b);
+    const tarih = z => z ? new Date(z * 1000).toLocaleString(DIL.locale, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : 'önceki';
+    popover(b, [
+      ['Aynı biçimde yeniden yaz', k(v.ozet.bicim || '')],
+      ...Object.entries(OZET_BICIM).filter(([kk]) => kk !== v.ozet.bicim).map(([kk, ad]) => [ad, k(kk)]),
+      ...(v.ozet.bicim ? [['Bu biçim her videoda varsayılan olsun', () => post('/api/studio-ayar', {ozet_bicim: v.ozet.bicim}).then(() => toast('Yeni videolarda özet ' + OZET_BICIM[v.ozet.bicim].toLowerCase() + ' yazılacak')).catch(() => toast('Kaydedilemedi'))]] : []),
+      ...(gecmis.length ? [null, ['Önceki sürümler', null], ...gecmis.map((o, i) => [`${tarih(o.zaman)}${o.bicim ? ' · ' + OZET_BICIM[o.bicim] : ''} · ${String(o.ozet || '').slice(0, 42)}…`, () => post('/api/ozet/' + encodeURIComponent(temel) + '/geri', {i}).then(j => { v.ozet = j.ozet; v.ozet_gecmis = j.ozet_gecmis; $('#ozetKutu').innerHTML = ozetHtml(v); ozetBagla(temel, v); toast('Önceki özete dönüldü'); }).catch(er => toast(er.message))])] : []),
+    ], {input: {placeholder: 'Ne değişsin? ör. rakamları da yaz', dugme: 'Yeniden yaz', onEnter: not => ozetYenile(temel, v, {bicim: v.ozet.bicim || '', not}, b)}});
+    const pp = document.querySelector('.pop'), r = b.getBoundingClientRect();   // sayfanın sonunda: menü sığmıyorsa düğmenin üstüne açılır
+    if (pp && pp.getBoundingClientRect().bottom > innerHeight - 8 && r.top > pp.offsetHeight + 12) pp.style.top = (r.top + scrollY - pp.offsetHeight - 6) + 'px'; };
+}
+const _ozetBagla = ozetBagla;
+ozetBagla = function(temel, v){ _ozetBagla(temel, v); try{ if (!v.toplanti) ozetMenuKur(temel, v); }catch(e){ console.warn(e); } };   // eslint-disable-line no-global-assign
+/* ---------------------------------------------------------------- 13) metinden kesme (2026-10-27; gelişim önerisi "Kesim iptalinde emeği koru")
+   Vazgeç'e basınca seçilen paragraflar kaybolmaz: aynı videoda Kes yeniden açılınca geri gelir. Duraksama (ee, ıı, hmm) temizliği
+   Seçenekler'in içinden çubuğa çıktı; kaç tane olduğu ve kaç saniye kazandıracağı yazar. */
+const kesAnahtar = () => 'kesSecim_' + aktif();
+const _secimBitir = secimBitir;
+secimBitir = function(){   // eslint-disable-line no-global-assign
+  try{ if (state.secim === 'kes' && aktif()){ const s = [...(state.secili || [])]; s.length || $('#kesDolgu').checked ? store.set(kesAnahtar(), {s, d: $('#kesDolgu').checked, z: Date.now()}) : store.set(kesAnahtar(), null); } }catch(e){}
+  return _secimBitir();
+};
+const _secimBasla = secimBasla;
+secimBasla = function(v, tur){   // eslint-disable-line no-global-assign
+  const r = _secimBasla(v, tur);
+  if (tur === 'kes'){ try{
+    const k = store.get(kesAnahtar(), null), n = (state.sonuc?.paragraflar || []).length;
+    if (k && Date.now() - (k.z || 0) < 30 * 864e5){ (k.s || []).filter(i => i < n).forEach(i => state.secili.add(i)); $('#kesDolgu').checked = !!k.d; secimCiz(); if (state.secili.size) toast(`Önceki seçiminiz geri geldi: ${state.secili.size} paragraf`); }
+    kesDolguKur();
+  }catch(e){ console.warn(e); } }
+  return r;
+};
+async function kesDolguKur(){
+  let b = $('#kesDolguBtn'); if (!b){ b = document.createElement('button'); b.type = 'button'; b.className = 'sbtn'; b.id = 'kesDolguBtn'; $('#kesSecenek').before(b);
+    b.onclick = () => { $('#kesDolgu').checked = !$('#kesDolgu').checked; secimCiz(); dolguYaz(); }; }
+  b.hidden = true; const temel = aktif();
+  try{ const d = await json('/api/dolgu/' + encodeURIComponent(temel)); if (aktif() !== temel) return;
+    const a = d['aralıklar'] || []; if (!d.kelime_zamani_var || !a.length) return;
+    b.dataset.n = a.length; b.dataset.sn = Math.round(a.reduce((t, x) => t + (x[1] - x[0]), 0)); b.hidden = false; dolguYaz(); }catch(e){}
+}
+function dolguYaz(){ const b = $('#kesDolguBtn'); if (!b) return; const on = $('#kesDolgu').checked;
+  b.setAttribute('aria-pressed', on); b.classList.toggle('blue', false); b.textContent = (on ? '✓ ' : '') + `Duraksamalar (${b.dataset.n}) · ${b.dataset.sn} sn`; b.title = on ? 'Duraksamalar videodan çıkarılacak; geri almak için tıklayın' : 'ee, ıı, hmm gibi duraksamaları videodan çıkar'; }
+const _secimCiz = secimCiz;
+secimCiz = function(){ const r = _secimCiz(); try{ if (state.secim === 'kes') dolguYaz(); }catch(e){} return r; };   // eslint-disable-line no-global-assign
+/* ---------------------------------------------------------------- 14) ana sayfa: kurulum denetimi ve son çalışmalar (2026-10-27)
+   Yeni kuran biri eksikleri (ffmpeg, ses modeli, Claude/yerel model) tek kartta görür; geri gelen kullanıcı son videolarına tek tıkla döner. */
+function anaKutu(){ let k = $('#stAna'); if (!k){ k = document.createElement('div'); k.id = 'stAna'; $('.composer')?.after(k); } return k; }
+async function kurulumCiz(yenile){
+  let d; try{ d = await json('/api/kurulum' + (yenile ? '?yenile=1' : '')); }catch(e){ return; }
+  const k = anaKutu(); let kart = $('#stKurulum');
+  const eksik = d.adimlar.filter(a => !a.tamam);
+  if (!eksik.length || (store.get('kurulumGizli', 0) > Date.now() && d.hazir)){ kart?.remove(); return; }
+  if (!kart){ kart = document.createElement('div'); kart.id = 'stKurulum'; kart.className = 'st-kurulum'; k.prepend(kart); }
+  kart.innerHTML = `<div class="st-kb"><div><b>${d.hazir ? 'Studio’yu tamamlayın' : 'Studio’yu hazırlayın'}</b><span class="hint">${eksik.length} adım kaldı${d.hazir ? '; şimdi de kullanabilirsiniz' : ''}</span></div>${d.hazir ? '<button class="sbtn plain" type="button" data-k="gizle">Sonra</button>' : ''}</div>
+    <ol>${d.adimlar.map(a => `<li class="${a.tamam ? 'ok' : ''}"><span class="st-ki">${a.tamam ? '✓' : a.iniyor ? '…' : ''}</span><div><div class="st-ka">${esc(a.ad)}${a.durum ? ` <span class="hint">${esc(a.durum)}</span>` : ''}${a.zorunlu && !a.tamam ? ' <span class="chip warn">gerekli</span>' : ''}</div>
+      ${a.tamam ? '' : `<div class="hint">${esc(a.iniyor ? 'İndiriliyor; birkaç dakika sürer.' : a.nasil)}</div>${a.komut ? `<div class="st-kmt"><code>${esc(a.komut)}</code><button class="tiny" type="button" data-kopya="${esc(a.komut)}">Kopyala</button></div>` : ''}${a.eylem === 'model' && !a.iniyor ? '<button class="sbtn" type="button" data-k="model">Şimdi indir</button>' : ''}${a.eylem === 'claude' ? '<button class="sbtn blue" type="button" data-k="claude">Claude’a bağlan</button>' : ''}`}</div></li>`).join('')}</ol>
+    <button class="textbtn" type="button" data-k="yenile">Yeniden denetle</button>`;
+  kart.onclick = async e => { const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.kopya){ kopyala(b.dataset.kopya, 'Komut kopyalandı; Terminal’e yapıştırın'); return; }
+    const k2 = b.dataset.k;
+    if (k2 === 'gizle'){ store.set('kurulumGizli', Date.now() + 7 * 864e5); kart.remove(); return; }
+    if (k2 === 'yenile'){ b.textContent = 'Denetleniyor…'; await kurulumCiz(true); return; }
+    if (k2 === 'model'){ b.disabled = true; await post('/api/model-indir', {model: 'turbo'}).catch(() => {}); toast('Ses modeli iniyor'); setTimeout(() => kurulumCiz(true), 1500); return; }
+    if (k2 === 'claude'){ b.disabled = true; try{ await post('/api/claude/baglan'); toast('Terminal’de giriş penceresi açıldı; tarayıcıda onaylayın'); }catch(er){ toast(er.message); } setTimeout(() => kurulumCiz(true), 20000); }
+  };
+}
+function sonCiz(){
+  const k = anaKutu(); let s = $('#stSon');
+  const list = (state.tumListe || []).filter(x => !x.toplanti && !x.atolye).sort((a, b) => (b.olusturma || 0) - (a.olusturma || 0)).slice(0, 4);
+  if (!list.length){ s?.remove(); return; }
+  if (!s){ s = document.createElement('section'); s.id = 'stSon'; s.className = 'st-son'; k.appendChild(s); }
+  const gun = t => { const f = (Date.now() / 1000 - t) / 86400; return f < 1 ? 'bugün' : f < 2 ? 'dün' : new Date(t * 1000).toLocaleDateString(DIL.locale, {day: 'numeric', month: 'short'}); };
+  s.innerHTML = `<div class="st-sonb"><h3>Son çalışmalar</h3><button class="textbtn" type="button" onclick="yuzSec('kitaplik')">Tümü →</button></div><div class="st-sonl">${list.map(x => `<button type="button" class="st-sonk" data-t="${esc(x.temel)}">${x.kapak ? `<img src="${esc(x.kapak)}${x.kapak.startsWith('/kapak/') ? '?w=320' : ''}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '<span class="st-sonbos"></span>'}<span class="st-sont">${esc(x.baslik || x.temel)}</span><span class="hint">${gun(x.olusturma || 0)}${x.sure ? ' · ' + sure(x.sure) : ''}</span></button>`).join('')}</div>`;
+  s.onclick = e => { const b = e.target.closest('.st-sonk'); if (b) sonucGoster(b.dataset.t); };
+}
+const _gecmisYukle = gecmisYukle;
+gecmisYukle = async function(){ const r = await _gecmisYukle(); try{ sonCiz(); }catch(e){ console.warn(e); } return r; };   // eslint-disable-line no-global-assign
+function miniOyBekle(){ let n = 0; const t = setInterval(() => { if ($('#oynatici') || ++n > 40){ clearInterval(t); miniOyKur(); } }, 250); }
+document.addEventListener('keydown', e => {
+  if (!state.aktifTemel || $('#resultSec')?.classList.contains('hidden') || !OY.p || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.target.closest?.('input,textarea,select,[contenteditable],button') || document.querySelector('.pop,dialog[open]')) return;
+  const sn = oyZaman();
+  if (e.key === ' ' || e.key.toLowerCase() === 'k'){ e.preventDefault(); try{ oyCaliyor() ? (OY.tur === 'yt' ? OY.p.pauseVideo() : OY.p.pause()) : (OY.tur === 'yt' ? OY.p.playVideo() : OY.p.play()); }catch(_){ } }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){ e.preventDefault(); oyGit(Math.max(0, sn + (e.key === 'ArrowLeft' ? -5 : 5))); }
+  else if (e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'l'){ e.preventDefault(); oyGit(Math.max(0, sn + (e.key.toLowerCase() === 'j' ? -10 : 10))); }
+});
+
 /* ---------------------------------------------------------------- bağlantılar */
 const _sonucGoster = sonucGoster;
 sonucGoster = async function(temel, opts = {}){   // eslint-disable-line no-global-assign
   if (KR.acik && temel !== aktif()){ kurguDurdur(); KR.acik = false; $('#kurgubar')?.classList.remove('show'); }
   const r = await _sonucGoster(temel, opts);
   try{ const v = veri();
-    duzeltKur();
+    duzeltKur(); miniOyBekle(); tekKonusmaci(v);
     if (!v.toplanti){ yayinCiz(temel); sonrakiEkle(temel, v); okumaKur(temel, v, opts); }
     if (KR.acik && aktif() === temel){ $('#doc').classList.add('kurgu'); kurguCiz(); }
   }catch(e){ console.warn('Studio eki:', e); }
@@ -454,9 +583,11 @@ sistemCiz = async function(){ const r = await _sistemCiz(); try{ await gelisimCi
 const _libGoster = libGoster;
 libGoster = function(tab, kaydir){ _libGoster(tab, kaydir); try{ $('#stSuz')?.classList.toggle('hidden', tab !== 'tx'); $('#stSahne')?.classList.toggle('hidden', tab !== 'tx' || !SZ.sahne); if (tab === 'tx' && SZ.sahne) $('#hist').classList.add('hidden'); if (tab === 'dl') temizlikKur(); }catch(e){} };   // eslint-disable-line no-global-assign
 
-const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=12'; document.head.appendChild(css);
+const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=16'; document.head.appendChild(css);
 const bekle = setInterval(() => { if ($('#hist')){ clearInterval(bekle); suzgecKur(); } }, 300);
 if ($('#dls')) new MutationObserver(() => temizlikKur()).observe($('#dls'), {childList: true});
 if ($('#aySistem') && $('#aySistem').textContent.trim() && !$('#aySistem').textContent.includes('Yükleniyor')) gelisimCiz();
+if (matchMedia('(max-width:520px)').matches && $('#link')) $('#link').placeholder = (window.DIL?.t || (x => x))('Video linki');
+kurulumCiz(); { let n = 0; const t = setInterval(() => { if (state.tumListe || ++n > 60){ clearInterval(t); try{ sonCiz(); }catch(e){} } }, 300); }
 if (state.aktifTemel && state.sonuc){ duzeltKur(); if (!veri().toplanti){ yayinCiz(state.aktifTemel); sonrakiEkle(state.aktifTemel, veri()); } }
 })();

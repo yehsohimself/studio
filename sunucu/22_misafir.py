@@ -306,7 +306,7 @@ IZINLI = {
     ("GET", "/api/indirilenler"): None, ("GET", "/indirilen/<path:dosya>"): "indirilen", ("GET", "/indirilen-kapak/<path:dosya>"): "indirilen_kapak",
     ("DELETE", "/api/indirilen/<path:dosya>"): "indirilen", ("POST", "/api/indirilen-geri/<path:dosya>"): "indirilen",
     ("GET", "/api/metin/<temel>"): "temel", ("DELETE", "/api/sil/<temel>"): "temel", ("POST", "/api/geri-al/<temel>"): "temel",
-    ("POST", "/api/isimlendir/<temel>"): "temel", ("POST", "/api/segment/<temel>"): "temel", ("POST", "/api/ozet/<temel>"): "temel",
+    ("POST", "/api/isimlendir/<temel>"): "temel", ("POST", "/api/segment/<temel>"): "temel", ("POST", "/api/ozet/<temel>"): "temel", ("POST", "/api/ozet/<temel>/geri"): "temel",
     ("GET", "/api/ozet-durum/<temel>"): "temel", ("POST", "/api/ceviri/<temel>"): "temel", ("GET", "/api/ceviri-durum/<temel>"): "temel",
     ("POST", "/api/klipler/<temel>"): "temel", ("GET", "/api/dolgu/<temel>"): "temel", ("POST", "/api/dublaj/<temel>"): OZEL,
     ("GET", "/api/kaynak-video/<temel>"): "temel", ("GET", "/api/kurgu/<temel>"): "temel", ("POST", "/api/kurgu/<temel>"): OZEL,

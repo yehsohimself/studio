@@ -465,8 +465,11 @@ def studio_ayar():
         for k in STUDIO_AYARLARI:
             if k in v:
                 d[k] = bool(v[k])
+        if "ozet_bicim" in v:                      # 2026-10-27: yeni videoların özet biçimi (kisa | ayrintili | madde | "")
+            import ozet as _oz
+            d["ozet_bicim"] = str(v["ozet_bicim"]) if str(v["ozet_bicim"]) in _oz.BICIMLER else ""
         ayarlar_yaz(d)
-    return jsonify({"tamam": True, **{k: d.get(k, True) for k in STUDIO_AYARLARI}})
+    return jsonify({"tamam": True, **{k: d.get(k, True) for k in STUDIO_AYARLARI}, "ozet_bicim": d.get("ozet_bicim", "")})
 
 
 
@@ -590,6 +593,13 @@ def _studio_dongu():
             if bos and (3, 30) <= (simdi.tm_hour, simdi.tm_min) <= (5, 30) and _studio_isaret("studio_gece", time.strftime("%Y-%m-%d")):
                 import studio_gelisim
                 _studio_is("gelisim:gece", lambda log=print: studio_gelisim.otomatik_guncelle(log=log))
+            if bos and _studio_isaret("studio_surum", time.strftime("%Y-%m-%d-%H")):   # saatte bir: araç dışarıdan güncellendiyse dene (2026-10-27)
+                import studio_gelisim
+                def _surum_dene(log=print):
+                    for k in studio_gelisim.surum_degisimi_dene(log=log):
+                        if not k["tamam"]:
+                            _bildir("Studio", f"{k['ne']} {k['yeni']} sürümüyle denemeden geçmedi. Ayarlar → Sistem → Studio gelişimi")
+                _studio_is("gelisim:surum", _surum_dene)
             if bos and (5, 0) <= (simdi.tm_hour, simdi.tm_min) <= (7, 0) and _studio_isaret("studio_gece_deneme", time.strftime("%Y-%m-%d")):
                 _studio_is("gece testi", lambda log=print, _p=(simdi.tm_wday == 6): _studio_gece_deneme(_p))
             if bos and simdi.tm_wday == 0 and (simdi.tm_hour, simdi.tm_min) >= (8, 30) and _studio_isaret("studio_hafta", time.strftime("%G-%V")):
@@ -608,3 +618,44 @@ def harf_get():
     """Büyük harf kuralı için kullanıcının markaları (ayarlar.json harf_tr / harf_en; sayfalardaki TR/EN kümelerine eklenir). Kodda marka adı yok (2026-10-25)."""
     a = ayarlar_oku()
     return jsonify({"tr": [str(x).lower() for x in (a.get("harf_tr") or [])], "en": [str(x).lower() for x in (a.get("harf_en") or [])]})
+
+# ----------------------------------------------------------------------------- 9) ilk açılış denetimi (2026-10-27)
+# GitHub'dan yeni kuran biri ilk videoda "ffmpeg yok", "Claude bağlı değil" gibi hatalarla karşılaşmasın: ana sayfa eksikleri tek kartta gösterir.
+_kurulum_onb = {"t": 0, "d": None}
+
+
+@app.get("/api/kurulum")
+def kurulum_durum():
+    if _kurulum_onb["d"] and time.time() - _kurulum_onb["t"] < 60 and not request.args.get("yenile"):
+        return jsonify(_kurulum_onb["d"])
+    import claude_yaz
+    adim = []
+    var = lambda ad, yol: bool(shutil.which(ad) or Path(yol).exists())   # noqa: E731
+    adim.append({"kod": "ffmpeg", "ad": "Ses ve video aracı (ffmpeg)", "tamam": var("ffmpeg", FFMPEG), "zorunlu": True,
+                 "nasil": "Terminal'de çalıştırın:", "komut": "brew install ffmpeg"})
+    adim.append({"kod": "deno", "ad": "YouTube indirme yardımcısı (deno)", "tamam": var("deno", "/opt/homebrew/bin/deno"), "zorunlu": False,
+                 "nasil": "YouTube linkleri için gerekli. Terminal'de:", "komut": "brew install deno"})
+    model_ok, iniyor = _model_var("turbo"), bool(model_iniyor.get("turbo"))
+    adim.append({"kod": "model", "ad": "Ses tanıma modeli (~1,6 GB)", "tamam": model_ok, "zorunlu": False, "iniyor": iniyor,
+                 "nasil": "İlk videoda kendiliğinden iner; şimdiden indirirseniz ilk iş beklemez.", "eylem": "model"})
+    try:
+        c = claude_yaz.durum()
+    except Exception:  # noqa: BLE001
+        c = {"program": False, "giris": False}
+    try:
+        olla = ozet_modulu.ollama_hazir()
+    except Exception:  # noqa: BLE001
+        olla = False
+    yazi_ok = bool(c.get("giris")) or olla
+    adim.append({"kod": "yazi", "ad": "Özet ve çeviri için yapay zekâ", "tamam": yazi_ok, "zorunlu": False,
+                 "durum": "Claude" if c.get("giris") else ("Bilgisayardaki model (Ollama)" if olla else ""),
+                 "nasil": ("Claude hesabınızla bir kez giriş yapın." if c.get("program") else
+                           "Claude masaüstü uygulamasını kurup giriş yapın ya da bilgisayarda çalışan bir model kurun:"),
+                 "komut": "" if c.get("program") else "brew install ollama && brew services start ollama && ollama pull gemma3:4b",
+                 "eylem": "claude" if c.get("program") else ""})
+    bos = _disk_bos_gb()
+    adim.append({"kod": "disk", "ad": "Boş disk alanı", "tamam": bos >= 5, "zorunlu": False, "durum": f"{bos:.0f} GB",
+                 "nasil": "Videolar ve modeller için en az 5 GB boş alan gerekir."})
+    d = {"hazir": all(a["tamam"] for a in adim if a["zorunlu"]), "eksik": sum(not a["tamam"] for a in adim), "adimlar": adim}
+    _kurulum_onb.update(t=time.time(), d=d)
+    return jsonify(d)

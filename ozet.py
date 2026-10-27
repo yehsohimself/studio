@@ -117,9 +117,23 @@ def _parcala(satirlar):
     return parcalar
 
 
-def ozet_uret(paragraflar, kaynak_dil="tr", hedef_dil="tr", log=print, goruntu=None):
+BICIMLER = {   # 2026-10-27: özeti yenilerken seçilen biçim (Studio gelişim önerisi "Özeti ilk seferde doğru yap")
+    "kisa": "BİÇİM: kısa. Özet en çok 2 cümle, en çok 4 madde; yalnız en önemli bilgi.",
+    "ayrintili": "BİÇİM: ayrıntılı. Özet 6-8 cümle, 8-12 madde; adları, rakamları, örnekleri ve gerekçeleri koru.",
+    "madde": "BİÇİM: madde madde. Özet tek cümle; asıl yük maddelerde (6-10 madde), her madde kendi başına anlaşılır.",
+}
+
+
+def ozet_uret(paragraflar, kaynak_dil="tr", hedef_dil="tr", log=print, goruntu=None, bicim=None, istek=""):
     """paragraflar: [{"bas","ad","metin"}] -> {"ozet","maddeler","bolumler","dil","model"} | None
-    goruntu: isteğe bağlı görüntü notları [{"sn","aciklama","yazi"}]; transkripte (GÖRÜNTÜ) satırları olarak eklenir."""
+    goruntu: isteğe bağlı görüntü notları [{"sn","aciklama","yazi"}]; transkripte (GÖRÜNTÜ) satırları olarak eklenir.
+    bicim: kisa | ayrintili | madde | "" (verilmezse Ayarlar'daki `ozet_bicim`); istek: kullanıcının serbest notu ("rakamları da yaz")."""
+    if bicim is None:
+        try:
+            import ortak
+            bicim = str(ortak.ayar().get("ozet_bicim") or "")
+        except Exception:  # noqa: BLE001
+            bicim = ""
     if not paragraflar and not goruntu:
         return None
     dil = kaynak_dil if hedef_dil == "auto" else hedef_dil
@@ -137,13 +151,17 @@ def ozet_uret(paragraflar, kaynak_dil="tr", hedef_dil="tr", log=print, goruntu=N
 
     kurallar = (("(GÖRÜNTÜ) satırları videoda görünenleri anlatır; özet ve maddelerde bunları da kullan. " if goruntu else "") +
                 f"Yanıtı yalnızca {dil_adi} dilinde yaz. Sade, nesnel ve bilgi yoğun ol; abartma, süsleme ve "
-                f"övgü kullanma. Metinde olmayan bilgi ekleme, isim uydurma. Konuşmacılardan transkriptteki adlarıyla söz et. "
+                f"övgü kullanma. Metinde olmayan bilgi ekleme, isim uydurma. Konuşmacılardan transkriptteki adlarıyla söz et; "
+                "'Konuşmacı 1' gibi genel etiketleri özete ve maddelere YAZMA (okur için anlamsız): tek kişi konuşuyorsa 'video', "
+                "'anlatıcı' ya da kanal adıyla, birden çok adsız kişi varsa rollerinden ('sunucu', 'konuk') söz et. "
                 "Özet ve maddeler videoda SÖYLENEN SOMUT BİLGİYİ aktarsın: hangi haber, kim neyi iddia etti, hangi rakam, "
                 "hangi sonuç. 'tartışılıyor', 'ele alınıyor', 'değiniliyor', 'konuşuluyor' gibi genel ifadeler KULLANMA; "
                 "doğrudan bilgiyi yaz (örnek: 'OpenAI'nin ajanları engelli sitelere sızdığı için yeni modelin çıkışı iptal edildi'). "
                 "'kararlar' ve 'yapilacaklar' YALNIZCA konuşmacıların kendi aralarında aldığı kararlar ve kendilerinin üstlendiği "
                 "somut işler içindir (toplantı, planlama, sesli not gibi); haber, yorum, anlatım ya da eğitim videolarında bu listeler "
-                "BOŞ kalır. Konuşulan şirketler/üçüncü kişiler için iş uydurma.")
+                "BOŞ kalır. Konuşulan şirketler/üçüncü kişiler için iş uydurma." +
+                (" " + BICIMLER[bicim] + " Bu biçim aşağıdaki cümle ve madde sayılarının önüne geçer." if bicim in BICIMLER else "") +
+                (f" KULLANICININ İSTEĞİ (uy, ama metinde olmayanı ekleme): {str(istek)[:400]}" if str(istek or "").strip() else ""))
 
     bolum_sema = ('"bolumler": [{"zaman": "mm:ss", "baslik": "kısa bölüm başlığı"}]')
     bolum_kural = ("Bölümler konunun değiştiği anları göstersin; 'zaman' alanı bölümün BAŞLADIĞI satırın köşeli parantez "
@@ -214,7 +232,8 @@ def ozet_uret(paragraflar, kaynak_dil="tr", hedef_dil="tr", log=print, goruntu=N
     temiz = lambda a: [str(m).strip() for m in (veri.get(a) or []) if isinstance(m, (str, int, float)) and str(m).strip()]  # noqa: E731
     return {"ozet": str(veri["ozet"]).strip(),
             "maddeler": temiz("maddeler")[:12], "kararlar": temiz("kararlar")[:10], "yapilacaklar": temiz("yapilacaklar")[:12],
-            "bolumler": tekil[:20], "dil": dil, "model": SON_MODEL}
+            "bolumler": tekil[:20], "dil": dil, "model": SON_MODEL,
+            **({"bicim": bicim} if bicim in BICIMLER else {}), **({"istek": str(istek)[:400]} if str(istek or "").strip() else {})}
 
 
 if __name__ == "__main__":

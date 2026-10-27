@@ -130,3 +130,43 @@ body.st-mevcut #go{background:var(--fill)!important;color:var(--ink)!important;b
 }
 body.st-mevcut #mevcutAc{background:#2D5BFF!important;color:#fff!important;border:0!important;padding:0 16px!important;height:32px;border-radius:9px;font-weight:600}
 #doc.st-sekmeli #stSek{top:var(--st-ust,56px)}
+
+/* 11) mini oynatıcı (2026-10-27): yapışık 42vh oynatıcı yerine geçilince sol altta küçük oynatıcı */
+body.urun-transcript .oynatici:not(.mini){position:relative;top:auto}
+.oynatici .oy-kapat{display:none}
+.oynatici.mini{position:fixed;left:16px;bottom:16px;top:auto;width:min(340px,calc(100vw - 32px));z-index:40;margin:0;padding:0;background:transparent;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.45);animation:oyGir .22s ease}
+.oynatici.mini .oyc{max-height:none;border-radius:14px}
+.oynatici.mini.ses{background:var(--surface,var(--bg));padding:8px 36px 8px 8px;border:1px solid var(--hair)}
+.oynatici.mini .oy-kapat{display:grid;place-items:center;position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:17px;line-height:1;cursor:pointer;z-index:2}
+.oynatici.mini.mini-gizli{display:none}
+@keyframes oyGir{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.oynatici.mini{animation:none}}
+/* tek konuşmacı */
+#doc.tekgenel #paras .para .h .n{display:none}
+#doc.tekkon .spk .pct{display:none}
+/* 14) ana sayfa: kurulum kartı ve son çalışmalar */
+#stAna{max-width:720px;margin:28px auto 0;display:flex;flex-direction:column;gap:22px}
+body:is(.yuz-kitaplik,.linkVar) #stAna,body:has(#resultSec:not(.hidden)) #stAna{display:none}
+.st-kurulum{border:1px solid var(--hair);border-radius:16px;padding:16px 18px;background:var(--surface,var(--card,transparent))}
+.st-kb{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.st-kb b{display:block;font-size:15px}
+.st-kurulum ol{list-style:none;margin:12px 0 6px;padding:0;display:flex;flex-direction:column;gap:10px}
+.st-kurulum li{display:flex;gap:10px;align-items:flex-start}
+.st-kurulum li.ok{opacity:.55}
+.st-ki{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--hair);display:grid;place-items:center;font-size:12px;margin-top:1px}
+.st-kurulum li.ok .st-ki{background:var(--green,#34c759);border-color:transparent;color:#fff}
+.st-ka{font-weight:600;font-size:14px}
+.st-kmt{display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap}
+.st-kmt code{font-family:var(--mono,ui-monospace,monospace);font-size:12px;background:var(--fill);padding:5px 8px;border-radius:8px;overflow-wrap:anywhere}
+.st-kurulum li .sbtn{margin-top:6px}
+.st-sonb{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.st-sonb h3{margin:0;font-size:15px!important;font-weight:600!important;letter-spacing:0!important}
+.st-sonl{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.st-sonk{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0;border-radius:12px;padding:6px;transition:background .15s}
+.st-sonk:hover,.st-sonk:focus-visible{background:var(--fill)}
+.st-sonk:focus-visible{outline:2px solid var(--vurgu,#2D5BFF);outline-offset:2px}
+.st-sonk img,.st-sonbos{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:9px;background:var(--fill)}
+.st-sont{font-size:13px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:640px){.st-sonl{grid-template-columns:repeat(2,1fr)}#stAna{margin-top:18px}}
+/* telefonda link kutusu: "Yapıştır" telefonun kendi yapıştırmasıyla zaten var; kutu birkaç harfe iniyordu */
+@media (max-width:520px){body.urun-transcript .composer #paste{display:none}body.urun-transcript .composer .bar input#link{min-width:0;flex:1}}
