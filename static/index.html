@@ -3632,7 +3632,10 @@ function tOnayCiz(l){
     if (!r || !r.ok){ toast('Olmadı'); b.closest('.tonr').style.opacity = 1; return; }
     await gecmisYukle();
     if (kabul) toast('Toplantılara eklendi; özet ve işler birkaç dakikada hazır olur', null, null, 5000);
-    else toast('Kaldırıldı', 'Geri al', async () => { await fetch('/api/geri/' + encodeURIComponent(t), {method: 'POST'}); gecmisYukle(); }, 7000); });
+    else { const kd = ((await r.json().catch(() => ({}))) || {}).kayit_disi;
+      toast(kd ? `Kaldırıldı · “${kd}” bir daha kaydedilmeyecek` : 'Kaldırıldı', 'Geri al', async () => { await fetch('/api/geri/' + encodeURIComponent(t), {method: 'POST'});
+        if (kd) await fetch('/api/kayit-disi', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({sil_ad: kd})});
+        gecmisYukle(); }, kd ? 9000 : 7000); } });
 }
 /* "Toplantılarınıza sorun": marka/müşteri/şirket bazında karar ve söz soruları (sor.py, toplantılarda Opus) */
 const TSOR = {k: null, q: null, yukleniyor: false};
@@ -6518,7 +6521,7 @@ function stCizgi(){
 })();
 </script>
 <script src="/static/studio_ek.js?v=31"></script>
-<script src="/static/meet_ek.js?v=24"></script>
+<script src="/static/meet_ek.js?v=25"></script>
 <script src="/static/teslim_ek.js?v=2"></script>
 <script src="/static/takip_ek.js?v=2"></script>
 </body>
