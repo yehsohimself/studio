@@ -3,6 +3,7 @@
 python disa_depo.py studio <hedef klasör>      Studio + ortak motor → hedef (var olan dosyaların üstüne yazar, fazlalıkları siler)
 python disa_depo.py meet <hedef klasör>        Meet + ortak motor → hedef; ürüne özel dosyalar disa/meet/
 python disa_depo.py pt <hedef klasör>          PT tek başına (pt_sunucu.py) → hedef; ürüne özel dosyalar disa/pt/
+python disa_depo.py content <hedef klasör>     Content tek başına (content_sunucu.py) → hedef; ürüne özel dosyalar disa/content/
 python disa_depo.py pt-medya <zip>             PT'nin görsel ve ses paketi (GitHub sürümüne konur)
 
 Ne kopyalanır: ürünün sunucu parçaları + onların kullandığı modüller (kapanış), statik dosyalar, testler, şablonlar, lisans. Kişisel dosyalar
@@ -93,6 +94,8 @@ def kes(urun, hedef, log=print):
                 kopyala(f, rel)
                 if rel.endswith((".sh", ".command")):
                     (hedef / rel).chmod(0o755)
+    if U.get("son"):                                          # ürüne özel son düzeltmeler (Meet: uzantıdan kardeş ürün parçaları çıkar)
+        globals()[U["son"]](hedef)
     site = hedef / "site.py"
     if site.exists():
         site.write_text(site.read_text(encoding="utf-8").replace('"Video Hub.command"', f'"{yeni_ad}"').replace("Transkript sisteminin", f"{U['ad']} ürününün"), encoding="utf-8")
@@ -104,7 +107,8 @@ def kes(urun, hedef, log=print):
         (hedef / "README.md").write_text(README[urun], encoding="utf-8")
     kopyalanan.add("README.md"); kopyalanan.add("docs/ekran.jpg")
     (hedef / "docs").mkdir(exist_ok=True)
-    (hedef / "docs" / "MIMARI.md").write_text(_mimari(urun), encoding="utf-8"); kopyalanan.add("docs/MIMARI.md")
+    if U.get("mimari", True):                                 # Content'in motoru yok: ortak mimari notu ona uymaz
+        (hedef / "docs" / "MIMARI.md").write_text(_mimari(urun), encoding="utf-8"); kopyalanan.add("docs/MIMARI.md")
     # fazlalıkları sil (yalnız bu betiğin yazdığı türden dosyalar; .git, veri klasörleri dokunulmaz)
     for f in list(hedef.rglob("*")):
         rel = f.relative_to(hedef).as_posix()
@@ -236,6 +240,23 @@ URUNLER["pt"] = {
 }
 
 
+# ----------------------------------------------------------------------------- Content (2026-10-29)
+URUNLER["content"] = {
+    "ad": "Content",
+    "parcalar": [],
+    "moduller": ["content", "content_site", "content_sunucu", "content_yontem", "content_kanit", "content_araclar", "content_dogrulama",
+                 "content_test", "claude_yaz", "goruntu", "sesnot", "ortak", "gizli", "sizinti"],
+    "static": ["content.html", "logo/content.svg"],
+    "dosyalar": ["LICENSE", "pytest.ini"],
+    "sablon": "disa/content",
+    "requirements_cikar": [],
+    "requirements": "yt-dlp[default,curl-cffi]\nflask\nrequests\npillow\nmlx-whisper\nscenedetect==0.7.2\nopencv-python-headless\n"
+                    "pyobjc-framework-Vision\npyobjc-framework-Quartz\npytest\n",
+    "komut": ("", "Content.command"),
+    "mimari": False,
+}
+
+
 # ----------------------------------------------------------------------------- Meet (2026-10-29)
 # Modüller elle sayılmaz: parçaların ve modüllerin içe aktardığı yerel modüllerin kapanışı (_kapanis). Kardeş ürünlerin modülleri (Ghost, Content,
 # Couple, PT, Atölye) alınmaz; Meet kodunda onları çağıran yerler try/except ya da globals() denetimiyle korunur (testler ve açılış denemesi bunu sınar).
@@ -246,7 +267,7 @@ URUNLER["meet"] = {
     "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "04_toplanti", "05_asana", "07_cekirdek", "07_meet", "08_canli",
                  "09_cekirdek", "09_meet", "10_sayfalar", "11_ozellik_sayaci", "12_api", "14_haftalik", "16_altyapi_ve_meet", "16_meet",
                  "17_disa_aktarim", "18_indirilenler", "20_meet_gelisim", "22_misafir", "23_misafir_meet", "24_guvenlik", "25_sahip_uzak",
-                 "27_meet_altyazi", "28_meet_devam", "29_meet_saglik", "30_kayit_disi"],
+                 "27_meet_altyazi", "28_meet_devam", "29_meet_saglik", "30_kayit_disi", "31_yazi_dili"],
     "kapanis": ["site", "transkript", "canli", "canli_asistan", "sesnot", "duman_testi", "yeniden_baslat", "sizinti", "disa_depo", "yedek",
                 "geri_yukle", "videohub_mcp", "isimlendir", "takip", "dolgu", "studio_duzelt"],
     "moduller": [],
@@ -260,7 +281,36 @@ URUNLER["meet"] = {
     "sablon": "disa/meet",
     "requirements_cikar": ["python-pptx", "scenedetect", "opencv-python-headless", "pywebpush", "auto-editor", "shazamio"],
     "komut": ("", "Meet.command"),
+    "son": "_meet_son",
 }
+
+
+def _meet_son(hedef):
+    """Meet deposunun Chrome uzantısı yalnız toplantı işini yapar: Ghost'un X/Instagram okuyucuları ve Atölye/Content sağ tık menüleri çıkar
+    (kullanıcıya X ve Instagram izni sorulmasın). Kaynaktaki işaretler değişirse kesim burada durur (sessizce yarım uzantı çıkmasın)."""
+    import json as _json
+    u = hedef / "uzanti"
+    m = _json.loads((u / "manifest.json").read_text(encoding="utf-8"))
+    m["name"] = "Meet"
+    m["description"] = ("Meet for Google Meet, Teams and Zoom on the web: tells the local Meet app when you are in a call, who is there and "
+                        "who is speaking (from captions); side panel with prep notes, live suggestions, notes and summary. Talks only to Meet on this Mac.")
+    m["permissions"] = [x for x in m["permissions"] if x != "contextMenus"]
+    m["host_permissions"] = [x for x in m["host_permissions"] if not any(k in x for k in ("x.com", "instagram", ":8767"))]
+    m["content_scripts"] = [c for c in m["content_scripts"] if not set(c["js"]) & {"x.js", "ig.js"}]
+    (u / "manifest.json").write_text(_json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    for f in ("x.js", "ig.js"):
+        (u / f).unlink(missing_ok=True)
+    b = (u / "background.js").read_text(encoding="utf-8")
+    i, j = b.index("// ---- Creator atölyesi"), b.index("// ---- Kendini iyileştirme")
+    b = b[:i] + b[j:]
+    b = "\n".join(l for l in b.splitlines() if not l.lstrip().startswith(("if (m.tur === 'x_", "if (m.tur === 'ig_", "async function hesaplarAl()",
+                                                                           "chrome.alarms.create('hesaplar'")))
+    b = b.replace(" if (a.name === 'hesaplar') hesaplarAl();", "")
+    assert "hesaplarAl" not in b and "contextMenus" not in b, "uzantı: Ghost/Atölye kalıntısı"
+    (u / "background.js").write_text(b + "\n", encoding="utf-8")
+    gi = hedef / ".gitignore"
+    if "!uzanti/ikonlar/*.png" not in gi.read_text(encoding="utf-8"):
+        gi.write_text(gi.read_text(encoding="utf-8") + "!uzanti/ikonlar/*.png\n", encoding="utf-8")
 
 
 def _kapanis(parcalar, tohum, haric=MEET_HARIC):
