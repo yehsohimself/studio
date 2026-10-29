@@ -1,6 +1,9 @@
 """disa_depo.py - Bir ürünü tek başına çalışan ayrı bir depo olarak keser (2026-10-25; kullanıcı: "her ürün ayrı depo, seri yok").
 
 python disa_depo.py studio <hedef klasör>      Studio + ortak motor → hedef (var olan dosyaların üstüne yazar, fazlalıkları siler)
+python disa_depo.py meet <hedef klasör>        Meet + ortak motor → hedef; ürüne özel dosyalar disa/meet/
+python disa_depo.py pt <hedef klasör>          PT tek başına (pt_sunucu.py) → hedef; ürüne özel dosyalar disa/pt/
+python disa_depo.py pt-medya <zip>             PT'nin görsel ve ses paketi (GitHub sürümüne konur)
 
 Ne kopyalanır: ürünün sunucu parçaları + onların kullandığı modüller (kapanış), statik dosyalar, testler, şablonlar, lisans. Kişisel dosyalar
 (ayarlar.json, profil/, markalar/, kayıtlar...) hiçbir zaman kopyalanmaz. Kesilen depo 'ürünler isteğe bağlı' mekanizmasıyla çalışır:
@@ -18,7 +21,7 @@ KOK = Path(__file__).resolve().parent
 URUNLER = {
     "studio": {
         "ad": "Studio",
-        "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "06_marka", "10_sayfalar", "11_ozellik_sayaci", "12_api",
+        "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "06_marka", "07_cekirdek", "09_cekirdek", "10_sayfalar", "11_ozellik_sayaci", "12_api",
                      "13_takip", "16_altyapi_ve_meet", "17_disa_aktarim", "18_indirilenler", "21_studio", "22_misafir", "24_guvenlik"],
         "moduller": ["site", "transkript", "indir", "isimlendir", "adlar", "altyazi", "anlam", "arkaplan", "broll", "ceviri", "claude_yaz", "dublaj",
                      "dudak", "duzenle", "goruntu", "harfler", "kadraj", "kalite", "kapak", "kayit_json", "kitaplik_onbellek", "klipler", "konusan", "marka",
@@ -59,7 +62,7 @@ def kes(urun, hedef, log=print):
 
     for p in U["parcalar"]:
         kopyala(KOK / "sunucu" / f"{p}.py", f"sunucu/{p}.py")
-    for m in U["moduller"]:
+    for m in sorted(set(U["moduller"]) | set(_kapanis(U["parcalar"], U["kapanis"]) if U.get("kapanis") else [])):
         if (KOK / f"{m}.py").exists():
             kopyala(KOK / f"{m}.py", f"{m}.py")
         else:
@@ -71,25 +74,42 @@ def kes(urun, hedef, log=print):
         if (KOK / f).exists():
             kopyala(KOK / f, f)
     eski_ad, yeni_ad = U["komut"]
-    if (KOK / eski_ad).exists():
+    if eski_ad and (KOK / eski_ad).exists():
         kopyala(KOK / eski_ad, yeni_ad)
     # ürüne özel düzeltmeler
-    req = (hedef / "requirements.txt").read_text(encoding="utf-8").splitlines()
-    (hedef / "requirements.txt").write_text("\n".join(l for l in req if not any(l.startswith(c) for c in U["requirements_cikar"])) + "\n", encoding="utf-8")
+    req = (hedef / "requirements.txt").read_text(encoding="utf-8").splitlines() if not U.get("requirements") else []
+    if req:
+        (hedef / "requirements.txt").write_text("\n".join(l for l in req if not any(l.startswith(c) for c in U["requirements_cikar"])) + "\n", encoding="utf-8")
+    if U.get("requirements"):
+        (hedef / "requirements.txt").write_text(U["requirements"], encoding="utf-8"); kopyalanan.add("requirements.txt")
+    for kaynak in U.get("kopya", []):                         # veri klasörlerinden depoya giren dosyalar (PT hareket kartları, BLS dizini)
+        for f in sorted(KOK.glob(kaynak)):
+            kopyala(f, f.relative_to(KOK).as_posix())
+    if U.get("sablon"):                                       # ürüne özel dosyalar (kurulum, başlatıcı, .gitignore, testler): disa/<ürün>/
+        sk = KOK / U["sablon"]
+        for f in sorted(sk.rglob("*")):
+            if f.is_file() and f.name != ".DS_Store":
+                rel = f.relative_to(sk).as_posix().replace("_gitignore", ".gitignore")
+                kopyala(f, rel)
+                if rel.endswith((".sh", ".command")):
+                    (hedef / rel).chmod(0o755)
     site = hedef / "site.py"
-    site.write_text(site.read_text(encoding="utf-8").replace('"Video Hub.command"', f'"{yeni_ad}"').replace("Transkript sisteminin", f"{U['ad']} ürününün"), encoding="utf-8")
+    if site.exists():
+        site.write_text(site.read_text(encoding="utf-8").replace('"Video Hub.command"', f'"{yeni_ad}"').replace("Transkript sisteminin", f"{U['ad']} ürününün"), encoding="utf-8")
     gi = hedef / ".gitignore"
     ek = "\n# kesilen depo: örnek medya ve ekran görüntüsü depoya girer (monorepo'da *.mp4/*.jpg dışarıdaydı)\n!static/*_ornek/*.mp4\n!docs/ekran.jpg\n"
     if "!docs/ekran.jpg" not in gi.read_text(encoding="utf-8"):
         gi.write_text(gi.read_text(encoding="utf-8") + ek, encoding="utf-8")
-    (hedef / "README.md").write_text(README[urun], encoding="utf-8"); kopyalanan.add("README.md"); kopyalanan.add("docs/ekran.jpg")
+    if urun in README:                                        # PT'nin README'si şablonda (disa/pt/README.md)
+        (hedef / "README.md").write_text(README[urun], encoding="utf-8")
+    kopyalanan.add("README.md"); kopyalanan.add("docs/ekran.jpg")
     (hedef / "docs").mkdir(exist_ok=True)
     (hedef / "docs" / "MIMARI.md").write_text(_mimari(urun), encoding="utf-8"); kopyalanan.add("docs/MIMARI.md")
     # fazlalıkları sil (yalnız bu betiğin yazdığı türden dosyalar; .git, veri klasörleri dokunulmaz)
     for f in list(hedef.rglob("*")):
         rel = f.relative_to(hedef).as_posix()
         if f.is_file() and rel not in kopyalanan and not rel.startswith(".git/") and f.suffix in {".py", ".js", ".css", ".html", ".svg", ".png", ".md", ".txt", ".json", ".webmanifest", ".command", ".mp4", ".ini", ".sh"} \
-                and not rel.startswith(("kayitlar/", "profil/", "indirilenler/", "yuklemeler/", ".onbellek/", "static/derlenmis/")) and rel not in ("ayarlar.json", "sesler.json", "takip.json", "CLAUDE.md"):
+                and not rel.startswith(("kayitlar/", "profil/", "indirilenler/", "yuklemeler/", ".onbellek/", "static/derlenmis/", "pt/", "pt_medya/", "modeller/")) and rel not in ("ayarlar.json", "sesler.json", "takip.json", "CLAUDE.md"):
             f.unlink()
     for d in sorted((x for x in hedef.rglob("*") if x.is_dir() and ".git" not in x.parts), key=lambda x: -len(x.parts)):
         if not any(d.iterdir()):
@@ -102,7 +122,10 @@ def dogrula(hedef, log=print):
     """Kesilen depoda testler: pytest + duman hizli (kaynak .venv ile; hedefte venv olmayabilir)."""
     py = KOK / ".venv" / "bin" / "python"
     sonuc = {}
-    for ad, cmd in (("pytest", [str(py), "-m", "pytest", "tests", "-q", "-x"]), ("duman hizli", [str(py), "duman_testi.py", "hizli"])):
+    adimlar = [("pytest", [str(py), "-m", "pytest", "tests", "-q", "-x"])]
+    if (Path(hedef) / "duman_testi.py").exists():
+        adimlar.append(("duman hizli", [str(py), "duman_testi.py", "hizli"]))
+    for ad, cmd in adimlar:
         r = subprocess.run(cmd, cwd=hedef, capture_output=True, text=True, timeout=1200)
         sonuc[ad] = r.returncode == 0
         log(f"  {'✓' if r.returncode == 0 else '✗'} {ad}" + ("" if r.returncode == 0 else "\n" + (r.stdout + r.stderr)[-1500:]))
@@ -192,6 +215,90 @@ gider) ya da yerel Ollama modeli gerekir. Kurulum: yukarıdaki dört komut, sonr
 """}
 
 
+
+# ----------------------------------------------------------------------------- PT (2026-10-29)
+PT_MEDYA_JSON = ["kartlar.json", "youtube.json", "youtube_sorgu.json", "anatomi.json", "storyboard.json"]
+PT_MEDYA_HARIC = ("istekler.json", "_kisi.png", "_onizleme.png", "_ses_model", "bekleyen.json", "ham.mp4", "bas.png", "bit.png")
+
+URUNLER["pt"] = {
+    "ad": "PT",
+    "parcalar": [],
+    "moduller": ["pt", "pt_site", "pt_sunucu", "pt_beslenme", "pt_bls", "pt_form", "pt_hareket", "pt_hizli", "pt_ilk", "pt_kanit", "pt_kart",
+                 "pt_kitaplik", "pt_koc", "pt_oneri", "pt_oyun", "pt_programlar", "pt_push", "pt_rota", "pt_saglik", "pt_ses", "pt_sohbet",
+                 "pt_storyboard", "pt_anatomi", "pt_yemek", "pt_youtube", "claude_yaz", "ortak", "gizli", "sizinti"],
+    "static": ["pt.html", "pt-sw.js", "pt.webmanifest", "pt-ikon-180.png", "pt-ikon-192.png", "pt-ikon-512.png", "pt-ikon-512-maskable.png", "logo/pt.svg"],
+    "dosyalar": ["LICENSE", "pytest.ini", "tests/test_pt_oyun.py"],
+    "kopya": [f"pt_medya/{a}" for a in PT_MEDYA_JSON] + ["modeller/bls/bls.json"],
+    "sablon": "disa/pt",
+    "requirements_cikar": [],
+    "requirements": "flask\nrequests\npillow\nnumpy\npyobjc-framework-Vision\npytest\n",
+    "komut": ("", "PT.command"),
+}
+
+
+# ----------------------------------------------------------------------------- Meet (2026-10-29)
+# Modüller elle sayılmaz: parçaların ve modüllerin içe aktardığı yerel modüllerin kapanışı (_kapanis). Kardeş ürünlerin modülleri (Ghost, Content,
+# Couple, PT, Atölye) alınmaz; Meet kodunda onları çağıran yerler try/except ya da globals() denetimiyle korunur (testler ve açılış denemesi bunu sınar).
+MEET_HARIC = re.compile(r"^(atolye|content|couple|pt|ghost_)|^(paylasim|kesif|karisim|tetik|konu_toplantisi|fikir_kartlari|reklam_arsivi|oranlar|"
+                        r"hesaplar|performans|yerimleri|bultenler|abonelik|kantan|seckiler|teslim|ghost)$")
+URUNLER["meet"] = {
+    "ad": "Meet",
+    "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "04_toplanti", "05_asana", "07_cekirdek", "07_meet", "08_canli",
+                 "09_cekirdek", "09_meet", "10_sayfalar", "11_ozellik_sayaci", "12_api", "14_haftalik", "16_altyapi_ve_meet", "16_meet",
+                 "17_disa_aktarim", "18_indirilenler", "20_meet_gelisim", "22_misafir", "23_misafir_meet", "24_guvenlik", "25_sahip_uzak",
+                 "27_meet_altyazi", "28_meet_devam", "29_meet_saglik", "30_kayit_disi"],
+    "kapanis": ["site", "transkript", "canli", "canli_asistan", "sesnot", "duman_testi", "yeniden_baslat", "sizinti", "disa_depo", "yedek",
+                "geri_yukle", "videohub_mcp", "isimlendir", "takip", "dolgu", "studio_duzelt"],
+    "moduller": [],
+    "static": ["index.html", "meet_ek.js", "meet_ek.css", "misafir.js", "misafir_meet.js", "sahip_uzak.js", "dil.js", "dil", "manifest.webmanifest",
+               "note.webmanifest", "note-ikon-180.png", "note-ikon-192.png", "note-ikon-512.png", "note-ikon-512-maskable.png", "ikon-180.png",
+               "ikon-192.png", "ikon-512.png", "ikon-512-maskable.png", "il", "logo", "ikon"],
+    "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "ayarlar.ornek.json", ".gitignore", "kaydedici/kaydedici.swift", "kaydedici/Info.plist",
+                 "uzanti", "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_yedek.py", "tests/test_meet_acil.py",
+                 "tests/test_meet_altyazi.py", "tests/test_meet_bekleme.py", "tests/test_meet_devam.py", "tests/test_meet_gelisimim.py",
+                 "tests/test_meet_kayit_disi.py"],
+    "sablon": "disa/meet",
+    "requirements_cikar": ["python-pptx", "scenedetect", "opencv-python-headless", "pywebpush", "auto-editor", "shazamio"],
+    "komut": ("", "Meet.command"),
+}
+
+
+def _kapanis(parcalar, tohum, haric=MEET_HARIC):
+    """Parçaların ve tohum modüllerin içe aktardığı yerel modüllerin kapanışı (kardeş ürün modülleri hariç)."""
+    yerel = {p.stem for p in KOK.glob("*.py")}
+    desen = re.compile(r"^\s*(?:import\s+([\w, ]+)|from\s+(\w+)\s+import)|__import__\(\s*[\"'](\w+)|import_module\(\s*[\"'](\w+)", re.M)
+
+    def ithal(s):
+        out = set()
+        for m in desen.finditer(s):
+            if m.group(1):
+                out |= {x.strip().split(" as ")[0].split(".")[0] for x in m.group(1).split(",")}
+            out |= {g for g in m.groups()[1:] if g}
+        return {x for x in out if x in yerel and not haric.search(x)}
+    kuyruk = [m for p in parcalar for m in ithal((KOK / "sunucu" / f"{p}.py").read_text(encoding="utf-8"))] + [t for t in tohum if t in yerel]
+    gor = set()
+    while kuyruk:
+        m = kuyruk.pop()
+        if m not in gor:
+            gor.add(m); kuyruk += list(ithal((KOK / f"{m}.py").read_text(encoding="utf-8")))
+    return sorted(gor)
+
+
+def medya_paketi(hedef_zip, log=print):
+    """PT'nin görsel ve ses paketi (git dışı; GitHub sürümüne konur). Kök JSON'lar depoda olduğu için pakete girmez."""
+    import zipfile
+    kaynak = KOK / "pt_medya"
+    n = 0
+    with zipfile.ZipFile(hedef_zip, "w", zipfile.ZIP_STORED) as z:
+        for f in sorted(kaynak.rglob("*")):
+            rel = f.relative_to(kaynak)
+            if not f.is_file() or (f.suffix == ".json" and len(rel.parts) == 1) or any(x in PT_MEDYA_HARIC for x in rel.parts) \
+                    or rel.name.startswith(("_kontrol", "_ok")) or f.name == ".DS_Store":
+                continue
+            z.write(f, rel.as_posix()); n += 1
+    log(f"{n} dosya → {hedef_zip} ({Path(hedef_zip).stat().st_size / 1e6:.0f} MB)")
+    return hedef_zip
+
 def _mimari(urun):
     s = (KOK / "docs" / "MIMARI.md").read_text(encoding="utf-8")
     # ürün bölümünden yalnız bu ürün ve motor kalır
@@ -203,6 +310,8 @@ def _mimari(urun):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "pt-medya":
+        medya_paketi(sys.argv[2]); raise SystemExit(0)
     if len(sys.argv) < 3 or sys.argv[1] not in URUNLER:
         raise SystemExit(__doc__)
     h = kes(sys.argv[1], sys.argv[2])

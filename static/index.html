@@ -2691,7 +2691,7 @@
   <div class="row"><div class="l">İşlerimi Asana’ya ekle<small>Toplantıda size düşen işler Asana’nıza eklenir: size atanır, müşterinin projesine girer, söylendiyse son tarihiyle.</small></div><button class="tog" id="ayGorev" role="switch" aria-checked="true" type="button" aria-label="İşlerimi görev olarak ekle"></button></div>
   <div class="row" id="ayDanismanRow"><div class="l">Koçluk notu<small>Her toplantıdan sonra yalnızca size: nasıl konuştunuz, nerede daha iyi olabilirdi, sırada ne var. Paylaşılan notlara ve Drive’a girmez.</small></div><button class="tog" id="ayDanisman" role="switch" aria-checked="true" type="button" aria-label="Koçluk notu"></button></div>
   <div class="row" id="ayClaudeTopRow"><div class="l">Toplantılarda da Claude kullan<small>Özet, notlar, toplantı adı ve sorular Claude ile hazırlanır; toplantı metni Anthropic’e gider. Kapatırsanız toplantılar yalnızca bu bilgisayarda işlenir.</small></div><button class="tog" id="ayClaudeTop" role="switch" aria-checked="true" type="button" aria-label="Toplantılarda da Claude kullan"></button></div>
-  <div class="row"><div class="l">Otomatik toplantı kaydı<small id="ayOtoNot">Zoom, Teams, Google Meet ya da FaceTime’da görüşme başlayınca kayıt kendiliğinden başlar; bitince notlar hazırlanır.</small></div><button class="tog" id="ayOto" role="switch" aria-checked="true" type="button"></button></div>
+  <div class="row"><div class="l">Otomatik toplantı kaydı<small id="ayOtoNot">Zoom, Teams, Google Meet ya da FaceTime’da görüşme başlayınca kayıt kendiliğinden başlar; bitince notlar hazırlanır. Kaydettiğinizi toplantıdakilere söyleyin; birçok ülkede izin gerekir.</small></div><button class="tog" id="ayOto" role="switch" aria-checked="true" type="button"></button></div>
   <div class="row"><div class="l">Takvim<small id="ayTakvimNot">Toplantı adı ve katılımcılar Google Takvim’den alınır. Google Takvim → Ayarlar → takviminiz → “iCal biçimindeki gizli adres”i kopyalayıp yapıştırın.</small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end" id="ayTakvimAct"></div></div>
   <div class="row"><div class="l">Google Drive<small id="ayDriveNot"></small></div><div style="display:flex;gap:6px;align-items:center" id="ayDriveAct"></div></div>
   <div class="row" id="ayDriveKlasorRow"><div class="l">Drive’da klasör<small>Toplantılar bu klasörün altına müşteri, tarih ve konu adıyla düşer.</small></div><input id="ayDriveKlasor" type="text" style="width:200px;max-width:45%"></div>
@@ -6521,7 +6521,7 @@ function stCizgi(){
 })();
 </script>
 <script src="/static/studio_ek.js?v=31"></script>
-<script src="/static/meet_ek.js?v=25"></script>
+<script src="/static/meet_ek.js?v=26"></script>
 <script src="/static/teslim_ek.js?v=2"></script>
 <script src="/static/takip_ek.js?v=2"></script>
 </body>

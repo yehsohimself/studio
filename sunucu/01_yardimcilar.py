@@ -133,7 +133,7 @@ def mesgul_nedenler():
     # 2026-10-25: ürünler ayrı kurulabilir (yalnız Studio gibi); başka ürünün durum sözlüğü yoksa boş sayılır (globals().get)
     if calisan:
         n.append(f"{len(calisan)} iş sürüyor ya da sırada")
-    for ad, d in (("içerik paketi", marka_durum), ("çeviri", ceviri_durum), ("X paylaşımları", globals().get("paylasim_durum", {})), ("brief", globals().get("brief_durum", {}))):
+    for ad, d in (("içerik paketi", globals().get("marka_durum", {})), ("çeviri", ceviri_durum), ("X paylaşımları", globals().get("paylasim_durum", {})), ("brief", globals().get("brief_durum", {}))):
         if any((x or {}).get("calisiyor") for x in list(d.values())):
             n.append(f"{ad} hazırlanıyor")
     if globals().get("haftalik_durum", {}).get("calisiyor"):

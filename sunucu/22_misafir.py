@@ -11,7 +11,7 @@ import secrets
 import claude_yaz
 
 MISAFIR_PORT = 8770
-URUN_PORTLARI[MISAFIR_PORT] = "transcript"            # site.py bu portu da aynı uygulamayla açar
+URUN_PORTLARI[MISAFIR_PORT] = "transcript" if "transcript" in URUNLER_KURULU else "note"   # site.py bu portu da aynı uygulamayla açar (Studio yoksa Meet)
 MISAFIR_KLASOR = KLASOR / "misafir"
 DAVET_DOSYA = MISAFIR_KLASOR / "davetler.json"
 TUNEL_LOG = KAYIT / "tunel.log"

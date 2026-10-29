@@ -1,8 +1,13 @@
 """Sunucu uçları (Flask test istemcisi, sanal kök): güvenlik katmanı, kabuk/sıkıştırma, hata yanıtları, yerinde düzeltme, davetli kapısı."""
 import gzip
 import json
+from pathlib import Path
+
+import pytest
 
 from tests.conftest import transkript_yaz
+
+studio = pytest.mark.skipif(not (Path(__file__).resolve().parents[1] / "sunucu" / "21_studio.py").exists(), reason="Studio bu kurulumda yok (ör. Meet deposu)")
 
 J = {"Content-Type": "application/json"}
 
@@ -68,6 +73,7 @@ def test_yerel_yazma_uclari_disaridan_kapali(istemci, site):
 
 
 # ---------------------------------------------------------------- Studio: yerinde düzeltme, kurgu, zip
+@studio
 def test_metin_duzelt_ve_geri_al(istemci, kok):
     transkript_yaz(kok, "transkript_tr_duzelt")
     p = jj(istemci.get("/api/metin/transkript_tr_duzelt"))["paragraflar"][0]
@@ -78,6 +84,7 @@ def test_metin_duzelt_ve_geri_al(istemci, kok):
     assert "Merhaba," in jj(istemci.get("/api/metin/transkript_tr_duzelt"))["paragraflar"][0]["metin"]
 
 
+@studio
 def test_kurgu_kaydet_ve_zip(istemci, kok):
     transkript_yaz(kok, "transkript_tr_kurgu")
     r = istemci.post("/api/kurgu/transkript_tr_kurgu", data=json.dumps({"ad": "Deneme", "tut": [[4.5, 9.0], [0, 4.0]], "sira": [1, 0, 2], "cikan": [2]}), headers=J)
@@ -179,6 +186,7 @@ def test_ozet_onceki_surume_don(istemci, kok):
     assert istemci.post("/api/ozet/transkript_tr_ozetg/geri", json={"i": 5}).status_code == 404
 
 
+@studio
 def test_kurulum_denetimi(istemci):
     j = istemci.get("/api/kurulum").get_json()
     assert {a["kod"] for a in j["adimlar"]} >= {"ffmpeg", "model", "yazi", "disk"} and "hazir" in j
