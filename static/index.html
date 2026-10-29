@@ -1217,6 +1217,15 @@
   .tkayitb:active{transform:scale(.98)}
   .tkayitb .nokta{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.28);transition:border-radius .2s,width .2s,height .2s}
   .tkayitb.kayitta{background:var(--ink);color:var(--bg);font-variant-numeric:tabular-nums;box-shadow:none}
+  .kmusler{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+  .kmusler .kmb{border:1px solid var(--line,rgba(127,127,127,.25));background:transparent;color:var(--muted);border-radius:999px;padding:4px 11px;font:500 12.5px var(--sans);cursor:pointer}
+  .kmusler .kmb small{opacity:.7;margin-left:2px}
+  .kmusler .kmb.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .kmus{display:inline-block;font-size:11px;font-weight:600;line-height:1;padding:3px 7px;margin:0 6px;border-radius:6px;border:1px solid var(--line,rgba(127,127,127,.3));color:var(--ink);background:transparent;vertical-align:1px;white-space:nowrap}
+  #kisacaKutu [hidden]{display:none!important}
+  .tkart .tkadsiz{font-size:11.5px;color:var(--orange,#ff9f0a);margin-right:6px;white-space:nowrap}
+  body.tSayfa #dosyalarBtn,body.tSayfa #dosyaMenu{background:var(--surface2,rgba(127,127,127,.14))!important;color:var(--ink)!important;box-shadow:none!important}   /* toplantı sayfasında tek birincil: Bu toplantıya sor */
+  .tkayitb.kayitta.sorunlu{background:var(--orange,#ff9f0a);color:#1c1c1e}
   .tkayitb.kayitta .nokta{width:12px;height:12px;border-radius:3px;background:var(--vurgu);box-shadow:none;animation:nabiz 1.4s infinite}
   .tdsat{margin:18px 0 0;font:400 13px/1.5 var(--sans);color:var(--muted)}
   .tdsat .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--fill2);margin-right:7px;vertical-align:1px}
@@ -1510,6 +1519,11 @@
   .tkunye .tkmeta{display:flex;align-items:center;gap:8px;font:600 13px var(--sans);color:var(--muted)}
   .tkunye .tkmeta img{width:26px;height:26px;border-radius:50%}
   .tkunye h2{font:700 27px/1.15 var(--sans);letter-spacing:-.03em;margin:14px 0 8px;text-wrap:balance}
+  .tkunye .tksaglik{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;font-size:13px;line-height:1.4}
+  .tkunye .tksaglik li{padding-left:16px;position:relative;color:var(--muted)}
+  .tkunye .tksaglik li::before{content:'';position:absolute;left:2px;top:.5em;width:7px;height:7px;border-radius:50%;background:var(--orange,#ff9f0a)}
+  .tkunye .tksaglik li.hata{color:var(--ink)}.tkunye .tksaglik li.hata::before{background:var(--red,#ff453a)}
+  .tkunye .tkbosluk{margin-top:6px;font-size:13px;color:var(--orange,#ff9f0a)}
   .tkunye .tktarih{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
   .tksor{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:50px;margin:20px 0 10px;border:0;border-radius:16px!important;background:var(--vurgu);color:#fff;
     font:600 16px var(--sans);cursor:pointer;box-shadow:0 10px 26px -12px rgba(var(--vurgu-rgb),.75);transition:transform .15s}
@@ -2101,6 +2115,26 @@
   #gh .gh-tk-soru{all:unset;cursor:pointer;display:block;font-weight:600;font-size:13.5px;line-height:1.45;color:var(--ink);margin:6px 0 2px}
   #gh .gh-tk-soru:hover{color:var(--vurgu)}#gh .gh-tk-soru i{font-style:normal;color:var(--green);font-weight:500;font-size:12px}
   #gh .gh-mac-s b{font-size:16px;color:var(--ink)}#gh .gh-mac-s span{font-size:13px;color:var(--ink2)}
+  /* Elden geçirme (27 Ekim): öneriler tek tek, tek dokunuşla karar; her karar türüyle öğrenilir (nedensiz toplu ret yerine) */
+  #ghEl{position:fixed;inset:0;z-index:80;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+  #ghEl .el-kart{width:min(640px,100%);max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--hair2);border-radius:20px;padding:20px 20px 16px;
+    box-shadow:0 30px 80px -40px rgba(var(--vurgu-rgb,255,61,154),.55)}
+  #ghEl .el-ust{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted);margin-bottom:12px}
+  #ghEl .el-ust .sag{margin-left:auto;display:flex;gap:6px;align-items:center}
+  #ghEl .el-cubuk{height:3px;border-radius:2px;background:var(--hair2);margin:-6px 0 14px;overflow:hidden}#ghEl .el-cubuk i{display:block;height:100%;background:var(--vurgu);transition:width .25s}
+  #ghEl .el-metin{white-space:pre-wrap;font-size:18px;line-height:1.5;color:var(--ink);margin:0 0 10px;word-break:break-word}
+  #ghEl .el-baglam{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+  #ghEl .el-dugme{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #ghEl .el-ret{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  #ghEl .el-ret .ghb{flex:1 1 auto}
+  #ghEl kbd{font:600 10.5px var(--mono,ui-monospace);opacity:.55;margin-left:6px}
+  #ghEl .el-alt{display:flex;justify-content:space-between;margin-top:12px;font-size:12.5px;color:var(--muted)}
+  #ghEl .el-son{text-align:center;padding:18px 6px}#ghEl .el-son b{display:block;font-size:22px;margin-bottom:8px;color:var(--ink)}
+  #ghEl .el-son p{margin:4px 0;color:var(--ink2)}
+  #gh .gh-tempo{font-size:12.5px;color:var(--muted);margin:-6px 0 12px;padding:8px 12px;border:1px dashed var(--hair2);border-radius:12px}
+  #gh .gh-tempo button{all:unset;cursor:pointer;color:var(--vurgu);font-weight:600}
+  @media (max-width:640px){#ghEl .el-metin{font-size:16.5px}#ghEl kbd{display:none}}
   @media (max-width:640px){
     #gh .gh-bas{flex-direction:row;align-items:flex-end}
     #gh .gh-bas h2{font-size:26px!important}
@@ -2375,7 +2409,7 @@
   body.tSayfa .tnotac.acik{border-bottom-left-radius:0;border-bottom-right-radius:0;margin-bottom:0;border-bottom:0}
   body.tSayfa #doc .sagk > #notlarKutu.kapali{display:none!important}
   body.tSayfa #doc .sagk > #notlarKutu{border-top-left-radius:0!important;border-top-right-radius:0!important}
-  body.tSayfa #kisacaKutu .kkisiler{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+  body.tSayfa #kisacaKutu .kkisiler{grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))}
   body.tSayfa #kisacaKutu .kkisi li em.yok{background:none!important;color:var(--muted)!important;padding:0!important;font-weight:400!important;opacity:1}
   body.tSayfa .tkkim .spk input{width:auto;flex:1;min-width:0}
   @media (max-width:760px){
@@ -2464,7 +2498,7 @@
     <button class="navbtn" id="dilBtn" type="button" aria-label="Dil / Language" title="Türkçe / English" style="font-weight:600;font-size:12px;letter-spacing:.04em">EN</button>
     <button class="navbtn" id="theme" aria-label="Görünümü değiştir"><svg id="themeIco" viewBox="0 0 24 24"></svg></button>
   </div>
-</div><div class="offline" id="offline">Bağlantı yok. Site yeniden başlıyor olabilir; düzelmezse “Studio” dosyasına çift tıklayın.</div></nav>
+</div><div class="offline" id="offline">Bağlantı yok. Birkaç saniye içinde yeniden bağlanır; düzelmezse Mac’i yeniden başlatın.</div></nav>
 
 <div class="wrap">
   <section class="hero" style="margin-top:0">
@@ -2540,7 +2574,7 @@
       <div class="tpav" id="tpAv"><img src="/static/logo/note.svg" alt=""></div>
       <div class="tpbilgi">
         <button class="tpgeri hidden" id="tpGeri" type="button">‹ Tüm toplantılar</button>
-        <div class="tpust"><h1><span class="selam" id="tSelam"></span><span id="tpAd">Meet</span></h1><button class="tkayitb" id="tKayitBuyuk" type="button"><span class="nokta"></span><span class="ytz" id="tKayitYazi">Kayda başla</span></button><button class="tdosyab" id="tDosyaBtn" type="button" title="Telefondaki ses notu ya da bir kayıt dosyası (sürükleyip bırakabilirsiniz)"><svg viewBox="0 0 24 24"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>Ses dosyası</button><input type="file" id="tDosya" accept="audio/*,.m4a,.mp3,.wav,.aac,.caf,.amr,.ogg,.opus,.qta" hidden></div>
+        <div class="tpust"><h1><span class="selam" id="tSelam"></span><span id="tpAd">Meet</span></h1><button class="tkayitb" id="tKayitBuyuk" type="button"><span class="nokta"></span><span class="ytz" id="tKayitYazi">Kayda başla</span></button><button class="tdosyab" id="tDosyaBtn" type="button" title="Telefondaki ses notu ya da bir kayıt dosyası (sürükleyip bırakabilirsiniz)"><svg viewBox="0 0 24 24"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>Dosya yükle</button><input type="file" id="tDosya" accept="audio/*,.m4a,.mp3,.wav,.aac,.caf,.amr,.ogg,.opus,.qta" hidden></div>
         <div class="tpsayi" id="tSayi"></div>
         <p class="tpacik" id="tpAcik"></p>
         <p class="tdsat" id="tDurumSat"></p>
@@ -2610,9 +2644,8 @@
       <div class="gh-sek" id="ghSek" role="tablist">
         <button type="button" role="tab" data-s="bugun"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Bugün<i></i></button>
         <button type="button" role="tab" data-s="taslak"><svg viewBox="0 0 24 24"><path d="M5 6.5h14M5 12h14M5 17.5h9"/></svg>Taslaklar<i></i></button>
-        <button type="button" role="tab" data-s="blog"><svg viewBox="0 0 24 24"><path d="M5 19.5l1-4L16.5 5a2.1 2.1 0 0 1 3 3L9 18.5z"/><path d="M14.5 7l3 3M5 19.5h14"/></svg>Blog<i></i></button>
-        <button type="button" role="tab" data-s="defter"><svg viewBox="0 0 24 24"><path d="M6 3.5h10.5a2.5 2.5 0 0 1 2.5 2.5v14.5H8.5A2.5 2.5 0 0 1 6 18z"/><path d="M6 18a2.5 2.5 0 0 1 2.5-2.5H19M10 8h5"/></svg>Defter<i></i></button>
-        <button type="button" role="tab" data-s="ses"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Sesiniz<i></i></button>
+        <button type="button" role="tab" data-s="defter"><svg viewBox="0 0 24 24"><path d="M6 3.5h10.5a2.5 2.5 0 0 1 2.5 2.5v14.5H8.5A2.5 2.5 0 0 1 6 18z"/><path d="M6 18a2.5 2.5 0 0 1 2.5-2.5H19M10 8h5"/></svg>Fikirler<i></i></button>
+        <button type="button" role="tab" data-s="ses"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Profil<i></i></button>
       </div>
       <div class="gh-harita" id="ghHarita" aria-label="Ghost’un beslendiği yerler"></div>
     </nav>
@@ -2620,7 +2653,7 @@
       <h1 class="gh-hero">Ghost</h1>
       <div class="gh-yaz">
         <textarea id="ghGirdi" rows="1" placeholder="Aklınızda ne var?" aria-label="Link, yazı ya da fikir" spellcheck="false"></textarea>
-        <div class="gh-yaz-alt"><button class="ghb gh-mik" type="button" data-g="girdimik" title="Sesli söyleyin (yalnızca kendi sesiniz)" aria-label="Sesli söyleyin"><svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><span id="ghIpucu" class="varsayilan">Video ya da haber linki, yapıştırılmış bir yazı ya da kendi fikriniz</span><button class="ghb ana" type="button" data-g="yaz" id="ghYaz" disabled>Yaz</button></div>
+        <div class="gh-yaz-alt"><button class="ghb gh-mik" type="button" data-g="girdimik" title="Sesli söyleyin (yalnızca kendi sesiniz)" aria-label="Sesli söyleyin"><svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><span id="ghIpucu" class="varsayilan">Bir fikir, link ya da yazı bırakın; gönderiye çevireyim</span><button class="ghb ana" type="button" data-g="yaz" id="ghYaz" disabled>Yaz</button></div>
       </div>
       <div id="ghSayfa"><p class="gh-ipucu" style="padding:24px 4px">Yükleniyor…</p></div>
     </div>
@@ -2652,23 +2685,23 @@
   <div class="row"><div class="l">Yapay zekâ modeli<small id="ayModel"></small></div></div>
   <h4 class="ayh">Toplantılar</h4>
   <div class="row" id="ayTelefonRow"><div class="l">iPhone’dan toplantı kaydı<small id="ayTelefonNot"></small></div><button class="sbtn" id="ayTelefon" type="button">Adresi kopyala</button></div>
-  <div class="row" id="ayUcretRow"><div class="l">Gün ücretiniz<small>Toplantılarda gelen kapsam dışı istekler şirket sayfasında saat olarak görünür; ücretinizi girerseniz yaklaşık tutarı da.</small></div><span style="display:flex;gap:6px;align-items:center"><input id="ayUcret" type="number" min="0" step="50" inputmode="numeric" placeholder="0" style="width:96px;height:36px;border:1px solid var(--hair);border-radius:10px;padding:0 10px;background:var(--surface);color:var(--ink);font:inherit;text-align:right" aria-label="Gün ücreti"><select class="sel" id="ayPara" aria-label="Para birimi"><option>€</option><option>₺</option><option>$</option><option>£</option></select></span></div>
-  <div class="row"><div class="l">Toplantı mı, değil mi?<small>Toplantıya benzemeyen kayıtlar (maç izlerken sohbet, video sesi) listeye girmeden önce size sorulur.</small></div><button class="tog" id="ayKapi" role="switch" aria-checked="true" type="button" aria-label="Toplantı kapısı"></button></div>
-  <div class="row"><div class="l">Toplantı sırasında fısıltı<small>Toplantı sürerken önceki kararları hatırlatır ve size sorulan bir şeye nasıl yanıt verebileceğinizi önerir. Canlı kartta ve Chrome yan panelinde görünür.</small></div><button class="tog" id="ayAsistan" role="switch" aria-checked="true" type="button" aria-label="Toplantı sırasında fısıltı"></button></div>
-  <div class="row"><div class="l">İşlerimi görev olarak ekle<small>Toplantıdan size düşen işler kendiliğinden Asana’nıza eklenir: size atanır, müşterinin projesine girer, söylendiyse son tarihiyle.</small></div><button class="tog" id="ayGorev" role="switch" aria-checked="true" type="button" aria-label="İşlerimi görev olarak ekle"></button></div>
-  <div class="row" id="ayDanismanRow"><div class="l">Kariyer danışmanı notu<small>Her toplantıdan sonra size özel: nasıl konuştunuz, nerede daha iyi olabilirdi, hangi fırsatlar var, ne yapmalısınız. Toplantının Word belgesinde ayrı bir sayfada yer alır.</small></div><button class="tog" id="ayDanisman" role="switch" aria-checked="true" type="button" aria-label="Kariyer danışmanı notu"></button></div>
+  <div class="row" id="ayUcretRow"><div class="l">Gün ücretiniz<small>İsteğe bağlı. Toplantılarda istenen ek işlerin yaklaşık değeri bununla hesaplanır.</small></div><span style="display:flex;gap:6px;align-items:center"><input id="ayUcret" type="number" min="0" step="50" inputmode="numeric" placeholder="0" style="width:96px;height:36px;border:1px solid var(--hair);border-radius:10px;padding:0 10px;background:var(--surface);color:var(--ink);font:inherit;text-align:right" aria-label="Gün ücreti"><select class="sel" id="ayPara" aria-label="Para birimi"><option>€</option><option>₺</option><option>$</option><option>£</option></select></span></div>
+  <div class="row"><div class="l">Toplantı olmayan kayıtları sor<small>Maç izlerken sohbet ya da video sesi gibi toplantıya benzemeyen kayıtlar listeye girmeden önce size sorulur.</small></div><button class="tog" id="ayKapi" role="switch" aria-checked="true" type="button" aria-label="Toplantı kapısı"></button></div>
+  <div class="row"><div class="l">Toplantı sırasında canlı öneriler<small>Toplantı sürerken önceki kararları hatırlatır, ne diyebileceğinizi önerir. Chrome yan panelinde ve Meet’in canlı kartında görünür.</small></div><button class="tog" id="ayAsistan" role="switch" aria-checked="true" type="button" aria-label="Toplantı sırasında canlı öneriler"></button></div>
+  <div class="row"><div class="l">İşlerimi Asana’ya ekle<small>Toplantıda size düşen işler Asana’nıza eklenir: size atanır, müşterinin projesine girer, söylendiyse son tarihiyle.</small></div><button class="tog" id="ayGorev" role="switch" aria-checked="true" type="button" aria-label="İşlerimi görev olarak ekle"></button></div>
+  <div class="row" id="ayDanismanRow"><div class="l">Koçluk notu<small>Her toplantıdan sonra yalnızca size: nasıl konuştunuz, nerede daha iyi olabilirdi, sırada ne var. Paylaşılan notlara ve Drive’a girmez.</small></div><button class="tog" id="ayDanisman" role="switch" aria-checked="true" type="button" aria-label="Koçluk notu"></button></div>
   <div class="row" id="ayClaudeTopRow"><div class="l">Toplantılarda da Claude kullan<small>Özet, notlar, toplantı adı ve sorular Claude ile hazırlanır; toplantı metni Anthropic’e gider. Kapatırsanız toplantılar yalnızca bu bilgisayarda işlenir.</small></div><button class="tog" id="ayClaudeTop" role="switch" aria-checked="true" type="button" aria-label="Toplantılarda da Claude kullan"></button></div>
-  <div class="row"><div class="l">Otomatik toplantı kaydı<small id="ayOtoNot">Zoom, Teams, Meet ya da FaceTime mikrofonu açınca kayıt kendiliğinden başlar; bitince yazıya dökülüp Drive’a eklenir.</small></div><button class="tog" id="ayOto" role="switch" aria-checked="true" type="button"></button></div>
+  <div class="row"><div class="l">Otomatik toplantı kaydı<small id="ayOtoNot">Zoom, Teams, Google Meet ya da FaceTime’da görüşme başlayınca kayıt kendiliğinden başlar; bitince notlar hazırlanır.</small></div><button class="tog" id="ayOto" role="switch" aria-checked="true" type="button"></button></div>
   <div class="row"><div class="l">Takvim<small id="ayTakvimNot">Toplantı adı ve katılımcılar Google Takvim’den alınır. Google Takvim → Ayarlar → takviminiz → “iCal biçimindeki gizli adres”i kopyalayıp yapıştırın.</small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end" id="ayTakvimAct"></div></div>
   <div class="row"><div class="l">Google Drive<small id="ayDriveNot"></small></div><div style="display:flex;gap:6px;align-items:center" id="ayDriveAct"></div></div>
   <div class="row" id="ayDriveKlasorRow"><div class="l">Drive’da klasör<small>Toplantılar bu klasörün altına müşteri, tarih ve konu adıyla düşer.</small></div><input id="ayDriveKlasor" type="text" style="width:200px;max-width:45%"></div>
   <div class="row"><div class="l">Müşteriler ve kişiler<small>Her müşteri için görüştüğünüz kişileri yazın; toplantı, tanınan kişilere göre o klasöre gider. Örnek: Ajans: Ayşe, Mert; Marka: Can</small></div><textarea id="ayMusteriler" rows="3" placeholder="Ajans A: Ayşe, Ali&#10;Marka B: Can&#10;Marka C" style="width:260px;max-width:55%;font:inherit;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea></div>
-  <div class="row"><div class="l">Toplantı öncesi hatırlatma<small>Takvimdeki toplantıdan 10 dakika önce aynı kişilerle önceki toplantılardaki açık işler ve bekleyen sorular bildirim olarak gelir.</small></div><button class="tog" id="ayOnBrif" role="switch" aria-checked="true" type="button" aria-label="Toplantı öncesi hatırlatma"></button></div>
+  <div class="row"><div class="l">Toplantı öncesi hatırlatma<small>Takvimdeki toplantıdan 10 dakika önce, aynı kişilerle kalan açık işler ve sorular bildirim olarak gelir.</small></div><button class="tog" id="ayOnBrif" role="switch" aria-checked="true" type="button" aria-label="Toplantı öncesi hatırlatma"></button></div>
   <div class="row"><div class="l">Hatırlatmayı e-postayla da gönder<small>Telefonda okumak için hazırlık notu e-postanıza da gelir.</small></div><button class="tog" id="ayOnBrifEp" role="switch" aria-checked="false" type="button" aria-label="Hatırlatmayı e-postayla da gönder"></button></div>
   <div class="row"><div class="l">Haftalık müşteri özeti<small>Her pazartesi sabahı son haftanın toplantıları müşteri müşteri e-postanıza gelir.</small></div><button class="tog" id="ayHaftalik" role="switch" aria-checked="true" type="button" aria-label="Haftalık müşteri özeti"></button></div>
   <div class="row"><div class="l">Toplantı notlarını e-postayla gönder<small>Her toplantıdan sonra bağlamlı notlar (konular, kararlar, yapılacaklar, açık sorular) size e-posta olarak gelir.</small></div><button class="tog" id="ayNotlar" role="switch" aria-checked="true" type="button"></button></div>
   <div class="row"><div class="l">Asana<small id="ayAsanaNot">Toplantıdan size düşen işler buraya gider. Asana’ya iş hesabınızla girin → sağ üstte profil fotoğrafı → Ayarlar → Uygulamalar → Geliştirici uygulamalarını yönet → Yeni erişim belirteci; çıkan kodu buraya yapıştırın.</small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end" id="ayAsanaAct"></div></div>
-  <div class="row"><div class="l">Tanınan sesler<small id="aySeslerNot">Bir transkriptte konuşmacıya ad verdiğinizde sesi öğrenilir; sonraki videolarda kendiliğinden tanınır.</small></div><div class="kay" id="aySesler" style="margin:0;justify-content:flex-end;max-width:50%"></div></div>
+  <div class="row"><div class="l">Tanınan sesler<small id="aySeslerNot">Bir konuşmacıya ad verdiğinizde sesi öğrenilir; sonraki kayıtlarda kendiliğinden tanınır.</small></div><div class="kay" id="aySesler" style="margin:0;justify-content:flex-end;max-width:50%"></div></div>
   <h4 class="ayh">Video</h4>
   <div class="row"><div class="l">Dudak senkronu (sync.so)<small>Dublajlı videolarda ağız hareketlerini yeni sese eşler. Ücretli (dakikası ~4-5 $) ve video sync.so’ya gönderilir; her seferinde onayınız istenir. Anahtarı sync.so → API Keys’ten alın.</small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end" id="aySyncAct"></div></div>
   <div class="row"><div class="l">Pexels (B-roll)<small id="ayPexelsNot">Kliplere konuşmaya uygun kısa stok görüntüler eklemek için ücretsiz Pexels API anahtarı (pexels.com/api).</small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end" id="ayPexelsAct"></div></div>
@@ -2811,8 +2844,8 @@ function islemUygula(){
   if ((document.documentElement.dataset.urun || 'transcript') === 'transcript'){   // Studio ayar kartlarında başlık + tek satır açıklama; Transkript kilitliyse nedenini söyler
     const neden = [state.db ? 'Dublaj' : '', state.alt ? 'Düzenlenmiş video' : ''].filter(Boolean).join(' ve ');
     const tc = $('#sonuc .chipb[data-k="tx"]'), oc = $('#sonuc .chipb[data-k="oz"]');
-    if (tc) tc.innerHTML = `<span class="ln">Transkript<span class="ack">${zorunlu && neden ? esc(neden) + ' bu metinden yapılır; açık kalır' : 'Kim, ne zaman, ne dedi.'}</span></span>`;
-    if (oc) oc.innerHTML = '<span class="ln">Özet<span class="ack">Uzun lafın kısası.</span></span>';
+    if (tc) tc.innerHTML = `<span class="ln">Transkript<span class="ack">${zorunlu && neden ? esc(neden) + ' bu metinden yapılır; açık kalır' : 'Konuşmanın tamamı, konuşanların adlarıyla.'}</span></span>`;
+    if (oc) oc.innerHTML = '<span class="ln">Özet<span class="ack">Ana fikirler, öne çıkanlar ve bölümler.</span></span>';
   }
   if ($('#cvChip')) $('#cvChip').innerHTML = (document.documentElement.dataset.urun || 'transcript') === 'transcript' ? 'Çeviri <span class="ack">Metin ve altyazı seçilen dile çevrilir; ses değişmez</span>' : state.ceviriDil ? `Çeviri <span class="sub">· ${esc(dilAdi(state.ceviriDil))} ▾</span>` : 'Çeviri';
   $('#go').textContent = state.islem === 'indir' ? 'İndir' : state.islem === 'ozet' ? 'Özetle' : (state.alt || state.db || (state.dl && state.tx)) ? 'Başlat' : 'Yazıya dök'; $('#goIk').setAttribute('aria-label', $('#go').textContent); $('#goIk').title = $('#go').textContent + ' (Return)'; $('#go').disabled = hic;
@@ -2824,7 +2857,7 @@ function kaliteGoster(){
   const q = state.preview?.kaliteler;
   if (q){ if (state.kalite !== 'en' && state.kalite !== 'mp3' && q[state.kalite] === null){ state.kalite = ['1080','720','480','360'].find(k => q[k]) || 'en'; }
     if (state.kalite === 'en' && q.en_yukseklik && q.en_yukseklik <= 1080) state.kalite = '1080'; }
-  $('#dlChip').innerHTML = (document.documentElement.dataset.urun || 'transcript') === 'transcript' ? '<span class="ln">Videoyu indir<span class="ack">Dosyası sizde kalsın.</span></span>'
+  $('#dlChip').innerHTML = (document.documentElement.dataset.urun || 'transcript') === 'transcript' ? '<span class="ln">Videoyu indir<span class="ack">Video dosyası bilgisayarınıza iner.</span></span>'
     : state.dl ? `Videoyu indir <span class="sub">· ${esc(kaliteAd(state.kalite))} ▾</span>` : 'Videoyu indir';
 }
 function kaliteMenu(anchor){
@@ -3034,7 +3067,7 @@ $('#tKayit').onclick = () => $('#kayitBtn').click();
 let tMusteri = '';
 let canliZamanlayici = null, canliSon = 0;
 /* Toplantı sırasında not ve 'önemli an' (notlarim.py): kayıt sürerken Bugün sayfasında görünür */
-let notBarAcik = false, notBarBas = 0, canliSonAktif = false;
+let notBarAcik = false, notBarBas = 0, canliSonAktif = false, MASA = null;   // MASA: masaüstü kaydedicinin durumu (/api/kayit/canli-durum)
 function notBarGoster(acik, bas){ const b = $('#notBar'); if (!b || URUN !== 'note') return; if (acik && bas) notBarBas = bas; if (acik === notBarAcik) return; notBarAcik = acik; b.classList.toggle('hidden', !acik); if (acik) notListeCiz(); }
 async function notListeCiz(){
   let l = []; try{ l = await (await fetch('/api/canli/notlar')).json(); }catch(e){ return; }
@@ -3049,8 +3082,17 @@ $('#notGir').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preven
 $('#notIsaret').onclick = () => notEkle('isaret');
 document.addEventListener('keydown', e => { if (notBarAcik && (e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'm'){ e.preventDefault(); notEkle('isaret'); } });
 document.addEventListener('click', e => { const b = e.target.closest('#notlarimKutu [data-sn]'); if (b) gitSn(+b.dataset.sn); });
+document.addEventListener('click', e => { const b = e.target.closest('.kmusler [data-km]'); if (!b) return;   // Kısaca: müşteriye göre süz
+  const kutu = b.closest('#kisacaKutu') || document, m = b.dataset.km;
+  kutu.querySelectorAll('.kmusler [data-km]').forEach(x => x.classList.toggle('on', x === b));
+  kutu.querySelectorAll('li[data-m]').forEach(li => { li.hidden = !!m && li.dataset.m !== m; });
+  kutu.querySelectorAll('.kkisi').forEach(kk => { const L = [...kk.querySelectorAll('li[data-m]')]; kk.hidden = !!m && L.length > 0 && L.every(li => li.hidden); });
+  kutu.querySelectorAll('ul.kliste').forEach(ul => { const L = [...ul.querySelectorAll('li[data-m]')]; const gizli = !!m && L.length > 0 && L.every(li => li.hidden);
+    ul.hidden = gizli; const h = ul.previousElementSibling; if (h && h.tagName === 'H4') h.hidden = gizli; }); });
 function canliBaslat(){ if (canliZamanlayici) return; canliCek(); canliZamanlayici = setInterval(canliCek, 5000); }
 async function canliCek(){
+  try{ MASA = await (await fetch('/api/kayit/canli-durum')).json(); }catch(e){ MASA = null; }   // 2026-10-27: sayfa masaüstü kaydını görmüyor, "Kayda başla" diyordu
+  kayitDugme();
   let c; try{ c = await (await fetch('/api/canli')).json(); }catch(e){ return; }
   const kutu = $('#canliKutu'); const nav = $('#yuz button[data-v="toplanti"]');
   canliSonAktif = !!(c && c.aktif); notBarGoster(canliSonAktif || !!K.rec, c && c.aktif ? Date.now() / 1000 - (c.islenen_sn || 0) - 60 : (K.rec ? K.bas / 1000 : 0));
@@ -3060,7 +3102,7 @@ async function canliCek(){
   const o = c.ozet;
   const satirlar = (c.segmentler || []).map(s => `<div class="cl"><span class="z">${zamanK(s.bas)}</span>${esc(s.metin)}</div>`).join('');
   const asist = (c.asistan || []).slice(-3).reverse().map(k => k.tur === 'mentor'
-    ? `<div class="cas mentor"><span class="pr-etk">● Mentör · ${zamanK(k.sn)}</span><small>${esc(k.gozlem)}</small><b>${esc(k.yap)}</b>${k.soyle ? `<small class="soyle">“${esc(k.soyle)}”</small>` : ''}</div>`
+    ? `<div class="cas mentor"><span class="pr-etk">● Öneri · ${zamanK(k.sn)}</span><small>${esc(k.gozlem)}</small><b>${esc(k.yap)}</b>${k.soyle ? `<small class="soyle">“${esc(k.soyle)}”</small>` : ''}</div>`
     : k.tur === 'oneri'
     ? `<div class="cas oneri"><span class="pr-etk">● Şöyle diyebilirsiniz · ${zamanK(k.sn)}</span>${k.durum ? `<small>${esc(k.durum)}</small>` : ''}<b>“${esc(k.soyle)}”</b></div>`
     : `<div class="cas"><span class="pr-etk">● Hatırlatma · ${zamanK(k.sn)}</span><b>${esc(k.metin)}</b>${k.dayanak ? `<small>${esc(k.dayanak)}</small>` : ''}</div>`).join('');
@@ -3345,11 +3387,12 @@ async function toplantiDurum(){
   { const sat = $('#tDurumSat'); if (sat){ const p = [];
       p.push(d && d.oto_kayit ? `<span class="dot ok"></span>Toplantıya girdiğinizde kayıt kendiliğinden başlar` : `<span class="dot"></span>Otomatik kayıt kapalı · <button class="textbtn" type="button" data-ac="ayar">Aç</button>`);
       if (d && d.yol && d.acik) p.push(`notlar Drive’a kaydedilir`);
+      if (u && u.disk_gb != null && u.disk_gb < 10) p.push(`<span class="uyar" title="Toplantı kayıtları için en az 10 GB boş yer önerilir. Çöp’ü boşaltın; büyük dosyaları silin.">Diskte ${String(u.disk_gb).replace('.', ',')} GB kaldı</span>`);   // 2026-10-28
       if (u && u.mik && u.mik.bos_mik_sn >= 1200){ const dk = Math.round(u.mik.bos_mik_sn / 60), sure_ = dk < 90 ? dk + ' dakikadır' : Math.round(dk / 60) + ' saattir';
         const pen = (u.mik.pencereler || []).filter(t => t && t !== 'Google Chrome').slice(0, 4);
         p.push(`<span class="uyar" title="${esc('Toplantı yokken mikrofon açık. Chrome’da başlığında kırmızı nokta olan sekmeyi kapatın.' + (pen.length ? ' Açık pencereler: ' + pen.join(' · ') : ''))}">Chrome mikrofonu ${sure_} açık${pen.length ? ': ' + esc(pen[0].slice(0, 40)) + (pen.length > 1 ? ` +${pen.length - 1}` : '') : ''}</span>`); }
       if (u && u.son_nabiz && Date.now() / 1000 - u.son_nabiz > 900){ const sa = (Date.now() / 1000 - u.son_nabiz) / 3600;
-        p.push(`<span class="uyar" title="Kayıt yine de başlar (takvim ve ekrandaki toplantı penceresinden anlaşılır); ama katılımcı adları ve kim konuştuğu gelmez. Chrome’da chrome://extensions sayfasında Meet Toplantı Yardımcısı’nın yenile düğmesine bir kez basın.">Chrome uzantısı ${sa < 24 ? Math.round(sa) + ' saattir' : Math.round(sa / 24) + ' gündür'} sessiz</span>`); }
+        p.push(`<span class="uyar" title="Kayıt yine de başlar (takvim ve ekrandaki toplantı penceresinden anlaşılır); ama katılımcı adları ve kim konuştuğu gelmez. Chrome’u kapatıp yeniden açın.">Chrome uzantısı ${sa < 24 ? Math.round(sa) + ' saattir' : Math.round(sa / 24) + ' gündür'} sessiz</span>`); }
       // 23 Ekim: ikinci takvim adresi aylarca 404 verdi, iş toplantıları sessizce gelmedi
       const bozuk = (tk?.takvimler || []).filter(k => k.hata);
       if (bozuk.length) p.push(`<button class="textbtn uyar" type="button" data-ac="ayar" title="Bu takvimdeki toplantıların adı, katılımcıları ve hazırlık notu gelmez">Bir takvim adresi çalışmıyor</button>`);
@@ -3405,10 +3448,10 @@ async function sozCiz(sirketKod){
   if (!benim.length && !bekl.length && !tahAcik.length){ if (SOZ.hedef){ k.innerHTML = '<p class="hint">Toplantılarınızda sizden beklenen açık iş ya da karar yok.</p>'; return; } k.classList.add('hidden'); return; }
   if (SOZ.sek === 'tahmin') return tahminCiz(k, tahAcik, sirketKod);
   const l = SOZ.sek === 'sozlerin' ? benim : bekl, gor = SOZ.tumu ? l : l.slice(0, 5);
-  const gunAd = o => { if (!o.son) return 'tarihsiz'; const d = new Date(o.son + 'T12:00'), b = new Date(); b.setHours(12, 0, 0, 0); const fark = Math.round((d - b) / 864e5);
+  const gunAd = o => { if (!o.son) return 'tarih yok'; const d = new Date(o.son + 'T12:00'), b = new Date(); b.setHours(12, 0, 0, 0); const fark = Math.round((d - b) / 864e5);
     return o.durum === 'gecikti' ? (fark === -1 ? 'dün' : `${-fark} gün gecikti`) : fark === 0 ? 'bugün' : fark === 1 ? 'yarın' : d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'short', day:'numeric', month:'short'}); };
   const gecikmis = benim.filter(o => o.durum === 'gecikti').length;
-  k.innerHTML = `<div class="tsust"><div class="seg mini" id="tSozSek"><button type="button" data-v="sozlerin" aria-pressed="${SOZ.sek === 'sozlerin'}">Sizden <b>${benim.length}</b></button><button type="button" data-v="bekledigin" aria-pressed="${SOZ.sek === 'bekledigin'}">Başkalarından <b>${bekl.length}</b></button>${tahAcik.length ? `<button type="button" data-v="tahmin" aria-pressed="false">Tahminlerin <b>${tahAcik.length}</b></button>` : ''}</div>${gecikmis && SOZ.sek === 'sozlerin' ? `<span class="tsuyari">${gecikmis} iş gecikti</span>` : ''}</div>`
+  k.innerHTML = `<div class="tsust"><div class="seg mini" id="tSozSek"><button type="button" data-v="sozlerin" aria-pressed="${SOZ.sek === 'sozlerin'}">Sizden <b>${benim.length}</b></button><button type="button" data-v="bekledigin" aria-pressed="${SOZ.sek === 'bekledigin'}">Başkalarından <b>${bekl.length}</b></button>${tahAcik.length ? `<button type="button" data-v="tahmin" aria-pressed="false">Tahminleriniz <b>${tahAcik.length}</b></button>` : ''}</div>${gecikmis && SOZ.sek === 'sozlerin' ? `<span class="tsuyari">${gecikmis} iş gecikti</span>` : ''}</div>`
     + (l.length ? `<ul class="tsliste">${gor.map(o => `<li class="${o.durum}"><label><input type="checkbox" data-t="${esc(o.temel)}" data-k="${o.k}" data-i="${o.i}" title="Tamamlandı"></label><span class="tsis">${SOZ.sek === 'bekledigin' ? `<button type="button" class="tskisi" data-a="${esc(o.kim)}">${esc(o.kim)}</button> · ` : ''}${esc(o.is)}<button type="button" class="tskay" data-t="${esc(o.temel)}">${esc(o.konu)}</button></span><span class="tsgun">${o.durum === 'karar' ? 'kararınız' : esc(gunAd(o))}</span></li>`).join('')}</ul>`
        + (l.length > 5 ? `<button class="tiny tstum" type="button">${SOZ.tumu ? 'Daha az göster' : `Tümünü göster (${l.length})`}</button>` : '')
       : `<p class="hint" style="margin:10px 2px 0">${SOZ.sek === 'sozlerin' ? 'Sizden beklenen açık iş ya da karar yok.' : 'Başkalarından beklediğiniz iş yok.'}</p>`);
@@ -3426,8 +3469,9 @@ async function bekDugme(sirketKod){
   const b = $('#tBekBtn'); if (!b || URUN !== 'note') return;
   if (!SOZ.veri || Date.now() - SOZ.t > 30000){ try{ SOZ.veri = await (await fetch('/api/sozler')).json(); SOZ.t = Date.now(); }catch(e){ return; } }
   const l = (SOZ.veri.sozlerin || []).filter(o => !sirketKod || (o.sirket || 'genel') === sirketKod), gec = l.filter(o => o.durum === 'gecikti' || o.durum === 'bugun').length;
-  b.dataset.s = sirketKod || ''; b.classList.toggle('hidden', !l.length); b.classList.toggle('acil', !!gec);
-  b.innerHTML = `Sizden beklenenler <b>${l.length}</b>${gec ? `<span>· ${gec} bugün ya da gecikmiş</span>` : ''} <i>›</i>`;
+  const bek = (SOZ.veri.bekledigin || []).filter(o => !sirketKod || (o.sirket || 'genel') === sirketKod);   // kendi işiniz yoksa da başkalarından beklenenler ve tahminler bu pencerede
+  b.dataset.s = sirketKod || ''; b.classList.toggle('hidden', !l.length && !bek.length); b.classList.toggle('acil', !!gec);
+  b.innerHTML = l.length ? `Sizden beklenenler <b>${l.length}</b>${gec ? `<span>· ${gec} bugün ya da gecikmiş</span>` : ''} <i>›</i>` : `Başkalarından beklenenler <b>${bek.length}</b> <i>›</i>`;
 }
 $('#tBekBtn')?.addEventListener('click', () => { const s = $('#tBekBtn').dataset.s || ''; SOZ.hedef = $('#bekIc'); SOZ.sek = 'sozlerin'; SOZ.tumu = true; sozCiz(s); $('#bekDlg').showModal(); });
 $('#bekDlg')?.addEventListener('close', () => { SOZ.hedef = null; SOZ.tumu = false; });
@@ -3448,7 +3492,7 @@ function tahminCiz(k, acik, sirketKod){
   const bugun = new Date().toISOString().slice(0, 10), isabet = SOZ.tah.isabet || {};
   const sira = acik.slice().sort((a, b) => ((b.oneri ? 2 : 0) + ((a.bakilacak || '9') <= bugun ? 0 : 1)) - ((a.oneri ? 2 : 0) + ((b.bakilacak || '9') <= bugun ? 0 : 1)) || (a.bakilacak || '').localeCompare(b.bakilacak || ''));
   const isb = Object.entries(isabet).map(([m, x]) => `${esc(m)} %${Math.round(x.oran * 100)} (${x.adet})`).join(' · ');
-  k.innerHTML = `<div class="tsust"><div class="seg mini" id="tSozSek"><button type="button" data-v="sozlerin" aria-pressed="false">Sizden</button><button type="button" data-v="bekledigin" aria-pressed="false">Başkalarından</button><button type="button" data-v="tahmin" aria-pressed="true">Tahminlerin <b>${acik.length}</b></button></div>${isb ? `<span class="hint">İsabet: ${isb}</span>` : ''}</div>`
+  k.innerHTML = `<div class="tsust"><div class="seg mini" id="tSozSek"><button type="button" data-v="sozlerin" aria-pressed="false">Sizden</button><button type="button" data-v="bekledigin" aria-pressed="false">Başkalarından</button><button type="button" data-v="tahmin" aria-pressed="true">Tahminleriniz <b>${acik.length}</b></button></div>${isb ? `<span class="hint">İsabet: ${isb}</span>` : ''}</div>`
     + `<ul class="tsliste">${sira.map(t => { const zamani = (t.bakilacak || '9') <= bugun; return `<li class="${zamani ? 'bugun' : ''}"><span class="tsis">${esc(t.tahmin)}<button type="button" class="tskay" data-t="${esc(t.temel)}">${esc((t.toplanti || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, ''))} · güven %${Math.round((t.guven || .7) * 100)}</button>${t.oneri ? `<small class="tsoneri">Sonraki toplantıdan: “${esc(t.oneri.kanit || '')}” → ${({dogru: 'tutmuş', yanlis: 'tutmamış', kismen: 'kısmen'})[t.oneri.sonuc] || ''}</small>` : ''}</span><span class="tsbtn"><button type="button" data-id="${t.id}" data-s="dogru">Tuttu</button><button type="button" data-id="${t.id}" data-s="kismen">Kısmen</button><button type="button" data-id="${t.id}" data-s="yanlis">Tutmadı</button></span><span class="tsgun">${zamani ? 'sonucu belli' : esc(new Date(t.bakilacak + 'T12:00').toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))}</span></li>`; }).join('')}</ul>`;
   k.classList.remove('hidden');
   $$('#tSozSek button').forEach(b => b.onclick = () => { SOZ.sek = b.dataset.v; SOZ.tumu = false; sozCiz(sirketKod); });
@@ -3521,7 +3565,7 @@ async function izgaraCiz(){
   if (false){ const z = new Date(sr.bas * 1000), dk = Math.round((sr.bas * 1000 - Date.now()) / 60000);
     const sm = ss ? Object.entries(ss.musteri_logolari || {}).find(([m]) => (sr.ad || '').toLocaleLowerCase('tr').includes(m.toLocaleLowerCase('tr'))) : null;
     const slogo2 = ss ? `<img class="tksl" src="${esc((sm && sm[1]) || ss.logo)}" alt="" title="${esc(ss.ad)}">` : '';
-    html += `<div class="tkart sira" role="button" tabindex="0" id="tSiraKart"><div class="tku"><span class="tkg">Sıradaki</span><span class="tks">${dk < 90 ? dk + ' dk sonra' : esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'long'})) + ' ' + esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}</span></div><h3>${esc(sr.ad)}</h3><p>Toplantıdan 10 dakika önce önceki görüşmelerden açık işler ve bekleyen sorular burada hazır olur.</p><div class="tka"><span class="avs">${(sr.kisiler || []).slice(0, 4).map(k => `<i>${esc(basHarf(k))}</i>`).join('')}</span><span class="tksag">${(sr.kisiler || []).length > 4 ? `<span class="tkd">+${sr.kisiler.length - 4}</span>` : ''}${slogo2}</span></div></div>`; }
+    html += `<div class="tkart sira" role="button" tabindex="0" id="tSiraKart"><div class="tku"><span class="tkg">Sıradaki</span><span class="tks">${dk < 90 ? dk + ' dk sonra' : esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {weekday:'long'})) + ' ' + esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}</span></div><h3>${esc(sr.ad)}</h3><p>Toplantı yaklaşınca önceki görüşmelerden açık işler ve bekleyen sorular burada hazır olur.</p><div class="tka"><span class="avs">${(sr.kisiler || []).slice(0, 4).map(k => `<i>${esc(basHarf(k))}</i>`).join('')}</span><span class="tksag">${(sr.kisiler || []).length > 4 ? `<span class="tkd">+${sr.kisiler.length - 4}</span>` : ''}${slogo2}</span></div></div>`; }
   html += liste.map(o => tkartHtml(o, sirket)).join('');
   $('#tizgara').innerHTML = html || `<div class="emptyh">${sirket ? esc(sirket.ad) + ' ile henüz kayıtlı toplantı yok.' + ((sirket.musteriler || []).length ? ' ' + esc(sirket.musteriler.slice(0, 3).join(', ')) + ' konuşulan toplantılar kendiliğinden buraya gelir.' : '') : 'Henüz toplantı yok. Google Meet, Zoom ya da Teams toplantısına girdiğinizde kayıt kendiliğinden başlar.'}</div>`;
   tkartBagla();
@@ -3579,8 +3623,8 @@ function tOnayCiz(l){
   let k = $('#tOnay'); if (!k){ k = document.createElement('div'); k.id = 'tOnay'; $('#tizgara').before(k); }
   if (!l.length){ k.classList.add('hidden'); k.innerHTML = ''; return; }
   k.classList.remove('hidden');
-  k.innerHTML = `<div class="tonh"><b>${l.length === 1 ? 'Bu kayıt bir toplantıya benzemiyor.' : `Bu ${l.length} kayıt toplantıya benzemiyor.`}</b><small>Toplantıysa ekleyin; özet, işler ve Drive klasörü o zaman hazırlanır.</small></div>`
-    + l.map(x => { const z = toplantiZamani(x); return `<div class="tonr" data-t="${esc(x.temel)}"><button type="button" class="tonad" title="Dinleyip kontrol etmek için açın"><b>${esc(toplantiKonu(x) || x.baslik)}</b><small>${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))} · ${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))} · ${Math.max(1, Math.round((x.sure || 0) / 60))} dk${x.onay_neden ? ' · ' + esc(x.onay_neden) : ''}</small></button><span class="tonb"><button type="button" class="sbtn" data-k="0">Kaldır</button><button type="button" class="sbtn blue" data-k="1">Toplantı, ekle</button></span></div>`; }).join('');
+  k.innerHTML = `<div class="tonh"><b>${l.length === 1 ? 'Bu kayıt bir toplantıya benzemiyor.' : `Bu ${l.length} kayıt toplantıya benzemiyor.`}</b><small>Toplantıysa ekleyin, notları hazırlansın. Değilse kaldırın.</small></div>`
+    + l.map(x => { const z = toplantiZamani(x); return `<div class="tonr" data-t="${esc(x.temel)}"><button type="button" class="tonad" title="Dinleyip kontrol etmek için açın"><b>${esc(toplantiKonu(x) || x.baslik)}</b><small>${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))} · ${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))} · ${Math.max(1, Math.round((x.sure || 0) / 60))} dk${x.onay_neden ? ' · ' + esc(x.onay_neden) : ''}</small></button><span class="tonb"><button type="button" class="sbtn" data-k="0">Kaldır</button><button type="button" class="sbtn blue" data-k="1">Evet, toplantı</button></span></div>`; }).join('');
   k.querySelectorAll('.tonad').forEach(b => b.onclick = () => sonucGoster(b.closest('.tonr').dataset.t, {}));
   k.querySelectorAll('.tonb button').forEach(b => b.onclick = async () => { const t = b.closest('.tonr').dataset.t, kabul = b.dataset.k === '1';
     b.closest('.tonr').style.opacity = .45;
@@ -3621,9 +3665,9 @@ function tSorCevap(q){ const c = $('#tSorC'); if (!c) return;
   $('#tSorKapat').onclick = () => { TSOR.q = null; c.innerHTML = ''; }; }
 function tkartHtml({x, z}, sirket){ const sk = x => x.sirket || 'genel'; { const mus = (x.musteri && x.musteri !== 'Diğer') ? x.musteri : x.musteri_tahmin; const kr = srRenk((SIRKET.liste.find(s2 => s2.kod === sk(x)) || {}).renk || '#8E8E93'); const kisiler = toplantiKatilim(x);
     const srk = SIRKET.liste.find(s2 => s2.kod === sk(x)), slogo = !sirket && srk && srk.kod !== 'genel' ? (srk.logo ? `<img class="tksl" src="${esc(srk.logo)}" alt="" title="${esc(srk.ad)}">` : `<span class="tksl h" title="${esc(srk.ad)}">${esc(basHarf(srk.ad))}</span>`) : '';
-    return `<div class="tkart" role="button" tabindex="0" data-t="${esc(x.temel)}" style="--c:${esc(kr)}"><div class="tku"><span class="tkg">${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))}</span><span class="tks">${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}${x.sure ? ' · ' + Math.max(1, Math.round(x.sure / 60)) + ' dk' : ''}</span><button type="button" class="tkdaha" data-d="${esc(x.temel)}" title="Düzenle ya da kaldır" aria-label="Düzenle ya da kaldır">⋯</button></div>`
+    return `<div class="tkart" role="button" tabindex="0" data-t="${esc(x.temel)}" aria-label="${esc(toplantiAdi(x))}" style="--c:${esc(kr)}"><div class="tku"><span class="tkg">${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'short'}))}</span><span class="tks">${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}${x.sure ? ' · ' + Math.max(1, Math.round(x.sure / 60)) + ' dk' : ''}</span><button type="button" class="tkdaha" data-d="${esc(x.temel)}" title="Düzenle ya da kaldır" aria-label="Düzenle ya da kaldır">⋯</button></div>`
       + `<h3>${esc(toplantiAdi(x))}</h3>${x.kisa ? `<p>${esc(x.kisa)}</p>` : '<p class="bos">Özet ilk açılışta hazırlanır.</p>'}`
-      + `<div class="tka"><span class="tkkisi" title="${esc(kisiler.join(', '))}">${esc(kisiler.slice(0, 3).map(k => k.split(' ')[0]).join(', '))}${kisiler.length > 3 ? ` +${kisiler.length - 3}` : ''}</span><span class="tksag">${x.benim_is ? `<span class="tkis">${x.benim_is} işiniz</span>` : mus ? `<span class="tkm">${esc(mus)}</span>` : ''}${slogo}</span></div></div>`; } }
+      + `<div class="tka"><span class="tkkisi" title="${esc(kisiler.join(', '))}">${esc(kisiler.slice(0, 3).map(k => k.split(' ')[0]).join(', '))}${kisiler.length > 3 ? ` +${kisiler.length - 3}` : ''}</span><span class="tksag">${x.adsiz ? `<span class="tkadsiz" title="Sesini dinleyip ad vermek için toplantıyı açın">${x.adsiz} kişi adsız</span>` : ''}${x.benim_is ? `<span class="tkis">${x.benim_is} işiniz</span>` : mus ? `<span class="tkm">${esc(mus)}</span>` : ''}${slogo}</span></div></div>`; } }
 /* Kişi profilleri (kisiler.py): şirket sayfasında kişiler satırı; tıklayınca kişinin sayfası (bilmen gereken, ondan beklediklerin, senden istedikleri) */
 let tKisi = (() => { try{ return sessionStorage.getItem('tKisi') || ''; }catch(e){ return ''; } })(), KISI = {k: '', p: null, t: 0}, KISILER = {l: [], t: 0};
 const kisiKod = ad => String(ad || '').replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase().replace(/ı/g, 'i').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'x';
@@ -3671,12 +3715,12 @@ async function kisiCiz(){
   $('#tpAv').innerHTML = `<span class="avh">${esc(basHarf(p.ad))}</span>`;
   $('#tpAd').textContent = p.ad;
   $('#tpGeri').classList.remove('hidden'); $('#tpGeri').textContent = `‹ ${tSirket && srk && srk.kod === tSirket ? srk.ad : 'Tüm toplantılar'}`;
-  $('#tSayi').innerHTML = `<span><b>${p.toplantilar.length}</b> toplantı</span><span${p.bekledigin.length ? ' class="vurgu"' : ''}><b>${p.bekledigin.length}</b> açık işi</span><span><b>${p.istekler.length}</b> isteği</span>`;
+  $('#tSayi').innerHTML = `<span><b>${p.toplantilar.length}</b> toplantı</span><span${p.bekledigin.length ? ' class="vurgu"' : ''}><b>${p.bekledigin.length}</b> açık iş</span><span><b>${p.istekler.length}</b> istek</span>`;
   $('#tpAcik').textContent = [n && n.rol, srk && srk.kod !== 'genel' ? srk.ad : ''].filter(Boolean).join(' · ');
   $('#tVurgu').innerHTML = ''; $('#tKisiler').classList.add('hidden'); $('#tKapsam').classList.add('hidden');
   // bilmen gereken
   const yk = $('#tYorum');
-  yk.innerHTML = `<div class="ktop"><h4>Bilmen gereken</h4>${n && !n.yetersiz ? `<span class="hint">${n.toplanti} toplantıdaki sözlerinden</span>` : ''}</div>`
+  yk.innerHTML = `<div class="ktop"><h4>Bilmeniz gerekenler</h4>${n && !n.yetersiz ? `<span class="hint">${n.toplanti} toplantıdaki sözlerinden</span>` : ''}</div>`
     + (n && n.bilmen ? `<ul class="kbil">${n.bilmen.map(b => `<li>${esc(b)}</li>`).join('')}</ul>`
         + `<div class="kdet">${(n.onemsedigi || []).length ? `<div><small>Önemsedikleri</small><p>${n.onemsedigi.map(esc).join(' · ')}</p></div>` : ''}${n.ikna ? `<div><small>Nasıl ikna olur</small><p>${esc(n.ikna)}</p></div>` : ''}${n.tarz ? `<div><small>Konuşma tarzı</small><p>${esc(n.tarz)}</p></div>` : ''}${n.dikkat ? `<div class="dk"><small>Dikkat</small><p>${esc(n.dikkat)}</p></div>` : ''}</div>`
       : p.not_hazirlaniyor ? `<p class="hint" style="display:flex;gap:8px;align-items:center"><span class="spin"></span>${esc(p.ad.split(' ')[0])}’in toplantılardaki sözleri okunuyor; yarım dakika kadar sürer.</p>`
@@ -3687,8 +3731,8 @@ async function kisiCiz(){
   const ks = $('#tSoz'), zk = t => (t || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, '').replace(/ · [^·]+$/, '');
   let h = '';
   if (p.kirilmalar.length) h += `<h5>Açık kalan kırılma</h5><ul class="tsliste">${p.kirilmalar.map(x => `<li class="gecikti"><span class="tsis">${esc(x.sinyal || '')}${x.onarim ? `<small class="tsoneri">Bir sonraki görüşmede: ${esc(x.onarim)}</small>` : ''}<button type="button" class="tskay" data-t="${esc(x.temel)}">${esc(zk(x.toplanti))}</button></span></li>`).join('')}</ul>`;
-  if (p.bekledigin.length) h += `<h5>Ondan beklediklerin</h5><ul class="tsliste">${p.bekledigin.map(x => `<li><span class="tsis">${esc(x.is)}<button type="button" class="tskay" data-t="${esc(x.temel)}">${esc(zk(x.toplanti))}</button></span>${x.ne_zaman ? `<span class="tsgun">${esc(x.ne_zaman)}</span>` : ''}</li>`).join('')}</ul>`;
-  if (p.istekler.length) h += `<h5>Senden istedikleri</h5><ul class="tsliste">${p.istekler.map(x => `<li><span class="tsis">${esc(x.istek)}<button type="button" class="tskay" data-t="${esc(x.temel)}">${esc(zk(x.toplanti))}</button></span>${x.kapsam_disi ? `<span class="tsgun kd" title="${esc(x.neden || '')}">kapsam dışı · ~${x.saat} sa</span>` : ''}</li>`).join('')}</ul>`;
+  if (p.bekledigin.length) h += `<h5>Ondan beklediğiniz</h5><ul class="tsliste">${p.bekledigin.map(x => `<li><span class="tsis">${esc(x.is)}<button type="button" class="tskay" data-t="${esc(x.temel)}">${esc(zk(x.toplanti))}</button></span>${x.ne_zaman ? `<span class="tsgun">${esc(x.ne_zaman)}</span>` : ''}</li>`).join('')}</ul>`;
+  if (p.istekler.length) h += `<h5>Sizden istedikleri</h5><ul class="tsliste">${p.istekler.map(x => `<li><span class="tsis">${esc(x.istek)}<button type="button" class="tskay" data-t="${esc(x.temel)}">${esc(zk(x.toplanti))}</button></span>${x.kapsam_disi ? `<span class="tsgun kd" title="${esc(x.neden || '')}">kapsam dışı</span>` : ''}</li>`).join('')}</ul>`;
   ks.innerHTML = h; ks.classList.toggle('hidden', !h); ks.classList.add('kisi');
   ks.querySelectorAll('.tskay').forEach(b => b.onclick = () => sonucGoster(b.dataset.t, {ozetOncelikli: true}));
   const set = new Set(p.toplantilar.map(t => t.temel));
@@ -3751,7 +3795,15 @@ $('#kayitBtn').onclick = async () => { $('#kayitPanel').classList.toggle('hidden
     $('#kayitOto').innerHTML = d.oto_kayit ? `<b>Otomatik kayıt açık.</b> Zoom, Teams, Meet ya da FaceTime mikrofonu açınca kayıt kendiliğinden başlar, toplantı bitince durur; transkript ve özet hazırlanır, ${d.yol ? 'Drive klasörünüze' : 'Drive’a'} müşteri adıyla eklenir. Bu paneli yalnızca elle kayıt için kullanın.` : 'Otomatik kayıt kapalı; Ayarlar’dan açabilirsiniz.'; }catch(e){} };
 $('#kayitKapat').onclick = () => $('#kayitPanel').classList.add('hidden');
 function kayitSureYaz(){ const s = Math.floor((Date.now() - K.bas) / 1000); $('#kayitSure').textContent = `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`.replace(/^00:/, ''); kayitDugme(); }
-function kayitDugme(){ notBarGoster(!!K.rec || canliSonAktif, K.rec ? K.bas / 1000 : 0); const b = $('#tKayitBuyuk'); if (!b) return; b.classList.toggle('kayitta', !!K.rec); $('#tKayitYazi').textContent = K.rec ? ($('#kayitSure').textContent + ' · Bitir') : 'Kayda başla'; }
+function kayitDugme(){
+  const masa = !K.rec && !!(MASA && MASA.kayit);
+  notBarGoster(!!K.rec || canliSonAktif || masa, K.rec ? K.bas / 1000 : (masa ? Date.now() / 1000 - (MASA.sure || 0) : 0));
+  const b = $('#tKayitBuyuk'); if (!b) return;
+  const sure = x => { x = Math.max(0, x | 0); const s2 = n => String(n).padStart(2, '0'); return x >= 3600 ? `${x / 3600 | 0}:${s2((x / 60 | 0) % 60)}:${s2(x % 60)}` : `${x / 60 | 0}:${s2(x % 60)}`; };
+  b.classList.toggle('kayitta', !!K.rec || masa); b.classList.toggle('sorunlu', masa && !!MASA.sorun);
+  $('#tKayitYazi').textContent = K.rec ? ($('#kayitSure').textContent + ' · Bitir') : masa ? (MASA.sorun ? `Kaydediliyor · ${MASA.sorun}` : `Kaydediliyor · ${sure(MASA.sure)}`) : 'Kayda başla';
+  b.title = masa ? 'Bu Mac toplantıyı kendiliğinden kaydediyor. Toplantı bitince kayıt kapanır ve notlar hazırlanır.' : '';
+}
 async function kayitBaslat(){
   if (K.rec) return;
   if (!navigator.mediaDevices?.getUserMedia){ msg('Bu tarayıcı kayıt yapamıyor; Chrome kullanın.', 'err'); return; }
@@ -3779,7 +3831,8 @@ async function kayitBaslat(){
   document.title = '● Kayıt · ' + URUN_AD;
 }
 async function kayitDurdur(){
-  if (!K.rec || K.durduruluyor) return; K.durduruluyor = true; const rec = K.rec; $('#kayitDurdur').disabled = true; $('#kayitDurum').textContent = 'kayıt kapatılıyor';
+  if (!K.rec || K.durduruluyor) return; K.durduruluyor = true;
+  { const amac = $('#kayitAmac').value.trim(); if (amac) fetch('/api/amac', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({anahtar: 'elle', metin: amac})}).catch(() => {}); }   // kayıt başladıktan sonra yazılan amaç kaybolmasın const rec = K.rec; $('#kayitDurdur').disabled = true; $('#kayitDurum').textContent = 'kayıt kapatılıyor';
   await new Promise(res => { rec.onstop = res; rec.stop(); }); await K.kuyruk;
   K.akislar.forEach(a => a.getTracks().forEach(t => t.stop())); try{ K.ctx.close(); }catch(e){} clearInterval(K.timer); cancelAnimationFrame(K.raf);
   let j = null; try{ const r = await fetch(`/api/kayit/${K.id}/bitir`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({baslik: $('#kayitBaslik').value.trim(), musteri: $('#kayitMusteri').value})}); j = await r.json(); if (!r.ok){ msg(j.hata || 'Kayıt tamamlanamadı.', 'err'); j = null; } }catch(e){ msg('Siteye ulaşılamadı; kayıt sunucuda duruyor.', 'err'); }
@@ -3793,7 +3846,9 @@ $('#kayitSistemEkle').onclick = async () => { if (!K.rec) return;
     if (!at.length){ d.getTracks().forEach(t => t.stop()); toast('Ses gelmedi; paylaşım penceresinde “Sistem sesini de paylaş”ı işaretleyin', null, null, 7000); return; }
     const src = K.ctx.createMediaStreamSource(new MediaStream(at)); src.connect(K.dest); src.connect(K.analyser); K.akislar.push(d); $('#kayitSistemEkle').hidden = true; $('#kayitDurum').textContent = 'mikrofon + bilgisayar sesi'; toast('Bilgisayar sesi de kaydediliyor'); }
   catch(e){ toast('Paylaşım seçilmedi; yalnızca mikrofon kaydediliyor'); } };
-$('#tKayitBuyuk').onclick = () => { if (K.rec){ kayitDurdur(); return; } $('#kayitPanel').classList.remove('hidden'); $('#kayitOto').innerHTML = ''; kayitBaslat();
+$('#tKayitBuyuk').onclick = () => { if (K.rec){ kayitDurdur(); return; }
+  if (MASA && MASA.kayit){ toast('Bu Mac toplantıyı zaten kaydediyor; ayrıca başlatmanız gerekmez.', null, null, 5000); return; }   // ikinci (çift) kayıt açılmasın
+  $('#kayitPanel').classList.remove('hidden'); $('#kayitOto').innerHTML = ''; $('#kayitBaslik').focus();                          // önce başlık ve amaç; kayıt "Kaydı başlat" ile
   fetch('/api/drive').then(r => r.json()).then(d => { const sel = $('#kayitMusteri'); if (sel.options.length < 2) sel.innerHTML = '<option value="">Müşteri: otomatik</option>' + (d.musteriler || []).map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('') + '<option value="Diğer">Diğer</option>'; }).catch(() => {}); };
 window.addEventListener('beforeunload', e => { if (K.rec){ e.preventDefault(); e.returnValue = ''; } });
 
@@ -3832,7 +3887,8 @@ async function baslat(oto){
   }catch(e){ msg('Siteye ulaşılamadı. Site kapanmış olabilir.', 'err'); }
   finally{ $('#go').disabled = false; }
 }
-function msg(t, k){ $('#formMsg').innerHTML = t ? `<div class="msg ${k||''}">${t}</div>` : ''; }
+function msg(t, k){ $('#formMsg').innerHTML = t ? `<div class="msg ${k||''}">${t}</div>` : '';
+  if (t && URUN === 'note') toast(String(t).replace(/<[^>]+>/g, ''), null, null, 7000); }   // Meet'te form alanı gizli: kayıt hataları görünmüyordu
 
 /* işler */
 const STEPS = ['İndir','Konuşmacılar','Yazıya dök','Belge','Özet'], STEPS_DL = ['Bağlan','İndir','Birleştir','Kaydet'], STEPS_V = ['Video','Altyazı','Yaz','Kaydet'];
@@ -3968,7 +4024,7 @@ setInterval(async () => { let ok = false; try{ const r = await fetch('/ping', {c
 function zamanLink(v, sn){ const l = v.link || ''; if (/youtu/.test(l)) return l + (l.includes('?') ? '&' : '?') + 't=' + sn + 's'; if (/vimeo/.test(l)) return l + '#t=' + sn + 's'; return null; }
 function initials(ad){ return ad.split(/\s+/).filter(Boolean).slice(0, 2).map(ilkHarf).join(''); }
 function uygulamaAdi(u){ u = (u || '').toLowerCase(); if (!u) return ''; if (/meet/.test(u)) return 'Google Meet'; if (/zoom/.test(u)) return 'Zoom'; if (/teams/.test(u)) return 'Teams'; if (/facetime/.test(u)) return 'FaceTime'; if (/chrome/.test(u)) return 'Chrome'; if (/safari/.test(u)) return 'Safari'; if (/firefox/.test(u)) return 'Firefox'; if (/slack/.test(u)) return 'Slack'; if (/discord/.test(u)) return 'Discord'; if (/whatsapp/.test(u)) return 'WhatsApp'; if (/webex/.test(u)) return 'Webex'; if (/uzantı|uzanti/.test(u)) return 'Chrome uzantısı'; if (/manuel|tarayıcı/.test(u)) return 'Elle kayıt'; return u.replace(/^.*\./, ''); }
-function kaynakMetni(v){ if (/altyazı/.test(v.kaynak||'')) return ['Hazır altyazıdan', true]; return ['Sesten çözüldü · ' + (/turbo/.test(v.model||v.kaynak||'') ? 'Hızlı' : 'En doğru'), false]; }
+function kaynakMetni(v){ if (/altyazı/.test(v.kaynak||'')) return ['Hazır altyazıdan', true]; return ['Sesten yazıya döküldü', false]; }
 document.addEventListener('click', async e => { const b = e.target.closest('button[data-et][data-ad]'); if (!b || !state.aktifTemel) return; b.disabled = true;
   const r = await fetch('/api/isimlendir/' + encodeURIComponent(state.aktifTemel), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({degisim: {[b.dataset.et]: b.dataset.ad}})});
   if (r.ok){ toast(`${b.dataset.et} artık ${b.dataset.ad}`); sonucGoster(state.aktifTemel); } else { b.disabled = false; toast('Uygulanamadı'); } });
@@ -4037,17 +4093,17 @@ async function sonucGoster(temel, opts={}){
   $('#kopyala').onclick = e => popover(e.currentTarget, [
     ['Düz metin', () => kopyala(d.paragraflar.map((p, i) => parMetin(i)).join('\n\n'))],
     ['Zaman damgalı, konuşmacılı', () => kopyala(d.paragraflar.map((p, i) => `[${p.zaman}] ${p.ad}: ${parMetin(i)}`).join('\n\n'))],
-    ...(ozetV.ozet ? [['Yalnızca özet', () => kopyala(ozetMetni(ozetV.ozet))]] : []),
-    ...(ozetV.ozet?.bolumler?.length ? [['YouTube bölüm listesi', () => kopyala(ozetV.ozet.bolumler.map((b, i) => `${i === 0 ? '00:00' : zamanK(b.sn)} ${b.baslik}`).join('\n'), 'Bölüm listesi kopyalandı; video açıklamasına yapıştırın')]] : [])]);
+    ...(ozetV.ozet && !v.toplanti ? [['Yalnızca özet', () => kopyala(ozetMetni(ozetV.ozet))]] : []),
+    ...(ozetV.ozet?.bolumler?.length && !v.toplanti ? [['YouTube bölüm listesi', () => kopyala(ozetV.ozet.bolumler.map((b, i) => `${i === 0 ? '00:00' : zamanK(b.sn)} ${b.baslik}`).join('\n'), 'Bölüm listesi kopyalandı; video açıklamasına yapıştırın')]] : [])]);
   $('#dosyalarBtn').onclick = () => indirDosya(temel + (cev && cev.docx ? '.' + state.gorunumDil : '') + '.docx', 'Word belgesi');
   $('#dosyaMenu').onclick = e => popover(e.currentTarget, [
     ['Word belgesi', () => indirDosya(temel + '.docx', 'Word belgesi')],
     ['Düz metin', () => indirDosya(temel + '.txt', 'Metin dosyası')],
-    ['Altyazı (SRT)', () => indirDosya(temel + '.srt', 'Altyazı dosyası')],
-    ['Altyazı (VTT, web)', () => { location.href = '/disa/' + encodeURIComponent(temel) + '.vtt'; toast('VTT altyazı indiriliyor'); }],
+    ...(v.toplanti ? [] : [['Altyazı (SRT)', () => indirDosya(temel + '.srt', 'Altyazı dosyası')],
+      ['Altyazı (VTT, web)', () => { location.href = '/disa/' + encodeURIComponent(temel) + '.vtt'; toast('VTT altyazı indiriliyor'); }]]),   // toplantıda video altyazısı anlamsız
     ['Markdown (Obsidian, Notion)', () => { location.href = '/disa/' + encodeURIComponent(temel) + '.md?indir=1'; toast('Markdown indiriliyor'); }],
     ['JSON (başka araçlar için)', () => { location.href = '/disa/' + encodeURIComponent(temel) + '.json?indir=1'; toast('JSON indiriliyor'); }],
-    ['Koleksiyona ekle…', () => { $('#kolRow')?.classList.remove('bos'); $('#kolEkle')?.click(); }],
+    ...(v.toplanti ? [] : [['Koleksiyona ekle…', () => { $('#kolRow')?.classList.remove('bos'); $('#kolEkle')?.click(); }]]),   // toplantı sayfasında koleksiyon satırı yok
     ['Markdown’ı kopyala', async () => { const r = await fetch('/disa/' + encodeURIComponent(temel) + '.md'); kopyala(await r.text(), 'Markdown kopyalandı; Notion ya da Obsidian’a yapıştırın'); }],
     ...(v.senaryo ? [['Senaryo belgesi', () => indirDosya(temel + '.senaryo.docx', 'Senaryo belgesi')]] : []),
     ...cevDiller.flatMap(k => [[`${dilAdi(k)} altyazı (SRT)`, () => indirDosya(`${temel}.${k}.srt`, `${dilAdi(k)} altyazı`)], [`${dilAdi(k)} Word belgesi (iki dilli)`, () => indirDosya(`${temel}.${k}.docx`, `${dilAdi(k)} Word belgesi`)]]),
@@ -4206,11 +4262,11 @@ function secimToggle(i, aralik){ const s = state.secili; const n = (state.sonuc?
 function dilEtiket(k){ return 'Altyazı: ' + (k === 'yok' ? 'Yok' : k === 'orijinal' ? 'Orijinal' : dilAdi(k)) + ' ▾'; }
 function secimCiz(){ const s = state.secili; const pl = state.sonuc?.paragraflar || [];
   if (state.secim === 'kes'){ $$('#paras .para').forEach(p => p.classList.toggle('cik', s.has(+p.dataset.i)));
-    const cikan = [...s].reduce((a, i) => a + (pl[i].bit - pl[i].sn), 0), toplam = state.sonuc.veri.sure || 0;
+    const cikan = [...s].reduce((a, i) => a + (pl[i].bit - (pl[i].bas ?? pl[i].sn)), 0), toplam = state.sonuc.veri.sure || 0;
     $('#kesT').innerHTML = s.size ? `<b>${s.size}</b> paragraf çıkarılacak · kalan <b>${sure(Math.max(0, toplam - cikan))}</b>` : 'Çıkarılacak paragraflara tıklayın'; $('#kesYap').disabled = !s.size && !$('#kesDolgu').checked; $('#kesDil').textContent = dilEtiket(state.klipDil); return; }
   $$('#paras .para').forEach(p => p.classList.toggle('sec', s.has(+p.dataset.i)));
   if (!s.size){ $('#klipT').textContent = 'Klip için paragrafları seçin'; $('#klipYap').disabled = true; return; }
-  const a = Math.min(...s), b = Math.max(...s); const bas = Math.max(0, pl[a].sn - 0.5), bit = pl[b].bit + 0.5; const n = b - a + 1;
+  const a = Math.min(...s), b = Math.max(...s); const bas = Math.max(0, (pl[a].bas ?? pl[a].sn) - 0.5), bit = pl[b].bit + 0.5; const n = b - a + 1;
   $('#klipT').innerHTML = `<b>${n}</b> paragraf · <b>${zamanK(bas)} – ${zamanK(bit)}</b> (${sure(bit - bas)})`; $('#klipYap').disabled = false; $('#klipDil').textContent = dilEtiket(state.klipDil); }
 $('#klipIptal').onclick = secimBitir; $('#kesIptal').onclick = secimBitir;
 $('#kesDolgu').onchange = secimCiz;
@@ -4228,7 +4284,7 @@ const zZ = x => `${Math.floor(x/60)}:${String(Math.floor(x%60)).padStart(2,'0')}
 function klipOlustur(temel, v, bas, bit, dikey, dil, ad){ const kesit = `${zZ(bas)}-${zZ(bit)}`; return videoIsiGonder({islem:'klip', temel, dil: dil === 'yok' ? 'orijinal' : dil, altyazisiz: dil === 'yok', stil: state.altStil, kesit, kalite:'720', dikey: !!dikey, baslik_ek: ad || ''},
   {tur:'klip', temel, baslik: ad ? `${v.baslik} · ${ad}` : v.baslik, kapak: v.kapak, sure: bit - bas, kanal: v.kanal, dil, stil: state.altStil, kesit, dikey: !!dikey, altyazisiz: dil === 'yok'}, dikey ? 'Dikey klip kuyruğa alındı' : 'Klip kuyruğa alındı'); }
 $('#kesYap').onclick = async () => { const s = state.secili, pl = state.sonuc.paragraflar, v = state.sonuc.veri, temel = state.aktifTemel; const toplam = v.sure || (pl.length ? pl[pl.length - 1].bit : 0);
-  let cikar = [...s].map(i => [Math.max(0, pl[i].sn - 0.05), pl[i].bit + 0.05]);
+  let cikar = [...s].map(i => [Math.max(0, (pl[i].bas ?? pl[i].sn) - 0.05), pl[i].bit + 0.05]);
   if ($('#kesDolgu').checked){ try{ const d = await (await fetch('/api/dolgu/' + encodeURIComponent(temel))).json(); if (!d.kelime_zamani_var) toast('Bu transkriptte kelime zamanı yok; duraksamalar temizlenemedi'); cikar = cikar.concat((d['aralıklar'] || []).map(a => [Math.max(0, a[0] - 0.05), a[1] + 0.05])); }catch(e){} }
   if (!cikar.length){ toast('Çıkarılacak bir şey seçilmedi'); return; }
   cikar.sort((a, b) => a[0] - b[0]); const birles = []; for (const c of cikar){ if (birles.length && c[0] <= birles[birles.length - 1][1] + 0.1) birles[birles.length - 1][1] = Math.max(birles[birles.length - 1][1], c[1]); else birles.push([...c]); }
@@ -4239,7 +4295,7 @@ $('#kesYap').onclick = async () => { const s = state.secili, pl = state.sonuc.pa
     {tur:'kesim', temel, baslik: v.baslik, kapak: v.kapak, sure: kalan, kanal: v.kanal, dil: state.klipDil, stil: state.altStil, altyazisiz: state.klipDil === 'yok'}, `Kesilmiş video kuyruğa alındı · ${birles.length} parça çıkarılıyor`);
   if (j){ secimBitir(); $('#jobsSec').scrollIntoView({behavior:'smooth'}); } };
 $('#klipYap').onclick = async () => { const s = state.secili; if (!s.size) return; const pl = state.sonuc.paragraflar, v = state.sonuc.veri, temel = state.aktifTemel; const a = Math.min(...s), b = Math.max(...s);
-  const bas = Math.max(0, pl[a].sn - 0.5), bit = pl[b].bit + 0.5; const j = await klipOlustur(temel, v, bas, bit, state.klipDikey, state.klipDil); if (j){ secimBitir(); $('#jobsSec').scrollIntoView({behavior:'smooth'}); } };
+  const bas = Math.max(0, (pl[a].bas ?? pl[a].sn) - 0.5), bit = pl[b].bit + 0.5; const j = await klipOlustur(temel, v, bas, bit, state.klipDikey, state.klipDil); if (j){ secimBitir(); $('#jobsSec').scrollIntoView({behavior:'smooth'}); } };
 
 /* öne çıkan anlar */
 function kliplerHtml(v){ const k = v.klipler;
@@ -4399,11 +4455,20 @@ if (location.hash === '#defter'){ GH.sekme = 'defter'; GH.dsek = 'gorus'; histor
 if (!['bugun', 'taslak', 'blog', 'defter', 'ses'].includes(GH.sekme)) GH.sekme = 'bugun';
 
 /* ---- veri ve çizim ---- */
-async function paylasimlarCiz(){            // ad korunuyor: kitaplık yenilemesi de bunu çağırıyor
-  if (URUN !== 'ghost') return;
+// 27 Ekim: kitaplık yenilemesi, iş yoklaması ve eylemler aynı saniyede 10 kez çağırıyordu (site.log'da saniyede 5 /api/kesif); uçuştaki istek
+// bitmeden yeni istek açılmaz, araya gelen çağrılar bitişte tek bir yenilemeye dönüşür
+let ghYukleniyor = null, ghYukleTekrar = false, ghZiyaret = true;
+function paylasimlarCiz(){            // ad korunuyor: kitaplık yenilemesi de bunu çağırıyor
+  if (URUN !== 'ghost') return Promise.resolve();
+  if (ghYukleniyor){ ghYukleTekrar = true; return ghYukleniyor; }
+  ghYukleniyor = ghVeriYukle().finally(() => { ghYukleniyor = null; if (ghYukleTekrar){ ghYukleTekrar = false; paylasimlarCiz(); } });
+  return ghYukleniyor;
+}
+async function ghVeriYukle(){
   $('#gh').classList.remove('hidden');
   const al = u => fetch(u).then(r => r.ok ? r.json() : null).catch(() => null);
-  const [d, k, f, t] = await Promise.all([al('/api/paylasimlar'), al('/api/kesif'), al('/api/ghost/defter'), al('/api/ghost/toplanti')]);
+  const z = ghZiyaret && !document.hidden ? '?z=1' : ''; ghZiyaret = false;     // sayfa gerçekten açıldı (ghost_tempo üretimi buna göre ayarlar)
+  const [d, k, f, t] = await Promise.all([al('/api/paylasimlar' + z), al('/api/kesif'), al('/api/ghost/defter'), al('/api/ghost/toplanti')]);
   if (d) GH.d = d; if (k) GH.k = k; if (f) GH.f = f; if (t) GH.t = t;
   $('#gh').style.setProperty('--ghust', Math.round($('.nav')?.getBoundingClientRect().height || 56) + 'px');
   ghCiz();
@@ -4416,13 +4481,14 @@ function ghMesgul(){
     || [...$$('#gh .gh-gir textarea')].some(t => t.value.trim()) || $('#gh .gh-mik.kayitta, #gh .gh-mik.isliyor'));
 }
 function ghCiz(zorla){
+  if (GH.sekme === 'blog'){ GH.sekme = 'defter'; GH.dsek = 'blog'; }   // 29 Ekim: Blog artık Fikirler'in içinde
   if (!zorla && ghMesgul()){ if (!GH.bekliyor){ GH.bekliyor = true; setTimeout(() => { GH.bekliyor = false; ghCiz(); }, 2500); } return; }
   const d = GH.d || {}, T = d.taslaklar || [], kk = GH.k || {};
   const kalan = T.filter(x => x.plan_gun === 'Bugün' && (x.platform || 'x') === 'x').length;
   const aday = (GH.f?.adaylar || []).length;
   $$('#ghSek button').forEach(b => { const s = b.dataset.s; b.setAttribute('aria-selected', s === GH.sekme);
     b.querySelector('i').textContent = s === 'bugun' ? (kalan || '') : s === 'taslak' ? (T.length || '') : s === 'defter' ? (aday || '') : '';
-    b.title = s === 'bugun' ? (kalan ? `Bugün paylaşılacak ${kalan} gönderi` : '') : s === 'taslak' ? `${T.length} taslak` : s === 'defter' ? (aday ? `${aday} yeni görüş onayınızı bekliyor` : '') : ''; });
+    b.title = s === 'bugun' ? (kalan ? `Bugün için ${kalan} öneri` : '') : s === 'taslak' ? `${T.length} taslak` : s === 'defter' ? (aday ? `${aday} yeni görüş onayınızı bekliyor` : 'Notlarınız, görüşleriniz, yazı konuları') : s === 'ses' ? 'Tarzınız, Ghost’un öğrendikleri, kaynaklar' : ''; });
   GH.kartlar = [];
   $('#ghSayfa').innerHTML = ({bugun: ghBugun, taslak: ghTaslak, blog: ghBlog, defter: ghDefter, ses: ghSes}[GH.sekme] || ghBugun)();
   $('#ghYan').innerHTML = ghSizden() + ghStoryKutu();
@@ -4456,10 +4522,10 @@ function ghKart(x, acik, gunsuz){
       ${(x.zincir || []).length > 1 ? `<ol class="gh-zincir" start="2">${x.zincir.slice(1).map(z => `<li><span>${esc(z)}</span><small>${z.length}/280</small></li>`).join('')}</ol>` : ''}
       ${x.sogusun ? `<div class="gh-uyari">Sabah bir daha bakın: ${esc(x.sogusun)}. Maç sıcağında yazılan gönderiler en çok sessize alınır.</div>` : ''}
       ${x.cevrede ? `<div class="gh-uyari">Bunu <b>@${esc(x.cevrede.kullanici)}</b> zaten söyledi: “${esc(String(x.cevrede.metin || '').slice(0, 120))}…” <a class="ghb kucuk" href="${esc(x.cevrede.url)}" target="_blank" rel="noopener">Gör ↗</a><button class="ghb kucuk vurgu" type="button" data-a="cevurl" data-u="${esc(x.cevrede.url)}">Onu alıntıla</button></div>` : ''}
-      ${ghBaglam(x)}${ghKaynakSatir(x)}<div class="gh-xk">${x.paylas_link && !x.alinti ? ghXKaynak(x) : ''}</div>
-      <div class="gh-yorum" hidden>${soru ? `<small class="soru">Ghost soruyor: ${esc(x.soru)}</small>` : ''}${(x.yorumlar || []).length ? `<small>Önceki yorumunuz: “${esc(x.yorumlar.slice(-1)[0].yorum)}”</small>` : ''}${ghGir(soru ? 'Kendi karşılığınız ya da nasıl yazılmasını istediğiniz' : 'Ne değişsin? Ör. “çok uzun, ilk cümle yeter”, “böyle konuşmam, daha kuru”', 'data-a="yorum"', 'Yeniden yaz')}</div>
-      <div class="gh-onay" ${GH.onay[k] ? '' : 'hidden'}><span>${li ? 'LinkedIn' : 'X'} yeni sekmede açıldı. Paylaştınız mı?</span><button class="ghb kucuk" type="button" data-a="payiptal">Henüz değil</button><button class="ghb kucuk" type="button" data-a="paydegis">Değiştirerek paylaştım</button><button class="ghb ana kucuk" type="button" data-a="payok">Bu haliyle paylaştım</button></div>
-      <div class="gh-alt"><button class="ghb kucuk" type="button" data-a="yorumac" title="Yorumunuza göre yeniden yazılır; Ghost tarzınızı öğrenir">${soru ? '<span class="gh-nokta pembe" title="Ghost’un bir sorusu var"></span>' : ''}Yorum yap</button><button class="ghb kucuk" type="button" data-a="neoldu" aria-haspopup="menu" title="Paylaştınız mı, nasıl paylaştınız, neden paylaşmadınız, ne düşünüyorsunuz: Ghost sizi böyle tanır">Geri bildir</button><button class="ghb kucuk ikon" type="button" data-a="daha" title="Kopyala, değiştir, ayrıntılar, kaldır" aria-label="Diğer işlemler" aria-haspopup="menu">${bak ? '<span class="gh-rozet"></span>' : ''}<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button>
+      ${ghBaglam(x)}<div class="gh-xk">${x.paylas_link && !x.alinti ? ghXKaynak(x) : ''}</div>
+      <div class="gh-yorum" hidden>${soru ? `<small class="soru">Ghost soruyor: ${esc(x.soru)}</small>` : ''}${(x.yorumlar || []).length ? `<small>Önceki yorumunuz: “${esc(x.yorumlar.slice(-1)[0].yorum)}”</small>` : ''}${ghGir(soru ? 'Kendi cevabınız ya da nasıl yazılmasını istediğiniz' : 'Nasıl değişsin? Ör. “daha kısa”, “daha esprili”, “ben böyle konuşmam”', 'data-a="yorum"', 'Yeniden yaz')}</div>
+      <div class="gh-onay" ${GH.onay[k] ? '' : 'hidden'}><span>Paylaştınız mı?</span><button class="ghb kucuk" type="button" data-a="payiptal">Henüz değil</button><button class="ghb kucuk" type="button" data-a="paydegis">Değiştirip paylaştım</button><button class="ghb ana kucuk" type="button" data-a="payok">Evet, paylaştım</button></div>
+      <div class="gh-alt"><button class="ghb kucuk" type="button" data-a="yorumac" title="Ne değişsin, söyleyin; Ghost yeniden yazar ve tarzınızı öğrenir">${soru ? '<span class="gh-nokta pembe" title="Ghost’un bir sorusu var"></span>' : ''}Yeniden yaz</button><button class="ghb kucuk ikon" type="button" data-a="daha" title="Kopyala, kısalt, bağlantı, kaldır" aria-label="Diğer işlemler" aria-haspopup="menu">${bak ? '<span class="gh-rozet"></span>' : ''}<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button>
         <span class="bos"></span><button class="ghb ana" type="button" data-a="paylas">${li ? 'LinkedIn’de paylaş' : x.yanit_to ? 'X’te yanıtla' : (x.zincir || []).length > 1 ? 'Zinciri paylaş' : 'X’te paylaş'}</button></div>
       <div class="gh-detay" ${GH.detay[k] ? '' : 'hidden'}>${ghDetay(x)}</div>
     </div></article>`;
@@ -4471,9 +4537,10 @@ function ghKaynakSatir(x){
   const tarih = k && k.tarih ? (() => { const d = new Date(String(k.tarih).replace(' ', 'T')); return isNaN(d) ? k.tarih : d.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day: 'numeric', month: 'long'}) + (String(k.tarih).length > 10 ? ' ' + d.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'}) : ''); })() : '';
   const parca = [];
   const kis = (m, n) => { m = String(m || ''); return m.length <= n ? m : m.slice(0, m.lastIndexOf(' ', n) > n * 0.6 ? m.lastIndexOf(' ', n) : n) + '…'; };
-  if (k && (k.tur || k.baslik)) parca.push(`<span><b>${esc(k.tur ? k.tur[0].toLocaleUpperCase('tr') + k.tur.slice(1) : 'Kaynak')}:</b> ${esc(kis(k.baslik, 120))}${tarih ? ' · ' + esc(tarih) : ''}</span>`);
+  const turAd = ({'çalışma kaydı': 'Kendi işiniz', 'görüş defteri': 'Görüşünüz', 'geri dönüş defteri': 'Eski gönderiniz'})[k?.tur] || k?.tur;
+  if (k && (k.tur || k.baslik)) parca.push(`<span><b>${esc(turAd ? turAd[0].toLocaleUpperCase('tr') + turAd.slice(1) : 'Kaynak')}:</b> ${esc(kis(k.baslik, 120))}${tarih ? ' · ' + esc(tarih) : ''}</span>`);
   if (x.kaynak_cumle) parca.push(`<span class="gh-kc"><b>Kaynakta:</b> “${esc(x.kaynak_cumle)}”</span>`);
-  if (x.katki) parca.push(`<span><b>Sizin katkınız:</b> ${esc(x.katki)}</span>`);
+  if (x.katki) parca.push(`<span><b>Sizin bakışınız:</b> ${esc(x.katki)}</span>`);
   // köken (24 Ekim, editoryal yöntem): nereden keşfedildi, ne okundu, kimin beyanı, ne bilinmiyor, olay eskiyse
   if (k){
     const kes = [k.kesif_yayin ? 'dinlediğiniz yayında konuşuldu (' + k.kesif_yayin + ')' : '', k.kesif_bulten ? 'bülteninizde geçti (' + k.kesif_bulten + ')' : '', k.kesif_kantan ? k.kesif_kantan + ' seçkisinde' : '', k.kesif_link ? ghHost(k.kesif_link) + ' üzerinden; bağlantı asıl kaynağa gidiyor' : ''].filter(Boolean).join(' · ');
@@ -4492,7 +4559,7 @@ function ghBaglam(x){
   if (x.paylas_link){ const ad = x.baslik && !/^(ghost__|\d{8})/.test(x.baslik) && x.kaynak_tur !== 'fikir' ? x.baslik : '';
     return `<div class="gh-bag">${GH_BAG}<a class="ne" href="${esc(x.paylas_link)}" target="_blank" rel="noopener"><b>${esc(ghHost(x.paylas_link))}</b>${ad ? ' · ' + esc(String(ad).slice(0, 120)) : ''}</a><button class="ghb kucuk ikon" type="button" data-a="bagkaldir" title="Bağlantısız paylaş" aria-label="Bağlantıyı kaldır">${GH_SVG.x}</button></div>`; }
   if (x.karisim_tur === 'kendi') return '';   // kendi işi: sıfırdan anlatılır. Diğer her şey bir şeye tepki olmalı (kullanıcı, 23 Ekim: "kimse durup dururken paylaşmaz")
-  return `<div class="gh-bag yok"><span class="ne">Bağlam yok; okur neye tepki verdiğinizi görmeli.</span><button class="ghb iki kucuk" type="button" data-a="tetik" aria-haspopup="menu" title="Bu görüşü doğal olarak çağıran bir haber ya da okuduğunuz bir X gönderisi bulur">Tetik bul</button><button class="ghb kucuk" type="button" data-a="baglanti">Bağlantı ekle</button><button class="ghb kucuk" type="button" data-a="alinti" aria-haspopup="menu">Alıntıla</button></div>`;
+  return `<div class="gh-bag yok"><span class="ne">Bağlantı yok; okur neye tepki verdiğinizi görsün.</span><button class="ghb iki kucuk" type="button" data-a="tetik" aria-haspopup="menu" title="Bu gönderiye uyan güncel bir haber ya da okuduğunuz bir X gönderisi bulur">Uygun haber bul</button><button class="ghb kucuk" type="button" data-a="baglanti">Bağlantı ekle</button><button class="ghb kucuk" type="button" data-a="alinti" aria-haspopup="menu">Alıntıla</button></div>`;
 }
 function ghXKaynak(x){
   const xk = x.x_kaynak; if (!xk) return '';
@@ -4507,6 +4574,7 @@ function ghXYukle(el, x, tazele){
 }
 function ghDetay(x){
   let h = '';
+  const ks = ghKaynakSatir(x); if (ks) h += `<div class="gh-d"><b>Kaynak</b>${ks}</div>`;   // 29 Ekim: kartta değil burada
   const bicim = [({emoji: 'Emoji', minik: 'Minik not', gozlem: 'Gözlem', uzun: 'Uzun'})[x.bicim], ({ciddi: 'ciddi', eglenceli: 'eğlenceli', samimi: 'samimi'})[x.ton]].filter(Boolean).join(' · ');
   const gd = x.gundem || {}, et = [bicim, x.dayanak === 'gorus' ? 'görüşünüze dayanıyor' : x.dayanak ? 'size dayanıyor' : '', gd.trend ? 'Google’da yükseliyor' : '', gd.kaynak_sayisi > 1 ? gd.kaynak_sayisi + ' kaynak yazdı' : ''].filter(Boolean);
   if (et.length) h += `<p class="gh-etk">${et.map(esc).join(' · ')}</p>`;
@@ -4515,22 +4583,22 @@ function ghDetay(x){
       kk.kesif_kantan ? kk.kesif_kantan + ' seçkisinde' : '', kk.kesif_link ? ghHost(kk.kesif_link) + ' üzerinden; bağlantı asıl kaynağa gidiyor' : ''].filter(Boolean).join(' · ');
     const ok = (kk.okunan || []).filter(o => o && o !== kk.tur).join(', ');
     if (kes || ok) h += `<div class="gh-d"><b>Nereden geldi</b><p>${esc([kes, ok ? 'okunan: ' + ok : ''].filter(Boolean).join(' · '))}</p></div>`; }
-  if (x.geri) h += `<div class="gh-d"><b>Geri dönüş</b><p>${x.geri.tur === 'iddia' ? `${esc(x.geri.tarih || '')} tarihli iddianıza dönüyor: “${esc(x.geri.iddia || '')}”` : `Süregelen esprinize dönüyor: ${esc(x.geri.ad || '')}`}${x.geri.url ? ` · <a href="${esc(x.geri.url)}" target="_blank" rel="noopener">eski gönderi ↗</a>` : ''}</p></div>`;
-  if ((x.emsal || []).length) h += `<div class="gh-d"><b>Reklam arşivinizden emsal</b>${x.emsal.map(e => `<p>${esc(e.is)} · ${esc(e.neden)}</p>`).join('')}</div>`;
-  if (x.kendi_yorum) h += `<div class="gh-d"><b>Sizin cevabınız (konu toplantısı)</b><p>“${esc(x.kendi_yorum)}”</p></div>`;
+  if (x.geri) h += `<div class="gh-d"><b>Eski bir gönderinize dönüyor</b><p>${x.geri.tur === 'iddia' ? `${esc(x.geri.tarih || '')} tarihli iddianıza dönüyor: “${esc(x.geri.iddia || '')}”` : `Süregelen esprinize dönüyor: ${esc(x.geri.ad || '')}`}${x.geri.url ? ` · <a href="${esc(x.geri.url)}" target="_blank" rel="noopener">eski gönderi ↗</a>` : ''}</p></div>`;
+  if ((x.emsal || []).length) h += `<div class="gh-d"><b>Benzer işler</b>${x.emsal.map(e => `<p>${esc(e.is)} · ${esc(e.neden)}</p>`).join('')}</div>`;
+  if (x.kendi_yorum) h += `<div class="gh-d"><b>Sizin cevabınız</b><p>“${esc(x.kendi_yorum)}”</p></div>`;
   const kd = x.kaynak_denetimi;   // 25 Ekim: yorumun dayandığı olgu kaynakla tutarlı mı (ghost_kaynak)
-  if (x.ilk_taslak && x.ilk_taslak !== x.metin && !x.ilk_daha_iyi) h += `<div class="gh-d"><b>Ghost'un ilk yazdığı</b><p>“${esc(x.ilk_taslak)}”</p><p><i>Denetimlerden sonra bugünkü hâline geldi.</i></p><button class="ghb kucuk" type="button" data-a="ilkhal">İlk hâli daha iyi</button></div>`;
+  if (x.ilk_taslak && x.ilk_taslak !== x.metin && !x.ilk_daha_iyi) h += `<div class="gh-d"><b>İlk taslak</b><p>“${esc(x.ilk_taslak)}”</p><p><i>Denetimlerden sonra bugünkü hâline geldi.</i></p><button class="ghb kucuk" type="button" data-a="ilkhal">İlk hâli daha iyi</button></div>`;
   if (x.duzenleme?.tur === 'sinirli') h += `<div class="gh-d"><b>Yalnızca istediğiniz değişiklik</b><p>${esc((x.duzenleme.notlar || []).join(' · ') || 'Metniniz korundu.')}</p>${(x.kendi_taslak || x.onceki) ? `<p><i>Sizin metniniz: “${esc((x.kendi_taslak || x.onceki).slice(0, 600))}”</i></p>` : ''}</div>`;
   if (kd && kd.kim_ne_yapti) h += `<div class="gh-d"><b>Kaynağa göre</b><p>${esc(kd.kim_ne_yapti)}</p>${x.kaynak_oncesi ? `<p><i>Kaynakla uyuşmayan kısım düzeltildi${(kd.sorunlar || []).length ? ': ' + esc(kd.sorunlar.map(z => z.not || z.iddia).join(' · ').slice(0, 300)) : ''}</i></p>` : ''}</div>`;
-  if (x.not_provasi) h += `<div class="gh-d"><b>Topluluk Notu provası · risk ${x.not_provasi.risk}/5</b><p>${esc(x.not_provasi.neden || '')}${x.not_provasi.duzeltildi ? ' Bu yüzden metin düzeltildi.' : ''}</p></div>`;
+  if (x.not_provasi) h += `<div class="gh-d"><b>Yanlış anlaşılma riski · ${x.not_provasi.risk}/5</b><p>${esc(x.not_provasi.neden || '')}${x.not_provasi.duzeltildi ? ' Bu yüzden metin düzeltildi.' : ''}</p></div>`;
   if (x.guclendi) h += `<div class="gh-d"><b>Güçlendirildi</b><p>Çekinceler kanıtın izin verdiği kadar azaltıldı. Önceki hâli: “${esc(x.guclendi)}”</p></div>`;
   if (x.neden_simdi) h += `<div class="gh-d"><b>Neden şimdi</b><p>${esc(x.neden_simdi)}</p></div>`;
-  if ((x.kancalar || []).length) h += `<div class="gh-d"><b>Başka bir açılış · tıklayınca ilk cümle değişir</b>${x.kancalar.map((k, i) => `<button class="gh-kanca" type="button" data-a="kanca" data-i="${i}">${esc(k)}</button>`).join('')}</div>`;
+  if ((x.kancalar || []).length) h += `<div class="gh-d"><b>Başka bir açılış · dokununca ilk cümle değişir</b>${x.kancalar.map((k, i) => `<button class="gh-kanca" type="button" data-a="kanca" data-i="${i}">${esc(k)}</button>`).join('')}</div>`;
   if ((x.zincir || []).length) h += `<div class="gh-d"><b>Zincir olarak · ${x.zincir.length} parça</b>${x.zincir.map((z, i) => `<p class="gh-zin">${i + 1}/${x.zincir.length} ${esc(z)}</p>`).join('')}<button class="ghb iki kucuk" type="button" data-a="zincir">Zinciri paylaş</button></div>`;
   if ((x.kod_notlari || []).length || (x.dogruluk || []).length) h += `<div class="gh-d uyari"><b>Kontrol edin</b>${[...(x.kod_notlari || []), ...(x.dogruluk || [])].map(n => `<p>${esc(n)}</p>`).join('')}</div>`;
   if ((x.iddialar || []).length) h += `<div class="gh-d"><b>İddialar</b>${x.iddialar.map(c => `<div class="gh-iddia ${esc(c.durum || '')}"><span>${esc(c.iddia || '')}</span><em>${({dogru: 'Doğru', supheli: 'Şüpheli', yanlis: 'Yanlış'})[c.durum] || ''}</em></div>`).join('')}</div>`;
-  if ((x.panel || []).length) h += `<div class="gh-d"><b>Dört okur ne dedi</b><div class="gh-panel">${x.panel.map(o => `<div><small>${esc(o.ad || '')}</small>${esc(o.tepki || '')}<em>${o.emin_degil ? 'emin değil' : `değer ${o.deger || '–'}/5`}${o.kaydeder ? ' · kaydeder' : ''}${o.iletir ? ' · iletir' : ''}${o.rahatsiz ? ' · <u>rahatsız olur</u>' : ''}</em></div>`).join('')}</div></div>`;
-  if ((x.itirazlar || []).length) h += `<div class="gh-d"><b>Olası itirazlar ve cevabınız</b>${x.itirazlar.map((t, i) => `<div class="gh-itz"><b>${esc(t.itiraz)}</b><p>${esc(t.cevap)}</p><button class="ghb kucuk" type="button" data-a="itiraz" data-i="${i}">Cevabı kopyala</button></div>`).join('')}</div>`;
+  if ((x.panel || []).length) h += `<div class="gh-d"><b>Okurlar ne der</b><div class="gh-panel">${x.panel.map(o => `<div><small>${esc(o.ad || '')}</small>${esc(o.tepki || '')}<em>${o.emin_degil ? 'emin değil' : `değer ${o.deger || '–'}/5`}${o.kaydeder ? ' · kaydeder' : ''}${o.iletir ? ' · iletir' : ''}${o.rahatsiz ? ' · <u>rahatsız olur</u>' : ''}</em></div>`).join('')}</div></div>`;
+  if ((x.itirazlar || []).length) h += `<div class="gh-d"><b>Gelebilecek itirazlar</b>${x.itirazlar.map((t, i) => `<div class="gh-itz"><b>${esc(t.itiraz)}</b><p>${esc(t.cevap)}</p><button class="ghb kucuk" type="button" data-a="itiraz" data-i="${i}">Cevabı kopyala</button></div>`).join('')}</div>`;
   if (x.baslik && !/^ghost__/.test(x.temel)) h += `<div class="gh-d"><b>Kaynak video</b><button class="ghb iki kucuk" type="button" data-a="kaynak">${esc(String(x.baslik).slice(0, 70))}</button></div>`;
   return h || '<p class="gh-ipucu">Bu taslak için ek not yok.</p>';
 }
@@ -4543,7 +4611,7 @@ function ghHarita(){
   const yol = ([x, y]) => `<path d="M100 58 C100 ${(58 + y) / 2}, ${x} ${(58 + y) / 2 - 10}, ${x} ${y - 14}"/>`;
   return `<svg viewBox="0 0 200 222" aria-hidden="true">${D.map(yol).join('')}</svg><div class="gh-h-merkez"><img src="/static/logo/ghost.svg" alt=""></div>
     ${D.map(([x, y, ad, n, s, ds]) => `<button class="gh-h-dugum" type="button" data-g="harita" data-s="${s}" data-ds="${ds}" style="left:${x / 2}%;top:${y}px"><i></i>${esc(ad)}<b>${esc(String(n))}</b></button>`).join('')}
-    <p class="gh-etk">${GH.k?.calisiyor ? '<i></i>KAYNAKLAR TARANIYOR' : 'GHOST · BESLENDİĞİ YERLER'}</p>`;
+    <p class="gh-etk">${GH.k?.calisiyor ? '<i></i>KAYNAKLAR TARANIYOR' : 'BESLENDİĞİ YERLER'}</p>`;
 }
 
 /* ---- Bugün ---- */
@@ -4584,10 +4652,13 @@ function ghBugun(){
   const P = (d.paylasilan || []).filter(x => (x.paylasim_zaman || 0) * 1000 >= gece.getTime());
   const Px = P.filter(x => (x.platform || 'x') === 'x'), xh = hd.x_gunluk || 4;
   const guclu = bugun.filter(x => (x.okur?.paylasilir ?? x.okur?.deger ?? 0) >= 4 && (x.okur?.tazelik ?? 4) >= 4).length;
-  const alt = bugun.length ? `${bugun.length} gönderi` : Px.length ? 'Hepsi paylaşıldı' : '';
-  const not = [Px.length ? `${Px.length}/${xh} paylaşıldı` : '', bugun.length > 1 ? (guclu ? `en güçlü ${Math.min(3, guclu)} önde` : 'güçlü aday çıkmadı; en iyileri sırada') : ''].filter(Boolean).join(' · ');
+  const alt = bugun.length ? `${bugun.length} öneri` : Px.length ? 'Hepsi paylaşıldı' : '';
+  // 29 Ekim (herkes için sadeleştirme): başlıkta tek not; geçmiş günler, yeni öneri ve yenileme tek ⋯ menüsünde
+  const not = Px.length ? `${Px.length}/${xh} paylaşıldı` : bugun.length ? 'En iyileri önde' : '';
+  const bugunG = new Date().toLocaleDateString('sv');
   let h = `<header class="gh-bas"><div><h2>Bugün.${alt ? ` <span>${alt}</span>` : ''}</h2>${not ? `<p>${not}</p>` : ''}</div>
-    <div class="gh-bas-sag">${ghGunNav()}<button class="ghb iki kucuk" type="button" data-g="yenile" aria-haspopup="menu" title="Yeni öneri getir ya da beğenmediğiniz önerileri yenileyin">↻ Yenile</button></div></header>`;
+    <div class="gh-bas-sag">${ghElListe().length > 1 ? `<button class="ghb iki kucuk" type="button" data-g="elden" title="Önerilere tek tek bakın; beğendiğinizi tutun, beğenmediğinizi nedeniyle kaldırın. Ghost her kararınızdan öğrenir">Hızlı gözden geçir</button>` : ''}<button class="ghb iki kucuk ikon" type="button" data-g="bugunmenu" aria-haspopup="menu" title="Yeni öneri, önceki günler" aria-label="Diğer"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button><input type="date" class="gh-takvim" id="ghTakvim" value="${bugunG}" min="${ghGunEkle(bugunG, -30)}" max="${bugunG}" tabindex="-1" aria-hidden="true"></div></header>`;
+  h += ghTempoNot();
   h += ghSonucKutu();
   h += ghToplanti();
   if (GH.k?.calisiyor) h += `<div class="gh-haz"><i class="spin"></i><span><b>Yeni öneriler araştırılıyor</b> · ${esc(GH.k.adim || 'kaynaklar okunuyor')}</span></div>`;
@@ -4597,11 +4668,11 @@ function ghBugun(){
   const simdi = sirali.find(x => ghAnahtar(x) === GH.on) || sirali[0], kalan = sirali.filter(x => x !== simdi);
   if (Px.length || simdi) h += `<div class="gh-liste gh-zaman">${Px.map(x => `<div class="gh-ok">${GH_SVG.tik}<span>${esc(x.metin)}</span><small>${new Date(x.paylasim_zaman * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'})}</small></div>`).join('')}${simdi ? ghKart(simdi, true) : ''}</div>`;
   if (simdi && kalan.length){ const G = kalan.slice(0, 5);
-    h += `<section class="gh-sira2"><div class="gh-sira2-ust"><span class="gh-ara"><i></i>Sırada · ${kalan.length}</span><button class="ghb kucuk" type="button" data-g="gec" data-k="${esc(ghAnahtar(simdi))}" title="Şu anki gönderiyi sona atar">Bunu geç</button></div>
+    h += `<section class="gh-sira2"><div class="gh-sira2-ust"><span class="gh-ara"><i></i>Sırada · ${kalan.length}</span><button class="ghb kucuk" type="button" data-g="gec" data-k="${esc(ghAnahtar(simdi))}" title="Bu öneriyi listenin sonuna alır">Sonraya bırak</button></div>
       ${G.map(x => `<button type="button" class="gh-sira2-b" data-g="ghon" data-k="${esc(ghAnahtar(x))}">${ghIk(x.alan)}<b>${esc(x.plan_dilim || ghAlan(x.alan)[2])}</b><span>${esc(String(x.metin || ''))}</span></button>`).join('')}
       ${kalan.length > G.length ? `<button class="gh-sonra" type="button" data-g="sekme" data-s="taslak">${kalan.length - G.length} gönderi daha <span>→</span></button>` : ''}</section>`; }
-  if (!bugun.length) h += Px.length >= xh ? `<div class="gh-bos"><b>Bugünün gönderileri tamam.</b>Yine de yazmak isterseniz Taslaklar’da hazır olanlar var.</div>`
-    : `<div class="gh-bos"><b>${new Date().getHours() * 60 + new Date().getMinutes() < 450 ? 'Bugünün önerileri sabah 07.30’da hazırlanır.' : 'Bugün için hazır gönderi yok.'}</b>Yukarıya bir link ya da fikir bırakın, ya da kaynaklardan yeni öneri isteyin.<div><button class="ghb ana kucuk" type="button" data-g="kesif">Yeni öneri getir</button><button class="ghb kucuk" type="button" data-g="gungit" data-n="-1">Dünün önerileri</button></div></div>`;
+  if (!bugun.length) h += Px.length >= xh ? `<div class="gh-bos"><b>Bugünlük bu kadar.</b>Daha fazlası isterseniz Taslaklar’da hazır olanlar var.</div>`
+    : `<div class="gh-bos"><b>${new Date().getHours() * 60 + new Date().getMinutes() < 450 ? 'Bugünün önerileri sabah 07.30’da gelir.' : 'Bugün için hazır öneri yok.'}</b>Yukarıya bir fikir ya da link bırakın, ya da yeni öneri isteyin.<div><button class="ghb ana kucuk" type="button" data-g="kesif">Yeni öneri getir</button><button class="ghb kucuk" type="button" data-g="gungit" data-n="-1">Dünün önerileri</button></div></div>`;
   if (hikaye.length) h += `<section class="gh-bolum"><div class="gh-ara"><i></i>Haftanın hikâyesi</div><div class="gh-liste">${hikaye.map(x => ghKart(x, GH.acik[ghAnahtar(x)] === true, true)).join('')}</div></section>`;
   if (yanit.length) h += `<section class="gh-bolum"><div class="gh-ara"><i></i>Yanıt önerileri · ${yanit.length}</div><div class="gh-liste">${yanit.map(x => ghKart(x, GH.acik[ghAnahtar(x)] === true, true)).join('')}</div></section>`;
   if (li.length) h += `<section class="gh-bolum"><div class="gh-ara"><i></i>LinkedIn · bu hafta</div><div class="gh-liste">${li.map(x => ghKart(x, GH.acik[ghAnahtar(x)] === true)).join('')}</div></section>`;
@@ -4615,17 +4686,99 @@ function ghToplanti(){
   if (t.durum === 'yaziliyor' || GH.t?.yaziliyor) return `<div class="gh-haz"><i class="spin"></i><span><b>Kararlarınızla yazılıyor</b> · ${t.konular.filter(k => k.cevap).length} konuda sizin cevabınız merkezde</span></div>`;
   const saat = new Date(t.son * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour: '2-digit', minute: '2-digit'});
   const sec = t.konular.filter(k => k.karar === 'yaz').length, gc = t.konular.filter(k => k.karar === 'gec').length;
-  return `<section class="gh-top" data-tid="${esc(t.id)}"><header><div><b>Konu toplantısı</b><small>${t.konular.length} konu. “Geç” dedikleriniz yazılmaz; sorulara verdiğiniz cevap gönderinin merkezine girer. ${saat}’te kalanlar kendiliğinden yazılır.</small></div>
+  return `<section class="gh-top" data-tid="${esc(t.id)}"><header><div><b>Bugünün konuları</b><small>${t.konular.length} konu. İstemediklerinizi geçin; bir soruya cevap verirseniz gönderi sizin sözünüzle yazılır. ${saat}’te kalanlar kendiliğinden yazılır.</small></div>
     <button class="ghb ana kucuk" type="button" data-g="tkbitir">Yazmaya başla${sec || gc ? ` (${sec} seçili, ${gc} geçildi)` : ''}</button></header>
     ${t.konular.map(k => `<div class="gh-tk ${k.karar || ''}" data-tk="${esc(k.id)}">
       <div class="gh-tk-ust">${ghIk(k.alan)}<span>${k.tur === 'gorus' ? 'Görüşünüzle ilgili haber' : esc(ghAlan(k.alan)[2])}</span>${k.kesif ? `<small>${esc(k.kesif)}</small>` : ''}
         <span class="sag"><button class="ghb kucuk${k.karar === 'yaz' ? ' secili' : ''}" type="button" data-g="tkyaz">Yaz</button><button class="ghb kucuk${k.karar === 'gec' ? ' secili' : ''}" type="button" data-g="tkgec">Geç</button></span></div>
       <a class="gh-tk-b" href="${esc(k.link || '#')}" target="_blank" rel="noopener">${esc(k.baslik)}</a>
-      <details class="gh-tk-d"><summary>${k.tur === 'gorus' ? 'Görüşünüz' : 'Önerdiğim açı'}${(k.arsiv || []).length ? ` · arşivinizden ${k.arsiv.length} benzer iş` : ''}</summary>
+      <details class="gh-tk-d"><summary>${k.tur === 'gorus' ? 'Görüşünüz' : 'Önerdiğim bakış'}${(k.arsiv || []).length ? ` · arşivinizden ${k.arsiv.length} benzer iş` : ''}</summary>
       <p>${esc(k.aci || '')}</p>
       ${(k.arsiv || []).map(a => `<p class="gh-tk-ar">${a.link ? `<a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.kunye)}</a>` : esc(a.kunye)} · ${esc(a.neden)}</p>`).join('')}</details>
       ${k.karar === 'gec' ? '' : `<button class="gh-tk-soru" type="button" data-g="soruac" title="Cevaplamak için tıklayın">${esc(k.soru || 'Bu konuda sizin söyleyeceğiniz ne?')}${k.cevap ? ' <i>✓ cevapladınız</i>' : ''}</button><div class="gh-gir" ${k.cevap ? '' : 'hidden'}><textarea rows="2" placeholder="Bir cümle yeter; cevabınız gönderinin çekirdeği olur">${esc(k.cevap || '')}</textarea><div><button class="ghb gh-mik" type="button" data-g="mik" title="Sesli söyleyin" aria-label="Sesli söyleyin">${GH_SVG.mik}</button><button class="ghb iki kucuk" type="button" data-g="tkcevap">${k.cevap ? 'Güncelle' : 'Kaydet'}</button></div></div>`}
     </div>`).join('')}</section>`;
+}
+/* ---- Elden geçirme (27 Ekim, geliştirme günü). Ölçüm: bir haftada 152 öneriden 81'i nedensiz toplu retle gitti, 1'i paylaşıldı; Ghost neyi
+   beğenmediğinizi öğrenemiyordu. Burada her öneri tek başına görünür, karar tek dokunuş: Kalsın (olumlu sinyal, öne alınır), Paylaş, ya da
+   nedeniyle kaldır (konu / bariz / ben değilim / cümle / bilgi). Her karar kendi türünde öğrenilir; Geri al her adımda. ---- */
+const GH_EL_RED = [['konu uymuyor', 'Konu değil', '1'], ['açı zayıf', 'Sıradan', '2'], ['ben değilim', 'Tarzım değil', '3'], ['yazım kötü', 'Cümle kötü', '4'], ['bilgi yanlış', 'Bilgi yanlış', '5']];
+function ghElListe(){
+  const T = (GH.d?.taslaklar || []).filter(x => x.plan_gun === 'Bugün' && !x.paylasildi && !x.gizli && !x.begendi && x.temel !== GH.sonuc?.temel);
+  return [...T.filter(x => (x.platform || 'x') === 'x' && x.plan_dilim !== 'Yanıt'), ...T.filter(x => x.plan_dilim === 'Yanıt'), ...T.filter(x => x.platform === 'linkedin')];
+}
+function ghElAc(){
+  const L = ghElListe(); if (!L.length){ toast('Bugün bakılacak öneri kalmadı'); return; }
+  GH.el = {L, n: 0, geri: [], say: {kalsin: 0, paylas: 0, atla: 0, ret: {}}, onay: false};
+  let o = $('#ghEl'); if (!o){ o = document.createElement('div'); o.id = 'ghEl'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', 'Önerileri gözden geçir'); ($('#gh') || document.body).appendChild(o);
+    o.addEventListener('click', e => { if (e.target === o) return ghElKapat(); const b = e.target.closest('[data-el]'); if (b && !b.disabled) ghElKarar(b.dataset.el, b.dataset.n); });
+    document.addEventListener('keydown', ghElTus, true); }
+  o.hidden = false; document.body.style.overflow = 'hidden'; ghElCiz();
+}
+function ghElKapat(){ const o = $('#ghEl'); if (!o || o.hidden) return; o.hidden = true; document.body.style.overflow = ''; GH.el = null; paylasimlarCiz(); }
+function ghElTus(e){
+  if (!GH.el || $('#ghEl')?.hidden || e.metaKey || e.ctrlKey || e.altKey || /^(TEXTAREA|INPUT)$/.test(document.activeElement?.tagName)) return;
+  const k = e.key.toLowerCase(), m = {escape: 'kapat', k: 'kalsin', arrowright: 'kalsin', p: 'paylas', ' ': 'atla', arrowdown: 'atla', z: 'geri', backspace: 'geri', e: 'evet', h: 'hayir'}[k];
+  const r = GH_EL_RED.find(x => x[2] === k);
+  if (!m && !r) return; e.preventDefault(); e.stopPropagation();
+  if (GH.el.onay && !['evet', 'hayir', 'kapat'].includes(m)) return;
+  ghElKarar(r ? 'ret' : m, r ? r[0] : undefined);
+}
+function ghElCiz(){
+  const E = GH.el, o = $('#ghEl'); if (!E || !o) return;
+  const x = E.L[E.n];
+  if (!x){ const s = E.say, ret = Object.entries(s.ret), ad = n => (GH_EL_RED.find(r => r[0] === n) || [, n])[1];
+    o.innerHTML = `<div class="el-kart"><div class="el-son"><b>${E.L.length} öneriye baktınız</b>
+      <p>${[s.paylas ? `${s.paylas} paylaşıldı` : '', s.kalsin ? `${s.kalsin} beğenildi` : '', ret.length ? `${ret.reduce((t, [, n]) => t + n, 0)} kaldırıldı` : '', s.atla ? `${s.atla} atlandı` : ''].filter(Boolean).join(' · ') || 'Karar verilmedi'}</p>
+      ${ret.length ? `<p>Ghost öğrendi: ${ret.map(([n, c]) => `${ad(n).toLocaleLowerCase('tr')} ${c}`).join(', ')}. Yarınki öneriler bunu hesaba katar.</p>` : ''}
+      ${s.kalsin ? '<p>Beğendikleriniz Bugün’de öne geçti.</p>' : ''}
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">${E.geri.length ? '<button class="ghb kucuk" type="button" data-el="geri">Son kararı geri al</button>' : ''}<button class="ghb ana" type="button" data-el="kapat">Bitti</button></div></div></div>`;
+    return; }
+  const yanit = x.plan_dilim === 'Yanıt', li = x.platform === 'linkedin';
+  const bag = x.yanit_to ? `Yanıt: @${esc(x.yanit_to.kullanici || '')} · ${esc(String(x.yanit_to.metin || '').slice(0, 120))}` : x.alinti ? `Alıntı: @${esc(x.alinti.kullanici || '')}`
+    : x.paylas_link ? (() => { try{ return 'Bağlantıyla: ' + esc(new URL(x.paylas_link).hostname.replace(/^www\./, '')); }catch(e){ return ''; } })() : '';
+  o.innerHTML = `<div class="el-kart">
+    <div class="el-ust">${ghIk(x.alan)}<span>${esc(ghAlan(x.alan)[2])}${yanit ? ' · yanıt' : li ? ' · LinkedIn' : x.plan_dilim ? ' · ' + esc(x.plan_dilim) : ''}</span>
+      <span class="sag">${E.n + 1} / ${E.L.length}<button class="ghb kucuk" type="button" data-el="kapat" aria-label="Kapat">✕</button></span></div>
+    <div class="el-cubuk"><i style="width:${Math.round(E.n / E.L.length * 100)}%"></i></div>
+    <p class="el-metin">${esc(x.metin)}${(x.zincir || []).length > 1 ? `\n\n<span style="color:var(--muted)">+ ${x.zincir.length - 1} parça daha</span>` : ''}</p>
+    ${bag ? `<p class="el-baglam">${bag}</p>` : ''}
+    ${E.onay ? `<p class="el-baglam" style="color:var(--ink)">X açıldı. Paylaştınız mı?</p><div class="el-dugme"><button class="ghb ana" type="button" data-el="evet">Evet, paylaştım<kbd>E</kbd></button><button class="ghb iki" type="button" data-el="hayir">Henüz değil<kbd>H</kbd></button></div>`
+    : `<div class="el-dugme"><button class="ghb ana" type="button" data-el="kalsin" title="Bugün’de öne alınsın">Beğendim<kbd>K</kbd></button><button class="ghb iki" type="button" data-el="paylas">${li ? 'LinkedIn’de paylaş' : yanit ? 'X’te yanıtla' : 'X’te paylaş'}<kbd>P</kbd></button></div>
+      <div class="el-ret">${GH_EL_RED.map(([n, a, t]) => `<button class="ghb kucuk" type="button" data-el="ret" data-n="${esc(n)}">${a}<kbd>${t}</kbd></button>`).join('')}</div>`}
+    <div class="el-alt"><button class="ghb kucuk" type="button" data-el="geri" ${E.geri.length ? '' : 'disabled'}>← Geri al<kbd>Z</kbd></button><button class="ghb kucuk" type="button" data-el="atla">Şimdilik geç<kbd>␣</kbd></button></div></div>`;
+}
+async function ghElKarar(ne, neden){
+  const E = GH.el; if (!E) return; const x = E.L[E.n];
+  if (ne === 'kapat') return ghElKapat();
+  if (ne === 'geri'){ const g = E.geri.pop(); if (!g) return; E.n = g.n; E.onay = false;
+    if (g.ne === 'kalsin'){ E.say.kalsin--; await ghApi(g.x, {begendi: false}); }
+    else if (g.ne === 'ret'){ E.say.ret[g.neden]--; if (!E.say.ret[g.neden]) delete E.say.ret[g.neden]; await ghApi(g.x, {gizli: false}); }
+    else if (g.ne === 'paylas'){ E.say.paylas--; await ghApi(g.x, {paylasildi: false}); }
+    else if (g.ne === 'atla') E.say.atla--;
+    return ghElCiz(); }
+  if (!x) return;
+  if (ne === 'paylas'){
+    const li = x.platform === 'linkedin';
+    if (li){ await kopyala(x.metin, 'Metin panoda; LinkedIn’de yapıştırın'); window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank'); }
+    else if (x.yanit_to) window.open('https://x.com/intent/post?in_reply_to=' + encodeURIComponent(x.yanit_to.id) + '&text=' + encodeURIComponent(x.metin), '_blank');
+    else if ((x.zincir || []).length > 1){ window.open('https://x.com/intent/post?text=' + encodeURIComponent(x.zincir[0]), '_blank'); kopyala(x.zincir.slice(1).join('\n\n'), 'İlk parça X’te; kalan parçalar panoda'); }
+    else window.open('https://x.com/intent/post?text=' + encodeURIComponent(x.metin) + (x.paylas_link ? '&url=' + encodeURIComponent(x.paylas_link) : ''), '_blank');
+    E.onay = true; return ghElCiz(); }
+  if (ne === 'hayir'){ E.onay = false; return ghElCiz(); }
+  let r = {_ok: true};
+  if (ne === 'evet'){ E.onay = false; r = await ghApi(x, {paylasildi: true}); if (r._ok){ E.say.paylas++; E.geri.push({ne: 'paylas', x, n: E.n}); } }
+  else if (ne === 'kalsin'){ r = await ghApi(x, {begendi: true}); if (r._ok){ E.say.kalsin++; E.geri.push({ne, x, n: E.n}); } }
+  else if (ne === 'ret'){ r = await ghApi(x, {gizli: true, neden}); if (r._ok){ E.say.ret[neden] = (E.say.ret[neden] || 0) + 1; E.geri.push({ne, neden, x, n: E.n}); } }
+  else if (ne === 'atla'){ E.say.atla++; E.geri.push({ne, x, n: E.n}); }
+  if (!r._ok){ toast(r.hata || 'Kaydedilemedi; bir daha deneyin'); return; }
+  E.n++; ghElCiz();
+}
+/* tempo notu: Ghost bakılmayan günlerde daha az yazıyor (ghost_tempo.py); kişi bunu bilsin, dokununca normale döner */
+function ghTempoNot(){
+  const t = GH.d?.tempo || {}, hd = (GH.d?.ozet || {}).hedef || {}, g = hd.x_gunluk || 12;
+  if (t.mod === 'sakin') return `<p class="gh-tempo">Son iki günde önerilere dokunmadınız; Ghost bu yüzden günde ${Math.min(g, 8)} öneriyle yetiniyor. Birkaçına <button type="button" data-g="elden">baktığınızda</button> yeniden ${g}’ye çıkar.</p>`;
+  if (t.mod === 'uzakta') return `<p class="gh-tempo">Birkaç gündür bakmadığınız için Ghost günde ${Math.min(g, 5)} öneri yazdı, yanıt ve LinkedIn taslaklarını bekletti. Bir karar verdiğiniz an normale döner.</p>`;
+  return '';
 }
 function ghGecilen(){ const g = new Date().toISOString().slice(0, 10); try{ return new Set(JSON.parse(localStorage.getItem('ghGec_' + g) || '[]')); }catch(e){ return new Set(); } }
 function ghGecEkle(k){ const g = new Date().toISOString().slice(0, 10), s2 = ghGecilen(); s2.add(k); try{ localStorage.setItem('ghGec_' + g, JSON.stringify([...s2])); }catch(e){} }
@@ -4697,7 +4850,7 @@ function ghTaslak(){
     <div class="gh-suz"><div class="gh-suz-ust"><div class="gh-seg">${[['', 'Tümü'], ['x', 'X'], ['linkedin', 'LinkedIn']].map(([v, a]) => `<button type="button" data-g="plat" data-v="${v}" aria-pressed="${GH.plat === v}">${a}</button>`).join('')}</div><input type="search" id="ghAra" placeholder="Taslaklarda ara" value="${esc(GH.ara)}" aria-label="Taslaklarda ara"></div>
     ${alanlar.length > 1 ? `<div class="gh-alanlar">${['', ...alanlar].map(a => `<button type="button" data-g="alan" data-v="${esc(a)}" aria-pressed="${GH.alan === a}">${a ? ghIk(a) + esc(a) : 'Tüm alanlar'}</button>`).join('')}</div>` : ''}</div>
     <div id="ghTListe">${ghTaslakListe()}</div>`;
-  if (E.length) h += `<details class="gh-katla"><summary>Elenen fikirler <small>${E.length} · okur testinden geçmeyenler; bazen en iyisi buradadır</small></summary><div>${E.slice(0, 15).map((e, i) => `<div class="gh-sat"><div><b>${esc(e.konu || '')}</b>${e.gorus ? `<p>${esc(e.gorus)}</p>` : ''}<small>${esc(e.neden || '')}</small></div><div class="eyl"><button class="ghb iki kucuk" type="button" data-g="elenen" data-i="${i}">Yine de yaz</button></div></div>`).join('')}</div></details>`;
+  if (E.length) h += `<details class="gh-katla"><summary>Elenenler <small>${E.length} · kalite denetiminden geçmeyenler</small></summary><div>${E.slice(0, 15).map((e, i) => `<div class="gh-sat"><div><b>${esc(e.konu || '')}</b>${e.gorus ? `<p>${esc(e.gorus)}</p>` : ''}<small>${esc(e.neden || '')}</small></div><div class="eyl"><button class="ghb iki kucuk" type="button" data-g="elenen" data-i="${i}">Yine de yaz</button></div></div>`).join('')}</div></details>`;
   if (P.length) h += `<details class="gh-katla"><summary>Paylaştıklarınız <small>${P.length}</small></summary><div>${P.map((x, i) => `<div class="gh-sat"><div><small>${x.paylasim_zaman ? esc(ghTarih(x.paylasim_zaman, true)) : ''}${x.platform === 'linkedin' ? ' · LinkedIn' : ''}</small><p class="kisa">${esc(x.metin)}</p></div><div class="eyl"><button class="ghb kucuk" type="button" data-g="paygeri" data-i="${i}" title="Yanlışlıkla işaretlediyseniz taslaklara geri döner">Paylaşılmadı</button></div></div>`).join('')}</div></details>`;
   return h;
 }
@@ -4705,20 +4858,20 @@ function ghTaslak(){
 /* ---- Defter ---- */
 function ghDefter(){
   const f = GH.f || {}, N = f.notlar || [], G = f.gorusler || [], A = f.adaylar || [], MG = f.mac_gecmis || [], B = (f.birlestirme || {}).oneriler || [];
-  const sek = [['fikir', 'Fikirler', N.length], ['gorus', 'Görüşler', G.length + (A.length ? ' · ' + A.length + ' yeni' : '')], ['secki', 'ChatGPT seçkisi', ''], ['mac', 'Maç', MG.length || ''], ['arsiv', 'Reklam arşivi', f.arsiv_toplam || '']];
+  const sek = [['fikir', 'Notlarım', N.length], ['gorus', 'Görüşlerim', G.length + (A.length ? ' · ' + A.length + ' yeni' : '')], ['blog', 'Blog konuları', ''], ['secki', 'Okuma seçkisi', ''], ['mac', 'Maç', MG.length || ''], ['arsiv', 'Reklam arşivi', f.arsiv_toplam || '']];
   if (!sek.some(s => s[0] === GH.dsek)) GH.dsek = 'fikir';
-  let h = `<header class="gh-bas"><div><h2>Defter</h2></div></header>
+  let h = `<header class="gh-bas"><div><h2>Fikirler</h2><p>Gönderileriniz bunlardan beslenir: notlarınız, görüşleriniz, yazı konuları.</p></div></header>
     <div class="gh-alt-sek">${sek.map(([v, a, n]) => `<button type="button" data-g="dsek" data-v="${v}" aria-pressed="${GH.dsek === v}">${a}${n !== '' ? `<i>${n}</i>` : ''}</button>`).join('')}</div>`;
   if (GH.dsek === 'fikir'){
-    h += `<section class="gh-sayfa-kart"><header><div><b>İki parça bir gönderi</b><small>Notlarınızdan ve görüşlerinizden, birbirinden uzak iki parçayı tek fikirde buluşturur.</small></div><button class="ghb iki kucuk" type="button" data-g="biryap" ${f.calisiyor ? 'disabled' : ''}>${f.calisiyor === 'birlestirme' ? 'Hazırlanıyor…' : 'Yeni öneri'}</button></header>
+    h += `<section class="gh-sayfa-kart"><header><div><b>İki not, bir fikir</b><small>Birbirinden uzak iki notunuzu ya da görüşünüzü tek gönderide buluşturur.</small></div><button class="ghb iki kucuk" type="button" data-g="biryap" ${f.calisiyor ? 'disabled' : ''}>${f.calisiyor === 'birlestirme' ? 'Hazırlanıyor…' : 'Yeni öneri'}</button></header>
       ${B.length ? B.map((o, i) => `<div class="gh-sat"><div><p>${esc(o.a)}</p><p>${esc(o.b)}</p><b style="margin-top:6px">${esc(o.fikir)}</b></div><div class="eyl"><button class="ghb iki kucuk" type="button" data-g="birgonder" data-i="${i}">Gönderiye çevir</button></div></div>`).join('') : '<p class="gh-ipucu">Notlarınız birikince her akşam öneri gelir.</p>'}</section>`;
-    h += `<section class="gh-sayfa-kart"><header><div><b>Fikir defteri</b><small>Yukarıdaki kutuya yazdığınız ya da söylediğiniz fikirler, sorulara cevaplar, maç notları.</small></div></header>
+    h += `<section class="gh-sayfa-kart"><header><div><b>Notlarım</b><small>Yukarıdaki kutuya yazdığınız ya da söylediğiniz fikirler ve sorulara verdiğiniz cevaplar.</small></div></header>
       ${N.length ? N.map(x => `<div class="gh-sat"><div><small>${esc(ghTarih(x.zaman, true))} · ${esc(({sesli: 'sesli not', yazi: 'yazı', soru_cevap: 'soruya cevap', mac_oncesi: 'maç öncesi', mac_sonrasi: 'maç sonrası'})[x.tur] || x.tur || '')}</small><p>${esc(x.metin)}</p>${(x.gonderiler || []).length ? '<small class="yesil">Gönderisi yazıldı</small>' : ''}</div>
         <div class="eyl">${(x.gonderiler || []).length ? '' : `<button class="ghb iki kucuk" type="button" data-g="notyaz" data-id="${esc(x.id)}">Gönderiye çevir</button>`}<button class="ghb kucuk ikon" type="button" data-g="notsil" data-id="${esc(x.id)}" title="Notu sil" aria-label="Notu sil">${GH_SVG.x}</button></div></div>`).join('')
         : '<p class="gh-ipucu">Henüz not yok. Yukarıdaki kutuya bir fikir yazın ya da mikrofonla söyleyin; burada birikir.</p>'}</section>`;
   }
   if (GH.dsek === 'gorus' && (f.fikir_eslesme || []).length){
-    h += `<section class="gh-sayfa-kart"><header><div><b>Bugün tetiklenen görüşleriniz</b><small>Bugünkü bir haber bu görüşlerinizi doğal olarak çağırıyor.</small></div></header>
+    h += `<section class="gh-sayfa-kart"><header><div><b>Bugün görüşlerinize değen haberler</b><small>Bu haberler görüşlerinizden birini söylemek için iyi bir an.</small></div></header>
       ${f.fikir_eslesme.map(e => `<div class="gh-sat"><div><b>${esc(e.konu || '')}</b><p>${esc(e.gorus)}</p><small>Haber: <a href="${esc(e.madde?.link || '#')}" target="_blank" rel="noopener">${esc(e.madde?.baslik || '')}</a> · ${esc(e.neden || '')}</small></div>
         <div class="eyl"><button class="ghb iki kucuk" type="button" data-g="fkyaz" data-a="${esc(e.anahtar)}">Şimdi yaz</button></div></div>`).join('')}</section>`;
   }
@@ -4731,11 +4884,12 @@ function ghDefter(){
         ${GH.arsivAcik === String(i) ? [['Problem', x.problem], ['İçgörü', x.icgoru], ['Fikir', x.fikir], ['Sıçrama', x.sicrama], ['Cümle', x.cumle], ['Sonuç', x.sonuc], ['Çıkarım', x.ogrenme]].filter(a => a[1]).map(a => `<p><b>${a[0]}:</b> ${esc(a[1])}</p>`).join('') + (x.link ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">İşi aç ↗</a>` : '') : ''}</div></div>`).join('') : '<p class="gh-ipucu">Eşleşen iş yok.</p>') : ''}</section>`;
   }
   if (GH.dsek === 'gorus'){
-    h += `<section class="gh-sayfa-kart"><header><div><b>Görüş defteri</b><small>Savunduğunuz görüşler. Yeni gönderiler bunlarla tutarlı kalır; görüşünüz değiştiyse gönderi bunu açıkça söyler.</small></div><button class="ghb iki kucuk" type="button" data-g="adaytara" ${f.calisiyor ? 'disabled' : ''}>${f.calisiyor === 'adaylar' ? 'Taranıyor…' : 'Toplantılarımdan tara'}</button></header>
+    h += `<section class="gh-sayfa-kart"><header><div><b>Görüşlerim</b><small>Savunduğunuz görüşler. Yeni gönderiler bunlarla tutarlı kalır.</small></div><button class="ghb iki kucuk" type="button" data-g="adaytara" ${f.calisiyor ? 'disabled' : ''}>${f.calisiyor === 'adaylar' ? 'Taranıyor…' : 'Toplantılarımdan tara'}</button></header>
       ${A.length ? `<div class="gh-adaylar"><small>Kendi sözlerinizden çıkan yeni görüşler · eklensin mi?</small>${A.map(a => `<div class="gh-sat"><div><b>${esc(a.konu || '')}</b><p>${esc(a.gorus)}</p></div><div class="eyl"><button class="ghb iki kucuk" type="button" data-g="aday" data-i="${a.i}" data-k="1">Ekle</button><button class="ghb kucuk" type="button" data-g="aday" data-i="${a.i}" data-k="0">Hayır</button></div></div>`).join('')}</div>` : ''}
-      ${G.length ? `<small class="gh-ipucu">Onaylamadıklarınız gönderilerinizden çıkarıldı; yazıcı onları kanıtıyla, ölçülü kullanır. “Değil” dediğiniz hiç kullanılmaz.</small>` + G.filter(g => g.durum !== 'red').map((g, n) => `<div class="gh-sat"><div><b>${esc(g.konu || '')}</b><p>${esc(g.gorus)}</p>${g.durum !== 'onayli' && g.kanit ? `<small>Gönderinizden: “${esc(String(g.kanit).slice(0, 120))}”</small>` : ''}</div>
+      ${G.length ? `<small class="gh-ipucu">Onaylamadıklarınızı Ghost gönderilerinizden çıkardı. “Değil” dediğiniz hiç kullanılmaz.</small>` + G.filter(g => g.durum !== 'red').map((g, n) => `<div class="gh-sat"><div><b>${esc(g.konu || '')}</b><p>${esc(g.gorus)}</p>${g.durum !== 'onayli' && g.kanit ? `<small>Gönderinizden: “${esc(String(g.kanit).slice(0, 120))}”</small>` : ''}</div>
         <div class="eyl">${g.durum === 'onayli' ? '<small style="flex:none">Onaylı</small>' : `<button class="ghb iki kucuk" type="button" data-g="gorusok" data-gor="${esc(g.gorus)}">Benim görüşüm</button>`}<button class="ghb kucuk" type="button" data-g="gorusred" data-gor="${esc(g.gorus)}">Değil</button></div></div>`).join('') : '<p class="gh-ipucu">Henüz görüş yok.</p>'}</section>`;
   }
+  if (GH.dsek === 'blog') h += ghBlog(true);
   if (GH.dsek === 'secki') h += ghSecki();
   if (GH.dsek === 'mac') h += `<section class="gh-sayfa-kart"><header><div><b>Maç defteri</b><small>Maç günü tahminleriniz ve düdükten sonraki tepkileriniz. Maç olan gün Bugün’de sorulur.</small></div></header>
       <small class="gh-ipucu">Tahmin karnesi</small>${ghKarne(f.karne)}<small class="gh-ipucu">Notlar</small>
@@ -4744,7 +4898,7 @@ function ghDefter(){
 }
 function ghSecki(){
   ghYukle('secki', '/api/secki'); const d = GH.secki;
-  const bas = alt => `<header><div><b>ChatGPT’nin günlük seçkisi</b><small>${alt}</small></div>${d && d.bagli ? '' : '<button class="ghb ana kucuk" type="button" data-g="seckibagla">Drive’a bağlan</button>'}</header>`;
+  const bas = alt => `<header><div><b>Günlük okuma seçkisi</b><small>${alt}</small></div>${d && d.bagli ? '' : '<button class="ghb ana kucuk" type="button" data-g="seckibagla">Drive’a bağlan</button>'}</header>`;
   if (!d) return `<section class="gh-sayfa-kart">${bas('Yükleniyor…')}</section>`;
   if (!d.bagli) return `<section class="gh-sayfa-kart">${bas('Drive’daki “Günlük Okuma ve Yayın Seçkisi” her sabah buraya gelir; her konuda sizin karşılığınız sorulur. Ghost Drive’ı yalnızca okur.')}<p class="gh-ipucu">Bağlan’a basınca tarayıcıda Google onay sayfası açılır; “İzin ver”e basmanız yeterli.</p></section>`;
   const s = d.secki, Y = d.yazilan || {};
@@ -4757,14 +4911,14 @@ function ghSecki(){
 /* ---- Blog (ghost_blog.py, 26 Ekim): blog için konu önerileri. Asıl mesele sektörel, tema yalnız giriş; her öneri belirli soru, başlangıç,
    bilinmeyen; blog yeni açıldığı için ilk yazılar genelden ---- */
 function ghBlogYukle(){
-  fetch('/api/ghost/blog').then(r => r.json()).then(j => { GH.blog = j; if (GH.sekme === 'blog') ghCiz();
+  fetch('/api/ghost/blog').then(r => r.json()).then(j => { GH.blog = j; if (GH.sekme === 'defter' && GH.dsek === 'blog') ghCiz();
     clearTimeout(GH.blogZ); if (j.calisiyor) GH.blogZ = setTimeout(ghBlogYukle, 5000); }).catch(() => { GH.blog = {hata: 'Yüklenemedi', oneriler: []}; ghCiz(); });
 }
-function ghBlog(){
+function ghBlog(icerde){
   if (GH.blog === undefined){ GH.blog = null; ghBlogYukle(); }
   const d = GH.blog || {}, H = d.oneriler || [], L = H.filter(o => GH.blogTum || o.durum !== 'gec'), gecen = H.length - H.filter(o => o.durum !== 'gec').length;
-  return `<header class="gh-bas"><div><h2>Blog</h2></div></header>
-    <section class="gh-sayfa-kart"><header><div><b>Yazı konusu önerileri</b><small>Blogunuz için. Asıl mesele hep sektörel; futbol, film, şehir gibi bir tema yalnızca giriş. Blog yeni açıldı: ilk yazılar nişten değil, daha genel bir meseleden başlar.</small></div></header>
+  return `${icerde ? '' : '<header class="gh-bas"><div><h2>Blog</h2></div></header>'}
+    <section class="gh-sayfa-kart"><header><div><b>Blog konuları</b><small>Her öneri bir soru, bir başlangıç noktası ve henüz bilinmeyenle gelir. Beğendiğinizi işaretleyin.</small></div></header>
     ${ghGir('İsteğe bağlı yön: “markalar ve arşiv”, “bağımsız çalışma”, “daha genel olsun”', `data-g="blogyenile" ${d.calisiyor ? 'disabled' : ''}`, d.calisiyor ? 'Hazırlanıyor…' : 'Yeni öneriler')}
     ${d.hata ? `<p class="gh-ipucu">${esc(d.hata)}</p>` : ''}
     ${GH.blog === null ? '<p class="gh-ipucu">Yükleniyor…</p>' : L.length ? L.map(ghBlogKart).join('')
@@ -4786,34 +4940,36 @@ function ghSes(){
   ghYukle('perf', '/api/x/performans'); ghYukle('terc', '/api/ghost/tercihler');
   const oz = (GH.d || {}).ozet || {}, ps = oz.persona || {}, k = oz.kalite || {}, p = GH.perf, t = GH.terc, kk = GH.k || {}, sg = kk.saglik || {};
   const karar = (k.paylasilan || 0) + (k.kaldirilan || 0), yuz = v => v == null ? '–' : '%' + Math.round(v * 100);
-  let h = `<header class="gh-bas"><div><h2>Sesiniz</h2></div></header>`;
-  h += `<section class="gh-sayfa-kart" id="ghGelKart">${ghGelisimHtml()}</section>`;
+  let h = `<header class="gh-bas"><div><h2>Profil</h2><p>Ghost’un sizi nasıl tanıdığı ve neyi öğrendiği.</p></div></header>`;
+  let ileri = `<section class="gh-sayfa-kart" id="ghGelKart">${ghGelisimHtml()}</section>`;
   if (!GH.gel && !GH._gelYuk){ GH._gelYuk = true; fetch('/api/ghost/gelisim').then(r => r.json()).then(j => { GH.gel = j; const e = document.getElementById('ghGelKart'); if (e) e.innerHTML = ghGelisimHtml(); }).catch(() => {}).finally(() => { GH._gelYuk = false; }); }
-  h += `<section class="gh-sayfa-kart"><header><div><b>Kalite</b><small>Bu dönemin tek ölçüsü: paylaştığınız her şey iyi mi?</small></div></header><div class="gh-sayilar">
+  ileri += `<section class="gh-sayfa-kart"><header><div><b>Kalite</b><small>Paylaştığınız her şey iyi mi?</small></div></header><div class="gh-sayilar">
       <span><b>${!karar ? '–' : karar < 5 ? `${k.paylasilan}/${karar}` : yuz(k.paylasma_orani)}</b>karar verdiğiniz taslaklardan paylaşılan</span>
       <span><b>${k.duzeltme_ort == null ? '–' : '%' + Math.round(k.duzeltme_ort * 100)}</b>paylaşmadan önce değiştirdiğiniz</span>
       <span><b>${k.onerilen ? yuz(k.dayanakli / k.onerilen) : '–'}</b>size ya da görüşünüze dayanan</span><span><b>${k.gorus || 0}</b>görüş defterinde</span></div>
       ${Object.keys(k.nedenler || {}).length ? `<p class="gh-ipucu" style="margin-top:12px">En sık kaldırma nedeni: ${Object.entries(k.nedenler).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `${esc(n)} (${c})`).join(' · ')}</p>` : ''}</section>`;
-  h += `<section class="gh-sayfa-kart"><header><div><b>Okur tepkisi · son 30 gün</b><small>Chrome uzantısının X’teki profilinizden yalnızca okuduğu sayılar</small></div>${p && p.adet ? '<button class="ghb iki kucuk" type="button" data-g="dersyenile">Dersleri yenile</button>' : ''}</header>`
+  let okur = `<section class="gh-sayfa-kart"><header><div><b>X’te nasıl gidiyor · son 30 gün</b><small>Chrome uzantısının profilinizden okuduğu sayılar</small></div>${p && p.adet ? '<button class="ghb iki kucuk" type="button" data-g="dersyenile">Dersleri yenile</button>' : ''}</header>`
     + (!p ? '<p class="gh-ipucu">Yükleniyor…</p>' : !p.adet ? '<p class="gh-ipucu">X’te profilinize bir kez bakın; uzantı sayıları getirir.</p>'
       : `<div class="gh-sayilar"><span><b>${p.adet}</b>gönderi</span><span><b>${ghBin(p.medyan)}</b>medyan görüntülenme</span>${k.deger_isareti != null ? `<span><b>${String(k.deger_isareti).replace('.', ',')}</b>bin görüntülenmede kaydetme ya da iletme</span>` : ''}</div>
         ${(p.en_iyi || []).length ? `<div class="gh-en" style="margin-top:12px">${p.en_iyi.map(x => `<a href="https://x.com/i/status/${esc(x.id)}" target="_blank" rel="noopener"><b>${ghBin(x.goruntulenme)}</b><span>${esc(String(x.metin || '').slice(0, 140))}</span><small>${x.begeni} beğeni · ${x.yanit} yanıt · ${x.yerimi || 0} kaydetme</small></a>`).join('')}</div>` : ''}
-        ${(p.dersler || []).length ? `<div class="gh-dersler"><small>Ne işliyor</small><ul>${p.dersler.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : `<p class="gh-ipucu" style="margin-top:10px">${p.adet < 10 ? `Dersler için en az 10 ölçülmüş gönderi gerekiyor (şu an ${p.adet}).` : 'Dersler haftada bir çıkarılır; “Dersleri yenile” ile şimdi de çıkar.'}</p>`}`) + '</section>';
-  h += `<section class="gh-sayfa-kart"><header><div><b>Ses</b><small>Karakteriniz ve yazı ilkeleriniz; her taslak bunlara göre yazılır ve denetlenir.</small></div><button class="ghb iki kucuk" type="button" data-g="ayar">Ayarlar’da düzenle</button></header>
+        ${(p.dersler || []).length ? `<div class="gh-dersler"><small>Ne işliyor</small><ul>${p.dersler.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : `<p class="gh-ipucu" style="margin-top:10px">${p.adet < 10 ? `Ne işlediğini söylemek için en az 10 gönderi gerekiyor (şu an ${p.adet}).` : 'Haftada bir güncellenir.'}</p>`}`) + '</section>';
+  h += `<section class="gh-sayfa-kart"><header><div><b>Tarzınız</b><small>Her taslak buna göre yazılır.</small></div><button class="ghb iki kucuk" type="button" data-g="ayar">Düzenle</button></header>
       ${ps.karakter ? `<p class="gh-karakter">${esc(ps.karakter)}</p>` : ''}${ps.merkez ? `<p class="gh-ipucu"><b>Sesin merkezi:</b> ${esc(ps.merkez)}</p>` : ''}
       ${(ps.ilkeler || []).length ? `<details class="gh-katla" style="margin:12px 0 0;padding:0;background:none"><summary style="padding:6px 0">Yazı ilkeleri <small>${ps.ilkeler.length}</small></summary><ul class="gh-ilke">${ps.ilkeler.map(i => `<li>${esc(i)}</li>`).join('')}</ul></details>` : ''}</section>`;
   const TR = ((t || {}).tercihler || []).filter(x => x.aktif !== false);
-  h += `<section class="gh-sayfa-kart"><header><div><b>Düzeltmelerinizden öğrenilenler</b><small>Bir taslağı düzeltip paylaştıkça birikir; benzer konularda uygulanır. Yanlış olanı kaldırın.</small></div></header>`
+  h += `<section class="gh-sayfa-kart"><header><div><b>Ghost’un öğrendikleri</b><small>Düzelttikçe ve yorum yaptıkça birikir. Yanlış olanı kaldırın.</small></div></header>`
     + (!t ? '<p class="gh-ipucu">Yükleniyor…</p>' : TR.length || (t.silinen || []).length
       ? TR.slice(0, 15).map(x => `<div class="gh-sat"><div><p>${esc(x.tercih)}</p>${x.konu ? `<small>${esc(x.konu)}</small>` : ''}</div><div class="eyl"><button class="ghb kucuk" type="button" data-g="tercihsil" data-i="${x.i}">Kaldır</button></div></div>`).join('')
         + ((t.silinen || []).length ? `<p class="gh-ipucu" style="margin-top:10px">Bir daha kullanılmayacak ifadeler:</p><div class="gh-etiketler">${t.silinen.map(x => `<button type="button" data-g="silinensil" data-t="${esc(x)}" title="Listeden çıkar">${esc(x)} ×</button>`).join('')}</div>` : '')
-      : '<p class="gh-ipucu">Henüz yok. Bir taslağı kendi sesinize göre düzeltip paylaştığınızda ilk ders çıkar.</p>') + '</section>';
+      : '<p class="gh-ipucu">Henüz yok. Bir taslağı düzeltin ya da “Yeniden yaz”a ne istediğinizi yazın; ilk ders çıkar.</p>') + '</section>';
+  h += okur;
   h += `<section class="gh-sayfa-kart" id="ghHesapKart">${ghHesapHtml()}</section>`;
   if (!GH.hesap && !GH._hesapYuk){ GH._hesapYuk = true; fetch('/api/ghost/hesaplar').then(r => r.json()).then(j => { GH.hesap = j; const e = document.getElementById('ghHesapKart'); if (e) e.innerHTML = ghHesapHtml(); }).catch(() => {}).finally(() => { GH._hesapYuk = false; }); }
-  h += `<section class="gh-sayfa-kart"><header><div><b>Kaynaklar</b><small>Önerilerin geldiği haber ve dergi akışları. ${sg.toplam ? `${sg.calisan}/${sg.toplam} çalışıyor.` : ''}</small></div></header>
+  h += `<section class="gh-sayfa-kart"><header><div><b>Kaynaklar</b><small>Önerilerin geldiği yayınlar. ${sg.toplam ? `${sg.calisan}/${sg.toplam} çalışıyor.` : ''}</small></div></header>
       ${(sg.bozuk || []).length ? `<p class="gh-ipucu">Şu an okunamayanlar: ${esc(sg.bozuk.join(', '))}. Bir sonraki taramada yeniden denenir.</p>` : '<p class="gh-ipucu">Hepsi çalışıyor.</p>'}
       ${kk.kesif?.zaman ? `<p class="gh-ipucu">Son tarama ${esc(ghTarih(kk.kesif.zaman, true))}; ${kk.kesif.madde || 0} haber okundu, ${(kk.kesif.oneriler || []).length} öneri çıktı. Her gün 07.30 ve 14.00’te kendiliğinden taranır.</p>` : ''}
       <button class="ghb iki kucuk" type="button" data-g="kesif" ${kk.calisiyor ? 'disabled' : ''} style="margin:8px 0 12px">${kk.calisiyor ? 'Taranıyor…' : 'Şimdi tara'}</button>${ghTrendKutu()}</section>`;
+  h += `<details class="gh-katla"><summary>Gelişmiş <small>Haftalık değerlendirme ve kalite ölçüleri</small></summary><div>${ileri}</div></details>`;
   return h;
 }
 
@@ -4885,10 +5041,10 @@ async function ghEylem(a, b, el){
     toast(r._ok ? 'İlk hâline döndü; denetimlerin bunu bozduğu not edildi' : r.hata || 'Olmadı'); GH.acik[k] = true; paylasimlarCiz(); return; }
   if (a === 'ac'){ const ac = !el.classList.contains('acik'); el.classList.toggle('acik', ac); GH.acik[k] = ac; el.querySelector('.gh-ust').setAttribute('aria-expanded', ac); if (ac){ ghBoy(ta); ghXYukle(el, x); } return; }
   if (a === 'daha'){ const bak = !!b.querySelector('.gh-rozet');
-    return popover(b, [['Kopyala', () => ghEylem('kopya', b, el)], ['Daha kısa', () => yaz('/yeniden', {talimat: 'kisa'}, 'Kısaltılıyor…')], ['Daha keskin', () => yaz('/yeniden', {talimat: 'keskin'}, 'Keskinleştiriliyor…')], ['Son cümleyi parlat…', () => ghEylem('parlat', b, el)],
+    return popover(b, [['Kopyala', () => ghEylem('kopya', b, el)], ['Kısalt', () => yaz('/yeniden', {talimat: 'kisa'}, 'Kısaltılıyor…')], ['Daha net yaz', () => yaz('/yeniden', {talimat: 'keskin'}, 'Yeniden yazılıyor…')], ['Son cümleyi değiştir…', () => ghEylem('parlat', b, el)],
       (x.zincir || []).length ? ['Tek gönderiye çevir', () => yaz('/yeniden', {talimat: 'tek'}, 'Birleştiriliyor…')] : ['Zincire çevir', () => yaz('/yeniden', {talimat: 'zincir'}, 'Zincire çevriliyor…')], null,
-      ['Alıntılanacak gönderi seç…', () => ghEylem('alinti', b, el)], ['Bağlantı ekle ya da değiştir…', () => ghEylem('baglanti', b, el)], null,
-      [bak ? 'Ayrıntılar · bakılacak not var' : 'Ayrıntılar', () => ghEylem('detay', b, el)], ['Kaldır…', () => ghEylem('kaldir', b, el)]]); }
+      ['Bir X gönderisini alıntıla…', () => ghEylem('alinti', b, el)], ['Bağlantı ekle…', () => ghEylem('baglanti', b, el)], null,
+      ['Paylaştım ya da bir düşüncem var…', () => setTimeout(() => ghEylem('neoldu', b, el), 30)], [bak ? 'Neden önerildi? · bakılacak not var' : 'Neden önerildi?', () => ghEylem('detay', b, el)], ['Kaldır…', () => ghEylem('kaldir', b, el)]]); }
   if (a === 'yorumac'){ const y = el.querySelector('.gh-yorum'); y.hidden = !y.hidden; if (!y.hidden) y.querySelector('textarea').focus(); return; }
   if (a === 'yorum'){ const tk = b.closest('.gh-gir').querySelector('textarea'), v = tk.value.trim(); if (v.length < 3){ toast('Bir iki kelime yazın'); return; }
     el.classList.add('isliyor'); toast('Yorumunuza göre yeniden yazılıyor; Ghost tarzınızı öğreniyor…', null, null, 60000);
@@ -4952,7 +5108,7 @@ async function ghEylem(a, b, el){
       : [['Henüz X’te açtığınız bir gönderi yok', null]]), ['Gönderi bağlantısı yapıştır…', () => popover(b, [], {input: {placeholder: 'X gönderisinin bağlantısı (x.com/…/status/…)', onEnter: v => yaz('/alinti', {url: v}, 'Bu gönderiyi alıntılayan bir tepki olarak yeniden yazılıyor…')}})], ['X’te bu konuyu ara ↗', () => { window.open('https://x.com/search?q=' + encodeURIComponent(ara) + '&f=live', '_blank'); toast('Uygun bir gönderiyi açın; sonra buraya dönüp Alıntıla’ya yeniden basın', null, null, 8000); }]]); }
   if (a === 'soruac'){ const g = el.querySelector('.gh-soru .gh-gir'); g.hidden = !g.hidden; if (!g.hidden) g.querySelector('textarea').focus(); return; }
   if (a === 'dayanak'){ const v = b.closest('.gh-gir').querySelector('textarea').value.trim(); if (v.length < 8){ toast('Bir iki cümle yazın'); return; } b.closest('.gh-gir').querySelector('textarea').value = ''; return yaz('/dayanak', {yorum: v}, 'Sizin karşılığınızla yeniden yazılıyor…'); }
-  if (a === 'kaldir') return popover(b, [['Neden kaldırıyorsunuz?', null], ['Konu ilgimi çekmiyor', () => ghKaldir(x, 'konu uymuyor')], ['Konu iyi ama söylenen bariz ya da zayıf', () => ghKaldir(x, 'açı zayıf')], ['Bu ben değilim', () => ghKaldir(x, 'ben değilim')], ['Cümleler kötü', () => ghKaldir(x, 'yazım kötü')], ['Bilgi yanlış ya da eksik', () => ghKaldir(x, 'bilgi yanlış')], ['Bugün paylaşmak istemiyorum', () => ghKaldir(x, 'bugün değil')], ['Sadece kaldır', () => ghKaldir(x, '')]]);
+  if (a === 'kaldir') return popover(b, [['Neden kaldırıyorsunuz? Ghost bundan öğrenir', null], ['Konu bana göre değil', () => ghKaldir(x, 'konu uymuyor')], ['Konu iyi, yorum sıradan', () => ghKaldir(x, 'açı zayıf')], ['Tarzım değil', () => ghKaldir(x, 'ben değilim')], ['Cümleler kötü', () => ghKaldir(x, 'yazım kötü')], ['Bilgi yanlış ya da eksik', () => ghKaldir(x, 'bilgi yanlış')], ['Bugün değil', () => ghKaldir(x, 'bugün değil')], ['Sadece kaldır', () => ghKaldir(x, '')]]);
   if (a === 'degistir'){ const istek = (ph, fn) => () => popover(b, [], {input: {placeholder: ph, onEnter: fn}});
     return popover(b, [['Daha kısa', () => yaz('/yeniden', {talimat: 'kisa'}, 'Kısaltılıyor…')], ['Daha keskin', () => yaz('/yeniden', {talimat: 'keskin'}, 'Keskinleştiriliyor…')],
       (x.zincir || []).length ? ['Tek gönderiye çevir', () => yaz('/yeniden', {talimat: 'tek'}, 'Birleştiriliyor…')] : ['Zincire çevir', () => yaz('/yeniden', {talimat: 'zincir'}, 'Zincire çevriliyor…')], null,
@@ -4979,7 +5135,7 @@ async function ghMik(btn, hedef){
   rec.start(); toast('Dinliyorum; bitince yeniden basın', null, null, 4000);
 }
 // Toplu ret de öğretsin (24 Ekim): tek dokunuşluk hazır nedenler; 'ses' kaldırılanları 'bu ben değilim' örneği yapar, 'tur' türleri karıştırtır
-const GH_RED_NEDEN = [['Konular sıkıcı', () => ghTurRed('', 'konu')], ['Konular iyi, söylenenler bariz', () => ghTurRed('', 'aci')], ['Ses bana benzemiyor', () => ghTurRed('', 'ses')], ['Hepsi aynı tür', () => ghTurRed('', 'tur')]];
+const GH_RED_NEDEN = [['Konular ilgimi çekmiyor', () => ghTurRed('', 'konu')], ['Konular iyi, yorumlar sıradan', () => ghTurRed('', 'aci')], ['Tarzım değil', () => ghTurRed('', 'ses')], ['Hepsi birbirine benziyor', () => ghTurRed('', 'tur')]];
 async function ghTurRed(neden, neden_tur){
   const r = await ghPost('/api/kesif/yenile', {begenmedim: true, neden, neden_tur: neden_tur || ''}); if (!r._ok){ toast(r.hata || 'Olmadı'); return; }
   toast(`${r.kaldirilan || 0} öneri kaldırıldı. Yeni öneriler araştırılıyor; birkaç dakika sürer, hazır oldukça burada belirir.`, null, null, 9000); setTimeout(paylasimlarCiz, 1200);
@@ -4996,6 +5152,8 @@ async function ghSayfaEylem(g, b){
     case 'gunbugun': GH.gun = null; return ghCiz();
     case 'gerigetir': { b.disabled = true; const r = await fetch(`/api/paylasim/${encodeURIComponent(b.dataset.t)}/${b.dataset.i}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({gizli: false})}).catch(() => null);
       if (!r || !r.ok){ toast('Olmadı'); b.disabled = false; return; } toast('Geri getirildi; Taslaklar’da'); return paylasimlarCiz(); }
+    case 'bugunmenu': return popover(b, [['Yeni öneri getir', () => ghSayfaEylem('kesif', b)], ['Önerileri yenile…', () => setTimeout(() => ghSayfaEylem('yenile', b), 30)], null,
+      ['Dünün önerileri', () => { GH.gun = ghGunEkle(new Date().toLocaleDateString('sv'), -1); GH.acik = {}; ghCiz(); }], ['Takvimden bir gün seç…', () => ghSayfaEylem('takvim', b)]]);
     case 'takvim': { const t = $('#ghTakvim'); try{ t.showPicker(); }catch(e){ t.focus(); t.click(); } return; }
     case 'tekrar': b.disabled = true; return paylasimlarCiz();
     case 'gec': ghGecEkle(b.dataset.k); GH.on = null; return ghCiz();
@@ -5023,8 +5181,9 @@ async function ghSayfaEylem(g, b){
       Object.assign(o, r.oneri); if (d === 'gec') toast('Geçildi; sonraki önerilerde bu yönden kaçınılır'); return ghCiz(true); }
     case 'blogtum': GH.blogTum = !GH.blogTum; return ghCiz(true);
     case 'fkyaz': { b.disabled = true; return bitir(await ghPost('/api/ghost/fikir-karti/yaz', {anahtar: b.dataset.a}), 'Görüşünüz bu habere tepki olarak yazılıyor'); }
-    case 'yenile': return popover(b, [['Yeni öneri getir', () => ghSayfaEylem('kesif', b)], null, ['Bunları beğenmediyseniz neden?', null], ...GH_RED_NEDEN,
-      ['Nedensiz yenile', () => ghTurRed('')], null, ['Ya da kendi cümlenizle yazıp ↩', null]], {input: {placeholder: 'Ör. “daha çok futbol ve kültür”', onEnter: v => ghTurRed(v)}});
+    case 'elden': return ghElAc();
+    case 'yenile': return popover(b, [['Yeni öneri getir', () => ghSayfaEylem('kesif', b)], ...(ghElListe().length ? [['Tek tek gözden geçir', () => ghElAc()]] : []), null, ['Hepsini kaldırıp yenisini isteyin. Neden?', null], ...GH_RED_NEDEN,
+      ['Nedensiz yenile', () => ghTurRed('')], null, ['Ya da kendi cümlenizle ↩', null]], {input: {placeholder: 'Ör. “daha çok futbol ve kültür”', onEnter: v => ghTurRed(v)}});
     case 'harita': { if (b.dataset.ds){ GH.dsek = b.dataset.ds; store.set('gDsek', GH.dsek); } return ghSekme(b.dataset.s); }
     case 'macac': { GH.macAcik = !GH.macAcik; const m = b.parentElement.querySelector('.gh-mac'); m.hidden = !GH.macAcik; if (!m.hidden) m.querySelector('textarea')?.focus(); return; }
     case 'turred': return popover(b, [['Neden beğenmediniz? Düzenledikleriniz ve kendi fikirleriniz kalır', null], ...GH_RED_NEDEN, ['Nedensiz yenile', () => ghTurRed('')], null, ['Ya da kendi cümlenizle yazıp ↩:', null]],
@@ -5088,11 +5247,11 @@ async function ghSayfaEylem(g, b){
 /* ---- giriş kutusu ---- */
 function ghGirdiTuru(g){ return !g ? '' : /^https?:\/\/\S+$/.test(g) ? (/(youtube\.com|youtu\.be|vimeo|instagram|tiktok|twitch|loom|spotify\.com\/episode|podcasts\.apple)/i.test(g) ? 'video' : /(^|\/\/|\.)(x|twitter)\.com\//i.test(g) ? 'x' : 'yazi_link') : g.length > 600 ? 'yazi' : 'fikir'; }
 function ghIpucu(){ const g = $('#ghGirdi').value.trim(), tur = ghGirdiTuru(g), ip = $('#ghIpucu');
-  $('#ghYaz').disabled = g.length < 12 || tur === 'x';
-  ip.textContent = ({video: 'Video önce yazıya dökülür, sonra taslak çıkar · birkaç dakika', yazi_link: 'Yazının metni okunur, paylaşmaya değer açılar seçilir · bir iki dakika',
-    x: 'X gönderileri buradan okunamıyor. Gönderiyi X’te açın; sonra bir taslakta “Alıntıla”yı kullanın ya da metnini yapıştırın.', yazi: 'Yapıştırdığınız yazıdan paylaşmaya değer açılar seçilir',
-    fikir: g.length < 12 ? 'Biraz daha yazın' : 'Fikriniz sizin sesinizle gönderiye dönüşür ve deftere de yazılır'})[tur] || 'Video ya da haber linki, yapıştırılmış bir yazı ya da kendi fikriniz';
-  ip.classList.toggle('uyari', tur === 'x'); ip.classList.toggle('varsayilan', !tur); }
+  $('#ghYaz').disabled = g.length < 12;
+  ip.textContent = ({video: 'Video dinlenir, sonra taslak çıkar · birkaç dakika', yazi_link: 'Yazı okunur, paylaşmaya değer bir bakış seçilir · bir iki dakika',
+    x: 'Gönderi okunur; alıntılayıp ne diyeceğinizi yazarım', yazi: 'Yapıştırdığınız yazıdan paylaşmaya değer bir bakış seçilir',
+    fikir: g.length < 12 ? 'Biraz daha yazın' : 'Fikriniz sizin sesinizle gönderiye dönüşür, notlarınıza da eklenir'})[tur] || 'Bir fikir, link ya da yazı bırakın; gönderiye çevireyim';
+  ip.classList.toggle('uyari', false); ip.classList.toggle('varsayilan', !tur); }
 async function ghYaz(){ const g = $('#ghGirdi').value.trim(), b = $('#ghYaz'); if (g.length < 12) return; b.disabled = true; b.textContent = 'Gönderiliyor…';
   const r = await ghPost('/api/ghost/yaz', {girdi: g}); b.textContent = 'Yaz';
   if (!r._ok){ toast(r.hata || 'Olmadı', null, null, 7000); ghIpucu(); return; }
@@ -5134,7 +5293,9 @@ if (URUN === 'ghost'){
     if (t.id === 'ghAra'){ GH.ara = t.value; GH.kartlar = []; $('#ghTListe').innerHTML = ghTaslakListe(); return; }
     if (t.classList.contains('gh-metin')){ ghBoy(t); const el = t.closest('.gh-oge'), x = ghVeri(el) || {}, u = t.value.trim().length, li = x.platform === 'linkedin', s = el.querySelector('.gh-say');
       s.textContent = li || u > 280 ? u : `${u}/280`; s.classList.toggle('asim', u > 280 && !li); el.querySelector('.gh-on span').textContent = t.value; } });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') $$('#ghSayfa .gh-oge.acik').forEach(el => { const x = ghVeri(el); if (x) ghXYukle(el, x, true); }); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible') return;
+    $$('#ghSayfa .gh-oge.acik').forEach(el => { const x = ghVeri(el); if (x) ghXYukle(el, x, true); });
+    if (Date.now() - (GH.sonZiyaret || 0) > 20 * 60000){ GH.sonZiyaret = Date.now(); ghZiyaret = true; paylasimlarCiz(); } });
   gh.addEventListener('focusout', e => { const t = e.target; if (!t.classList?.contains('gh-metin')) return;
     const x = ghVeri(t.closest('.gh-oge')), m = t.value.trim(); if (x && m && m !== x.metin){ const eski = x.metin; x.metin = m; ghApi(x, {metin: m, eski}).then(r => toast(r._ok ? 'Düzenleme kaydedildi; Ghost bundan da öğrenecek' : r.hata || 'Kaydedilemedi')); } });
   $('#ghGirdi').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey || (!e.shiftKey && /^https?:\/\/\S+$/.test(e.target.value.trim())))){ e.preventDefault(); ghYaz(); } });
@@ -5246,7 +5407,7 @@ function arkaOnizlemeKur(){
   row.querySelector('#duzArkaSeg').style.display = 'none'; row.style.flexWrap = 'wrap';
   const L = [['', 'orijinal', 'Orijinal', 'Arka plana dokunulmaz'], ['bulanik', 'bulanik', 'Bulanık', 'Portre modu gibi; kişi net, arkası yumuşak'], ['koyu', 'koyu', 'Stüdyo', 'Kişi sade, koyu bir stüdyo zemininin önünde']];
   const d = document.createElement('div'); d.className = 'altcar'; d.id = 'arkaOn';
-  d.innerHTML = `<div class="iz">${L.map(([v, dosya, ad, alt]) => `<div class="sl" data-v="${v}"><div class="vid"><video src="/static/arka_ornek/${dosya}.mp4" muted loop playsinline preload="metadata"></video><span class="oy">▶</span></div>
+  d.innerHTML = `<div class="iz">${L.map(([v, dosya, ad, alt]) => `<div class="sl" data-v="${v}"><div class="vid"><video src="/static/arka_ornek/${dosya}.mp4" muted loop playsinline preload="none"></video><span class="oy">▶</span></div>
       <div class="alt"><div><b>${ad}</b><small>${alt}</small></div><button type="button" class="secb">Bunu kullan</button></div></div>`).join('')}</div>
     <button type="button" class="ok sol" aria-label="Önceki">‹</button><button type="button" class="ok sag" aria-label="Sonraki">›</button>
     <div class="nok">${L.map((_, i) => `<i data-i="${i}"></i>`).join('')}</div>`;
@@ -5290,7 +5451,7 @@ function dbOnizlemeKur(){
   const L = [['orijinal', '🇺🇸 Orijinal', 'İngilizce, gerçek sesler'], ['tr', '🇹🇷 Türkçe', 'Colbert ve Keanu Reeves kendi sesleriyle Türkçe'], ['es', '🇪🇸 İspanyolca', 'Kendi sesleriyle İspanyolca'],
     ['fr', '🇫🇷 Fransızca', 'Kendi sesleriyle Fransızca'], ['de', '🇩🇪 Almanca', 'Kendi sesleriyle Almanca'], ['ja', '🇯🇵 Japonca', 'Kendi sesleriyle Japonca']];
   const d = document.createElement('div'); d.className = 'altcar dbcar'; d.id = 'dbOn';
-  d.innerHTML = `<div class="iz">${L.map(([k, ad, alt]) => `<div class="sl" data-v="${k}"><div class="vid"><video src="/static/dublaj_ornek/${k}.mp4" playsinline preload="metadata"></video><span class="oy">▶</span><span class="dil">${ad}</span></div>
+  d.innerHTML = `<div class="iz">${L.map(([k, ad, alt]) => `<div class="sl" data-v="${k}"><div class="vid"><video src="/static/dublaj_ornek/${k}.mp4" playsinline preload="none"></video><span class="oy">▶</span><span class="dil">${ad}</span></div>
       <div class="alt"><div><b>${ad}</b><small>${alt}</small></div>${k === 'orijinal' ? '<span class="hint">Üzerine gelince sesli oynar</span>' : '<button type="button" class="secb">Bu dili seç</button>'}</div></div>`).join('')}</div>
     <button type="button" class="ok sol" aria-label="Önceki">‹</button><button type="button" class="ok sag" aria-label="Sonraki">›</button>
     <div class="nok">${L.map((_, i) => `<i data-i="${i}"></i>`).join('')}</div>`;
@@ -5316,7 +5477,7 @@ function altOnizlemeKur(){
     ['karaoke', 'Karaoke', 'Cümle görünür, söylenen kelime sarıya döner. Röportaj ve anlatım için.'], ['pop', 'Pop', 'İki üç kelime, büyük harf, vurgu sarı. Reels ve TikTok için.'],
     ['vurgu', 'Vurgu', 'Söylenen kelime büyür ve yeşile döner. Enerjik kısa videolar için.']];
   const d = document.createElement('div'); d.className = 'altcar'; d.id = 'altOn';
-  d.innerHTML = `<div class="iz">${ST.map(([k, ad, alt]) => `<div class="sl" data-v="${k}"><div class="vid"><video src="/static/altyazi_ornek/${k}.mp4" muted loop playsinline preload="metadata"></video><span class="yuk"></span><span class="oy">▶</span></div>
+  d.innerHTML = `<div class="iz">${ST.map(([k, ad, alt]) => `<div class="sl" data-v="${k}"><div class="vid"><video src="/static/altyazi_ornek/${k}.mp4" muted loop playsinline preload="none"></video><span class="yuk"></span><span class="oy">▶</span></div>
       <div class="alt"><div><b>${ad}</b><small>${alt}</small></div><button type="button" class="secb">Bunu kullan</button></div></div>`).join('')}</div>
     <button type="button" class="ok sol" aria-label="Önceki">‹</button><button type="button" class="ok sag" aria-label="Sonraki">›</button>
     <div class="nok">${ST.map((_, i) => `<i data-i="${i}"></i>`).join('')}</div>`;
@@ -5380,16 +5541,20 @@ async function indirilenlerYukle(){
   list.forEach(x => {
     const p = platformOf(x.link);
     const el = document.createElement('div'); el.className = 'card hc'; el.tabIndex = 0; el.setAttribute('role','button');
-    const kal = x.kalite === 'altyazili' ? 'Altyazılı' + (x.dil && x.dil !== 'orijinal' ? ' ' + x.dil.toUpperCase() : '') : x.kalite === 'klip' ? 'Klip' + (x.dil && x.dil !== 'orijinal' ? ' ' + x.dil.toUpperCase() : '') : x.kalite === 'kesim' ? 'Kesilmiş' : x.kalite === 'dublaj' ? 'Dublaj' + (x.dil ? ' ' + x.dil.toUpperCase() : '') : x.kalite === 'dudak' ? 'Dudak senkronlu' : (x.cozunurluk || kaliteAd(x.kalite || (x.ses ? 'mp3' : 'en')));
+    const kal = x.kalite === 'altyazili' ? 'Altyazılı' + (x.dil && x.dil !== 'orijinal' ? ' ' + x.dil.toUpperCase() : '') : x.kalite === 'klip' ? 'Klip' + (x.dil && x.dil !== 'orijinal' ? ' ' + x.dil.toUpperCase() : '') : x.kalite === 'kesim' ? 'Kesilmiş' : x.kalite === 'dublaj' ? 'Dublaj' + (x.dil ? ' ' + x.dil.toUpperCase() : '') : x.kalite === 'dudak' ? 'Dudak senkronlu' : x.kalite === 'paylas' ? 'Reels/TikTok' : (x.cozunurluk || kaliteAd(x.kalite || (x.ses ? 'mp3' : 'en')));
     el.innerHTML = `<div class="th"><span class="ph"><svg viewBox="0 0 24 24">${x.ses ? '<path d="M9 18V6l12-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>' : '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/>'}</svg>${x.ses ? 'Ses' : (p ? esc(p[1]) : 'Video')}</span>${x.kapak ? `<img src="${esc(x.kapak)}" alt="" loading="lazy" onerror="this.remove()">` : ''}${x.sure ? `<span class="dur">${sure(x.sure)}</span>` : ''}</div>
       <div class="bd"><div class="ttl">${esc(x.baslik)}</div><div class="mt"><span class="kal">${esc(kal)}</span>${[boyutMetni(x.boyut), x.kesit ? 'bölüm ' + x.kesit.replace('-', '–') : '', tarih(x.olusturma)].filter(Boolean).map(esc).join(' · ')}</div>${{silindi: '<div class="kdurum">Kaynak transkript silindi (çöpten geri alınabilir)</div>', yok: '<div class="kdurum">Kaynak transkript artık yok</div>', degisti: '<div class="kdurum" title="Bu video üretildikten sonra transkript metni değişti; altyazı ya da kesit eski metinle olabilir">Kaynak sonradan değişti · yeniden üretmek gerekebilir</div>'}[x.kaynak_durum] || ''}</div>
-      <div class="ft"><span class="sp">${esc(x.kanal || '')}</span>${UZAK ? `<a class="tiny" href="/indirilen/${encodeURIComponent(x.ad)}" download>Tarayıcıya indir</a>` : `<button class="tiny fnd" type="button">Finder</button>`}${x.temel ? `<button class="tiny tx2" type="button">Transkript</button>` : `<button class="tiny tx" type="button">Yazıya dök</button>`}${x.kalite === 'dublaj' && !/önizleme/.test(x.ad) ? '<button class="tiny dudak" type="button" title="Ağız hareketlerini yeni sese eşler (sync.so, ücretli)">Dudakları eşle…</button>' : ''}<button class="tiny red" type="button" aria-label="Sil">Sil</button></div>`;
+      <div class="ft"><span class="sp">${esc(x.kanal || '')}</span>${UZAK ? `<a class="tiny" href="/indirilen/${encodeURIComponent(x.ad)}" download>Tarayıcıya indir</a>` : `<button class="tiny fnd" type="button">Finder</button>`}${x.temel ? `<button class="tiny tx2" type="button">Transkript</button>` : `<button class="tiny tx" type="button">Yazıya dök</button>`}${!x.ses && x.kalite !== 'paylas' ? '<button class="tiny pay" type="button" title="1080×1920, 30 kare/sn, platform ses seviyesi">Reels/TikTok</button>' : ''}${x.kalite === 'dublaj' && !/önizleme/.test(x.ad) ? '<button class="tiny dudak" type="button" title="Ağız hareketlerini yeni sese eşler (sync.so, ücretli)">Dudakları eşle…</button>' : ''}<button class="tiny red" type="button" aria-label="Sil">Sil</button></div>`;
     el.onclick = () => oynat(x); el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); oynat(x); } };
     el.querySelector('a.tiny')?.addEventListener('click', e => { e.stopPropagation(); toast('Dosya tarayıcıya indiriliyor'); });
     el.querySelector('.fnd')?.addEventListener('click', e => { e.stopPropagation(); fetch('/api/indirilen-goster/' + encodeURIComponent(x.ad), {method:'POST'}).then(() => toast('Finder’da gösteriliyor')); });
     el.querySelector('.tx')?.addEventListener('click', e => { e.stopPropagation(); indirilendenBaslat(x); });
     el.querySelector('.tx2')?.addEventListener('click', e => { e.stopPropagation(); sonucGoster(x.temel); });
     el.querySelector('.dudak')?.addEventListener('click', e => { e.stopPropagation(); dudakEsle(x); });
+    el.querySelector('.pay')?.addEventListener('click', async e => { e.stopPropagation(); const bt = e.currentTarget; bt.disabled = true; bt.textContent = 'Hazırlanıyor…';
+      try{ const r = await fetch('/api/indirilen-paylas/' + encodeURIComponent(x.ad), {method: 'POST'}); const j = await r.json(); if (!r.ok) throw new Error(j.hata || 'Hazırlanamadı');
+        toast('Reels, TikTok ve Shorts dosyası hazır' + (j.uyarilar?.length ? ' · ' + j.uyarilar[0] : '')); indirilenlerYukle(); }
+      catch(err){ toast(err.message); bt.disabled = false; bt.textContent = 'Reels/TikTok'; } });
     el.querySelector('.red').onclick = e => { e.stopPropagation(); indirilenSil(x, el); };
     g.appendChild(el);
   });
@@ -5573,7 +5738,7 @@ async function onBrifingCiz(){
   k.innerHTML = `<div class="ozet tsira"><div class="tsu"><span>Sıradaki · ${esc(ne2)} ${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))}</span><button class="tiny" id="obHazirla" type="button" title="Aynı kişilerle önceki toplantılardan açık işler ve bekleyen sorular">${kayit ? 'Yenile' : 'Hazırlık notu çıkar'}</button></div>`
     + `<h3>${esc(s.ad)}</h3>${s.kisiler.length ? `<p class="tsk">${esc(s.kisiler.slice(0, 5).join(', '))}${s.kisiler.length > 5 ? ` ve ${s.kisiler.length - 5} kişi` : ''}</p>` : ''}`
     + `<label class="obamac"><small>Bu toplantıdan ne çıkmalı?</small><input id="obAmac" type="text" maxlength="300" placeholder="Örn. çekim tarihi ve bütçe onayı" autocomplete="off"></label>`
-    + (kayit ? `<div class="blogm">${mdHtml(kayit.metin)}</div>` : `<p class="hint" style="margin:4px 0 0">Toplantıdan 10 dakika önce, aynı kişilerle önceki görüşmelerin açık işleri burada olur.</p>`) + '</div>';
+    + (kayit ? `<div class="blogm">${mdHtml(kayit.metin)}</div>` : `<p class="hint" style="margin:4px 0 0">Toplantı yaklaşınca, aynı kişilerle önceki görüşmelerin açık işleri burada olur.</p>`) + '</div>';
   if (!kayit && dk <= 45 && !onBrifingIstendi.has(s.id)){ onBrifingIstendi.add(s.id); fetch('/api/on-brifing/hazirla', {method:'POST'}).then(() => onBrifingCiz()).catch(() => {}); }   // yakında başlıyorsa beklemeden hazırla
   const amacAnahtar = `${s.bas}|${s.ad}`;
   fetch('/api/amac?anahtar=' + encodeURIComponent(amacAnahtar)).then(r => r.json()).then(j => { if (j.metin && document.activeElement !== $('#obAmac')) $('#obAmac').value = j.metin; }).catch(() => {});
@@ -5611,7 +5776,7 @@ async function haftalikCiz(tur, hedef){
 }
 function notlarHtml(v){
   const n = v.notlar; const g = v.notlar_gonderim;
-  const ust = `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h4>Toplantı notları</h4><span style="display:flex;gap:6px;flex-wrap:wrap">${n ? `<button class="tiny" id="notKopyala" type="button">Kopyala</button>` : ''}<button class="tiny" id="notGonder" type="button">${n ? 'E-postayla gönder' : 'Notları hazırla'}</button><button class="tiny" id="takipEposta" type="button" title="Katılımcılara gidecek bir e-posta taslağını Mail’de açar; siz okuyup gönderirsiniz">Takip e-postası</button><button class="tiny" id="briefYap" type="button" title="Toplantıdan creative brief / iş tanımı belgesi çıkarır">${v.brief ? 'Brief’i yenile' : 'Brief çıkar'}</button></span></div>`;
+  const ust = `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h4>E-posta notları</h4><span style="display:flex;gap:6px;flex-wrap:wrap">${n ? `<button class="tiny" id="notKopyala" type="button">Kopyala</button>` : ''}<button class="tiny" id="notGonder" type="button">${n ? 'E-postayla gönder' : 'Notları hazırla'}</button><button class="tiny" id="takipEposta" type="button" title="Katılımcılara gidecek bir e-posta taslağını Mail’de açar; siz okuyup gönderirsiniz">Takip e-postası</button><button class="tiny" id="briefYap" type="button" title="Toplantıdan creative brief / iş tanımı belgesi çıkarır">${v.brief ? 'Brief’i yenile' : 'Brief çıkar'}</button></span></div>`;
   const brief = v.brief ? `<details class="brief"><summary><b>Brief</b> <span class="hint">· göstermek için tıklayın</span></summary><div style="display:flex;gap:6px;margin:8px 0"><a class="tiny" href="/indir/${encodeURIComponent(state.aktifTemel)}.brief.docx" download>Word</a><button class="tiny" id="briefKopya" type="button">Kopyala</button></div><div class="blogm">${mdHtml(v.brief.metin)}</div></details>` : '';
   if (!n) return ust + `<div class="yok"><span>Notlar henüz hazırlanmadı.</span></div>` + brief;
   const yap = (n.yapilacaklar || []).map(y => `<li>${esc(y.is)}${y.kim ? ` <span class="hint">— ${esc(y.kim)}</span>` : ''}${y.ne_zaman ? ` <span class="hint">(${esc(y.ne_zaman)})</span>` : ''}</li>`).join('');
@@ -5720,7 +5885,9 @@ function kisacaHtml(v){
   const tg = toplantiZamani({baslik: v.baslik, olusturma: v.olusturma}), ben = (window.BEN_AD || '').split(' ')[0].toLocaleLowerCase('tr');
   const zt = sn => sn != null ? `<button type="button" class="zt" data-sn="${sn}">${zamanK(sn)}</button>` : '';
   const kanit = x => x.alinti ? `<q class="kanit${x.alinti_dogru === false ? ' supheli' : ''}" title="${x.alinti_dogru === false ? 'Bu alıntı transkriptte birebir bulunamadı; kayda bakın' : 'Söylendiği an'}">${esc(x.alinti)}</q>` : '';
-  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarihsiz</em>' : '')}${zt(x.sn)}${kanit(x)}</li>`;
+  // Çok müşterili toplantı (2026-10-28, kisaca.musteri_ata): her maddede müşteri etiketi, üstte müşteriye göre süzme
+  const mk = (k.musteriler || []).length >= 2, mc = x => mk && x.musteri ? `<span class="kmus">${esc(x.musteri)}</span>` : '', dm = x => mk ? ` data-m="${esc(x.musteri || '')}"` : '';
+  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"${dm(x)}><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${mc(x)}${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarih yok</em>' : '')}${zt(x.sn)}${kanit(x)}</li>`;
   const bas = ad => ad.split(/\s+/).filter(Boolean).slice(0, 2).map(ilkHarf).join('');
   const benim = p => ben && p.ad.toLocaleLowerCase('tr').split(/\s+/)[0] === ben;
   const kisiHtml = (p, ki) => { const kalan = p.isler.filter(x => !x.bitti).length;
@@ -5736,12 +5903,13 @@ function kisacaHtml(v){
   const zincir = x => (x.zincir || []).map(z => `<span class="kzincir ${z.iliski}">${({degistirdi: 'Değiştirdi', geri_aldi: 'Geri aldı', teyit: 'Teyit etti'})[z.iliski]}: ${zl(z)} kararı · ${esc(z.aciklama || z.karar || '')}</span>`).join('')
     + (x.sonra || []).map(z => `<span class="kzincir sonra ${z.iliski}">${z.iliski === 'teyit' ? `${zl(z)} yeniden onaylandı` : `${zl(z)} ${z.iliski === 'geri_aldi' ? 'geri alındı' : 'değişti'}`}${z.aciklama ? ' · ' + esc(z.aciklama) : ''}</span>`).join('');
   const gecersiz = x => (x.sonra || []).some(z => z.iliski !== 'teyit');
-  const kararlar = (k.kararlar || []).length ? `<h4 style="margin-top:18px">Kararlar</h4><ul class="kliste">${k.kararlar.map(x => `<li class="${gecersiz(x) ? 'kgecersiz' : ''}"><span>${esc(x.karar)}</span>${x.kim ? `<em>${esc(x.kim)}</em>` : ''}${zt(x.sn)}${kanit(x)}${zincir(x)}</li>`).join('')}</ul>` : '';
+  const kararlar = (k.kararlar || []).length ? `<h4 style="margin-top:18px">Kararlar</h4><ul class="kliste">${k.kararlar.map(x => `<li class="${gecersiz(x) ? 'kgecersiz' : ''}"${dm(x)}><span>${esc(x.karar)}</span>${mc(x)}${x.kim ? `<em>${esc(x.kim)}</em>` : ''}${zt(x.sn)}${kanit(x)}${zincir(x)}</li>`).join('')}</ul>` : '';
   const isler = digerK.length || belirsiz ? `<h4 style="margin-top:18px">İşler</h4><div class="kkisiler">${digerK.map(([p, ki]) => kisiHtml(p, ki)).join('')}${belirsiz}</div>` : '';
-  const oneriler = (k.oneriler || []).length ? `<h4 style="margin-top:18px">Öneriler <span class="pr-gri">(karar değil)</span></h4><ul class="kliste soluk">${k.oneriler.map(x => `<li><span>${esc(x.oneri)}</span>${x.kim ? `<em>${esc(x.kim)}</em>` : ''}${zt(x.sn)}</li>`).join('')}</ul>` : '';
-  const sorular = (k.acik_sorular || []).length ? `<h4 style="margin-top:18px">Açık sorular</h4><ul class="kliste">${k.acik_sorular.map(x => `<li><span>${esc(x.soru)}</span>${x.kime ? `<em>${esc(x.kime)}</em>` : ''}${zt(x.sn)}</li>`).join('')}</ul>` : '';
+  const oneriler = (k.oneriler || []).length ? `<h4 style="margin-top:18px">Konuşulan fikirler</h4><ul class="kliste soluk">${k.oneriler.map(x => `<li${dm(x)}><span>${esc(x.oneri)}</span>${mc(x)}${x.kim ? `<em>${esc(x.kim)}</em>` : ''}${zt(x.sn)}</li>`).join('')}</ul>` : '';
+  const sorular = (k.acik_sorular || []).length ? `<h4 style="margin-top:18px">Açık sorular</h4><ul class="kliste">${k.acik_sorular.map(x => `<li${dm(x)}><span>${esc(x.soru)}</span>${mc(x)}${x.kime ? `<em>${esc(x.kime)}</em>` : ''}${zt(x.sn)}</li>`).join('')}</ul>` : '';
+  const musSuz = mk ? `<div class="kmusler" role="group" aria-label="Müşteriye göre süz"><button type="button" class="kmb on" data-km="">Hepsi</button>${k.musteriler.map(m => `<button type="button" class="kmb" data-km="${esc(m.ad)}">${esc(m.ad)} <small>${m.adet}</small></button>`).join('')}</div>` : '';
   return `<div class="ktop"><h4>Kısaca</h4><button class="tiny" id="kisacaKopya" type="button">Kopyala</button></div>${k.ozet.map(p => `<p class="kp">${esc(p)}</p>`).join('')}`
-    + benden + kararlar + isler + oneriler + sorular;
+    + musSuz + benden + kararlar + isler + oneriler + sorular;
 }
 /* Künye (2026-10-23, ChatGPT brifi Ortak 4): kaynak, ne zaman işlendi, son değişiklik, hangi yöntem/model, hangi Video Hub sürümü; salt okunur dışa aktarım bağlantıları */
 function kunyeHtml(v, temel){ const k = v.kunye; if (!k) return '';
@@ -5757,7 +5925,7 @@ function kunyeHtml(v, temel){ const k = v.kunye; if (!k) return '';
 function gorevDurumHtml(v){ if (!v.toplanti) return '';
   const a = v.gorev_atama || {}, ok = Object.entries(a).filter(([k]) => !k.startsWith('_')), yer = [...new Set(ok.map(([, x]) => x.yer))].join(' ve ');
   const ilk = ok.find(([, x]) => x.url);
-  if (ok.length) return `<p class="kgorev">✓ İşleriniz ${esc(yer || 'Asana')}’ya eklendi (${ok.length})${ilk ? ` · <a href="${esc(ilk[1].url)}" target="_blank" rel="noopener">Asana’da aç</a>` : ''}</p>`;
+  if (ok.length) return `<p class="kgorev">✓ İşleriniz eklendi (${ok.length})${ilk ? ` · <a href="${esc(ilk[1].url)}" target="_blank" rel="noopener">Asana’da aç</a>` : ''}</p>`;
   if (a._bekliyor) return `<p class="kgorev hata">${a._bekliyor.adet || ''} işiniz Asana bağlantısını bekliyor; bağlayınca kendiliğinden eklenir. <button type="button" class="tiny" data-asanabagla="1">Asana’yı bağla</button></p>`;
   if (a._hata) return `<p class="kgorev hata">Asana’ya eklenemedi: ${esc(a._hata.metin.slice(0, 120))} <button type="button" class="tiny" data-gorev="1">Yeniden dene</button></p>`;
   return `<p class="kgorev"><button type="button" class="tiny" data-gorev="1">İşlerimi Asana’ya ekle</button></p>`; }
@@ -5778,14 +5946,14 @@ function sinyalHtml(v){
   const kd = (y.kapsam || []).filter(x => x.kapsam_disi), saat = kd.reduce((t, x) => t + (x.saat || 0), 0);
   const as = y.amac_sonuc, kirik = (y.kirilmalar || []).filter(k => !k.onarildi);
   let h = '';
-  if (y.amac) h += `<div class="sgamac ${as ? as.karsilandi : ''}"><small>Amacın</small><b>“${esc(y.amac)}”</b>${as ? `<span class="sgsonuc">${({evet: 'Tuttu', kismen: 'Kısmen tuttu', hayir: 'Tutmadı'})[as.karsilandi] || ''}</span><p>${esc(as.kanit || '')}${as.eksik ? ` <i>Eksik: ${esc(as.eksik)}</i>` : ''}</p>${as.sonraki ? `<p class="sgsonraki">→ ${esc(as.sonraki)}</p>` : ''}` : ''}</div>`;
-  if (kd.length) h += `<div class="sgblok"><h5>Kapsam dışı ${kd.length} istek</h5>${kd.map(x => `<div class="sgsat">${z(x.zaman, x.sn)}<span><b>${esc(x.istek)}</b>${x.kim ? ` <em>${esc(x.kim)}</em>` : ''}<small>${esc(x.neden || '')}</small></span><span class="sgsaat">~${x.saat} sa</span></div>`).join('')}</div>`;
+  if (y.amac) h += `<div class="sgamac ${as ? as.karsilandi : ''}"><small>Amacınız</small><b>“${esc(y.amac)}”</b>${as ? `<span class="sgsonuc">${({evet: 'Tuttu', kismen: 'Kısmen tuttu', hayir: 'Tutmadı'})[as.karsilandi] || ''}</span><p>${esc(as.kanit || '')}${as.eksik ? ` <i>Eksik: ${esc(as.eksik)}</i>` : ''}</p>${as.sonraki ? `<p class="sgsonraki">→ ${esc(as.sonraki)}</p>` : ''}` : ''}</div>`;
+  if (kd.length) h += `<div class="sgblok"><h5>Kapsam dışı ${kd.length} istek</h5>${kd.map(x => `<div class="sgsat">${z(x.zaman, x.sn)}<span><b>${esc(x.istek)}</b>${x.kim ? ` <em>${esc(x.kim)}</em>` : ''}<small>${esc(x.neden || '')}</small></span></div>`).join('')}</div>`;
   if ((y.celiskiler || []).length) h += `<div class="sgblok kirmizi"><h5>Önceden şöyle denmişti</h5>${y.celiskiler.map(c => `<div class="sgsat">${z(c.zaman, c.sn)}<span><b>${esc(c.konu || '')}</b><small>Şimdi: “${esc(c.simdi || '')}”</small><small>Önce (${esc((c.once_toplanti || '').replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} · /, '').slice(0, 40))}): ${esc(c.once || '')}</small></span></div>`).join('')}</div>`;
-  if (kirik.length) h += `<div class="sgblok"><h5>İlişkide kırılma</h5>${kirik.map(k => `<div class="sgsat">${z(k.zaman, k.sn)}<span><b><button type="button" class="sgkisi" data-kisi="${esc(k.kim || '')}">${esc(k.kim || '')}</button>: ${esc(k.sinyal || '')}</b>${k.alinti ? `<small>“${esc(k.alinti)}”</small>` : ''}${k.onarim ? `<span class="sgonar">Bir sonraki görüşmede: ${esc(k.onarim)}</span>` : ''}</span></div>`).join('')}</div>`;
-  if ((y.tahminler || []).length) h += `<div class="sgblok"><h5>Tahminin</h5>${y.tahminler.map(t => `<div class="sgsat">${z(t.zaman, t.sn)}<span><b>${esc(t.tahmin)}</b><small>Güven %${Math.round((t.guven || 0.7) * 100)} · ${(() => { const g = new Date(toplantiZamani(v).getTime() + (t.bakilacak || 42) * 864e5); return g < new Date() ? 'sonucu belli olmalı; Toplantılar sayfasında “Tahminlerin”den işaretleyin' : g.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long'}) + ' gibi sorulacak'; })()}</small></span></div>`).join('')}</div>`;
-  return h ? `<h4>Sinyaller</h4>${h}` : `<h4>Sinyaller</h4><p class="hint" style="margin:0">Bu toplantıda kapsam dışı istek, çelişki, kırılma ya da tahmin yok.</p>`;
+  if (kirik.length) h += `<div class="sgblok"><h5>Gerilen anlar</h5>${kirik.map(k => `<div class="sgsat">${z(k.zaman, k.sn)}<span><b><button type="button" class="sgkisi" data-kisi="${esc(k.kim || '')}">${esc(k.kim || '')}</button>: ${esc(k.sinyal || '')}</b>${k.alinti ? `<small>“${esc(k.alinti)}”</small>` : ''}${k.onarim ? `<span class="sgonar">Bir sonraki görüşmede: ${esc(k.onarim)}</span>` : ''}</span></div>`).join('')}</div>`;
+  if ((y.tahminler || []).length) h += `<div class="sgblok"><h5>Tahmininiz</h5>${y.tahminler.map(t => `<div class="sgsat">${z(t.zaman, t.sn)}<span><b>${esc(t.tahmin)}</b><small>Güven %${Math.round((t.guven || 0.7) * 100)} · ${(() => { const g = new Date(toplantiZamani(v).getTime() + (t.bakilacak || 42) * 864e5); return g < new Date() ? 'sonucu belli olmalı; “Sizden beklenenler” penceresindeki “Tahminleriniz” sekmesinden işaretleyin' : g.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long'}) + ' gibi sorulacak'; })()}</small></span></div>`).join('')}</div>`;
+  return h ? `<h4>Dikkat</h4>${h}` : '';   // 2026-10-29 sadeleştirme: boşken hiç gösterilmez
 }
-const TSEKMELER = [['ozet', 'Özet'], ['danisman', 'Size özel'], ['transkript', 'Transkript']];   // v21: Notlar Özet'e, Tarifler Size özel'e katıldı
+const TSEKMELER = [['ozet', 'Özet'], ['danisman', 'Koçluk'], ['transkript', 'Transkript']];   // v21: Notlar Özet'e, Tarifler Size özel'e katıldı
 let tSekme = (() => { try{ const k = sessionStorage.getItem('tSekme') || 'ozet'; return ({notlar: 'ozet', tarifler: 'danisman'})[k] || k; }catch(e){ return 'ozet'; } })();
 function tSekmeSec(k){ tSekme = k; try{ sessionStorage.setItem('tSekme', k); }catch(e){} document.body.dataset.tsek = k; $$('#tSekBar button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === k));
   if (k === 'danisman') setTimeout(() => { const u = $('#dnUret'); if (u && !u.disabled) u.click(); }, 50); }   // sekmeyi açmak yeter; ayrıca "Notu hazırla"ya basılmaz
@@ -5804,6 +5972,9 @@ async function toplantiSayfasiKur(temel, v, d){
     <h2>${esc(konu)}</h2>
     <div class="tktarih">${esc(z.toLocaleDateString(((window.DIL || {}).locale || 'tr-TR'), {day:'numeric', month:'long', weekday:'long'}))} · ${esc(z.toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}))} · ${Math.max(1, Math.round((v.sure || 0) / 60))} dk</div>
     ${katil.length ? `<div class="tkkatil">${esc(katil.join(' · '))}</div>` : ''}
+    ${(v.kayit_bosluklari || []).length ? `<div class="tkbosluk" title="Bağlantı koptuğu için bu aralıklar kayıtta yok; öncesi ve sonrası tek toplantı olarak birleştirildi">Kayıtta olmayan: ${v.kayit_bosluklari.map(b => { const s = t => new Date(z.getTime() + t * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'}); return esc(s(b.bas) + '–' + s(b.bit)); }).join(', ')}</div>` : ''}
+    ${(() => { const S = (v.saglik?.maddeler || []).filter(m => (m.seviye === 'hata' || m.seviye === 'uyari') && m.kod !== 'bosluk');   // toplantı sağlık özeti (2026-10-28)
+      return S.length ? `<ul class="tksaglik">${S.map(m => `<li class="${m.seviye}">${esc(m.metin)}</li>`).join('')}</ul>` : ''; })()}
     <button class="tksor" id="tkSor" type="button"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Bu toplantıya sor</button>
     <div class="tkdugme" id="tkDugme"></div>`;
   sol.prepend(ku);
@@ -5847,7 +6018,7 @@ async function toplantiSayfasiKur(temel, v, d){
   // e-postayla giden toplantı notları Kısaca'yı tekrar ediyor: katlanmış gelir (takip e-postası ve brief de orada)
   const nk = $('#notlarKutu');
   if (nk){ nk.classList.add('kapali'); const ac = document.createElement('button'); ac.type = 'button'; ac.className = 'tnotac'; ac.dataset.sek = 'ozet';
-    ac.innerHTML = '<span><b>Toplantı notları</b><small>E-postayla giden sürüm, takip e-postası ve brief</small></span><i>›</i>';
+    ac.innerHTML = '<span><b>E-posta notları</b><small>Katılımcılara gidecek sürüm, takip e-postası ve brief</small></span><i>›</i>';
     ac.onclick = () => { const k = nk.classList.toggle('kapali'); ac.classList.toggle('acik', !k); }; nk.before(ac); }
   ata('#tSesli, #tSinyal, #kisacaKutu, #notlarimKutu, #tOzetEk, #notlarKutu, .tnotac', 'ozet'); ata('#danismanKutu, #tarifKutu', 'danisman');
   // Transkript sekmesi: arama satırı, kontrol notları, ad önerisi, metin
@@ -5862,14 +6033,14 @@ async function toplantiSayfasiKur(temel, v, d){
 function danismanHtml(v){
   const d = v.danisman;
   const kilit = '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
-  if (!d) return `<div class="dnbos"><div class="dnik">${kilit}</div><h4>Size özel</h4><p>Nerede daha iyi olabilirdin, ne iyi gitti, sırada ne var.</p><button class="sbtn blue" id="dnUret" type="button">Notu hazırla</button><small>Yalnızca sen görürsün</small></div>`;
+  if (!d) return `<div class="dnbos"><div class="dnik">${kilit}</div><h4>Koçluk</h4><p>Bu toplantıda neyi iyi yaptınız, neyi daha iyi yapabilirdiniz, bundan sonra neye dikkat etmeli.</p><button class="sbtn blue" id="dnUret" type="button">Koçluk notunu hazırla</button><small>Yalnızca siz görürsünüz</small></div>`;
   const z = (zm, sn) => sn != null ? `<button type="button" class="zt" data-sn="${sn}">${esc(zm)}</button>` : '';
   const kayit = JSON.parse((() => { try{ return localStorage.getItem('dnYapildi_' + state.aktifTemel) || '{}'; }catch(e){ return '{}'; } })());
-  return `<div class="dnust"><span class="dnkim">${kilit}Yalnızca senin için</span><span class="dnara"><a class="tiny" href="/indir/${encodeURIComponent(state.aktifTemel || '')}.danisman.docx" title="Ayrı kişisel belge; Drive'a gönderilmez">Word</a><button class="tiny" id="dnKopya" type="button">Kopyala</button><button class="tiny" id="dnYenile" type="button">Yeniden yaz</button></span></div>`
+  return `<div class="dnust"><span class="dnkim">${kilit}Yalnızca sizin için</span><span class="dnara"><a class="tiny" href="/indir/${encodeURIComponent(state.aktifTemel || '')}.danisman.docx" title="Ayrı kişisel belge; Drive'a gönderilmez">Word</a><button class="tiny" id="dnKopya" type="button">Kopyala</button><button class="tiny" id="dnYenile" type="button">Yeniden yaz</button></span></div>`
     + `<p class="dnana">${esc(d.ozet || '')}</p>`
     + (d.emin === false && d.siz ? `<p class="dnuyari">Konuşmacılar karışık ayrılmış; seni “${esc(d.siz)}” olarak tahmin ettim. Adları düzeltip yeniden yazdırırsan daha isabetli olur.</p>` : '')
     + (d.aksiyonlar?.length ? `<section class="dnbol"><h5>${(Date.now() - toplantiZamani({baslik: v.baslik, olusturma: v.olusturma}).getTime()) > 7 * 864e5 ? 'Yapılacaklar' : 'Bu hafta yap'}</h5><ul class="dnyap">${d.aksiyonlar.map((a, i) => `<li><label><input type="checkbox" data-i="${i}" ${kayit[i] ? 'checked' : ''}><span>${esc(a.ne)}</span></label>${a.ne_zaman ? `<em>${esc(a.ne_zaman)}</em>` : ''}</li>`).join('')}</ul></section>` : '')
-    + (d.anlar?.length ? `<section class="dnbol"><h5>Daha iyi olabilirdi</h5>${d.anlar.map(a => `<article class="dnan"><div class="dnne">${z(a.zaman, a.sn)}<span>${esc(a.ne_oldu)}</span></div><div class="dnoneri"><small>Şöyle deneyebilirdin</small><p>${esc(a.daha_iyi)}</p></div>${a.neden ? `<div class="dnneden">${esc(a.neden)}</div>` : ''}</article>`).join('')}</section>` : '')
+    + (d.anlar?.length ? `<section class="dnbol"><h5>Daha iyi olabilirdi</h5>${d.anlar.map(a => `<article class="dnan"><div class="dnne">${z(a.zaman, a.sn)}<span>${esc(a.ne_oldu)}</span></div><div class="dnoneri"><small>Şöyle diyebilirdiniz</small><p>${esc(a.daha_iyi)}</p></div>${a.neden ? `<div class="dnneden">${esc(a.neden)}</div>` : ''}</article>`).join('')}</section>` : '')
     + (d.guclu?.length ? `<section class="dnbol"><h5>İyi giden</h5><ul class="dniyi">${d.guclu.map(g => `<li><span class="tik">✓</span><span>${esc(g.ne)}</span>${z(g.zaman, g.sn)}</li>`).join('')}</ul></section>` : '')
     + (d.firsatlar?.length ? `<section class="dnbol"><h5>Fırsat</h5><div class="dnfr">${d.firsatlar.map(f => `<div><b>${esc(f.baslik)}</b><p>${esc(f.neden)}</p>${(f.adimlar || (f.nasil ? [f.nasil] : [])).map(a => `<p class="adim">→ ${esc(a)}</p>`).join('')}</div>`).join('')}</div></section>` : '')
     + (d.dersler?.length ? `<section class="dnbol"><h5>Ders</h5>${d.dersler.map(x => `<p class="dnders"><b>${esc(x.baslik)}.</b> ${esc(x.ders)}</p>`).join('')}</section>` : '')
@@ -5882,7 +6053,7 @@ function danismanBagla(temel, v){
     await fetch('/api/danisman/' + encodeURIComponent(temel), {method:'POST'});
     const zt = setInterval(async () => { if (state.aktifTemel !== temel){ clearInterval(zt); return; } let d; try{ d = await (await fetch('/api/danisman-durum/' + encodeURIComponent(temel))).json(); }catch(e){ return; }
       if (d.calisiyor) return; clearInterval(zt); if (d.hata){ toast('Hazırlanamadı: ' + d.hata); }
-      if (d.danisman) v.danisman = d.danisman; kutu.innerHTML = danismanHtml(v); danismanBagla(temel, v); if (d.danisman && !d.hata) toast('Size özel not hazır · Word belgesine de eklendi'); }, 3000); };
+      if (d.danisman) v.danisman = d.danisman; kutu.innerHTML = danismanHtml(v); danismanBagla(temel, v); if (d.danisman && !d.hata) toast('Koçluk notu hazır'); }, 3000); };
   $('#dnUret')?.addEventListener('click', uret); $('#dnYenile')?.addEventListener('click', uret);
   kutu.querySelectorAll('.dnyap input').forEach(c => c.onchange = () => { let k = {}; try{ k = JSON.parse(localStorage.getItem('dnYapildi_' + temel) || '{}'); }catch(e){} k[c.dataset.i] = c.checked; try{ localStorage.setItem('dnYapildi_' + temel, JSON.stringify(k)); }catch(e){} c.closest('li').classList.toggle('bitti', c.checked); });
   kutu.querySelectorAll('.dnyap input:checked').forEach(c => c.closest('li').classList.add('bitti'));
@@ -5912,9 +6083,9 @@ function notlarBagla(temel, v){
     catch(e){ toast('Siteye ulaşılamadı'); } te.disabled = false; te.textContent = 'Takip e-postası'; };
   const bk = $('#briefKopya'); if (bk) bk.onclick = () => kopyalaBicimli(v.brief?.metin || '', 'Brief kopyalandı');
   const by = $('#briefYap'); if (by) by.onclick = async () => { by.disabled = true; by.textContent = 'Hazırlanıyor…';
-    const r = await fetch('/api/brief/' + encodeURIComponent(temel), {method:'POST'}); if (!r.ok){ const j = await r.json(); toast(j.hata || 'Olmadı'); by.disabled = false; return; }
+    const r = await fetch('/api/brief/' + encodeURIComponent(temel), {method:'POST'}); if (!r.ok){ const j = await r.json(); toast(j.hata || 'Brief hazırlanamadı'); by.disabled = false; by.textContent = 'Brief çıkar'; return; }
     const t = setInterval(async () => { let d; try{ d = await (await fetch('/api/brief-durum/' + encodeURIComponent(temel))).json(); }catch(e){ return; }
-      if (!d.calisiyor){ clearInterval(t); if (d.hata) toast('Brief hazırlanamadı: ' + d.hata); else { v.brief = d.brief; $('#notlarKutu').innerHTML = notlarHtml(v); notlarBagla(temel, v); $('#notlarKutu details.brief')?.setAttribute('open', ''); toast('Brief hazır'); } } }, 3000); };
+      if (!d.calisiyor){ clearInterval(t); if (d.hata){ toast('Brief hazırlanamadı: ' + d.hata); by.disabled = false; by.textContent = 'Brief çıkar'; } else { v.brief = d.brief; $('#notlarKutu').innerHTML = notlarHtml(v); notlarBagla(temel, v); $('#notlarKutu details.brief')?.setAttribute('open', ''); toast('Brief hazır'); } } }, 3000); };
   const k = $('#notKopyala'); if (k) k.onclick = async () => { const r = await fetch('/api/notlar/' + encodeURIComponent(temel), {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}); const j = await r.json(); if (j.metin) kopyala(j.metin, 'Notlar kopyalandı'); };
   const b = $('#notGonder'); if (b) b.onclick = async () => { b.disabled = true; const vardi = !!v.notlar; b.textContent = vardi ? 'Gönderiliyor…' : 'Hazırlanıyor…'; if (!vardi) toast('Notlar hazırlanıyor; birkaç dakika sürebilir');
     try{ const r = await fetch('/api/notlar/' + encodeURIComponent(temel), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({gonder: vardi})}); const j = await r.json();
@@ -5957,9 +6128,9 @@ async function ayarlarAc(){
   $$('#ayDil button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === ((window.DIL || {}).dil || 'tr')));
   $$('#ayDil button').forEach(b => b.onclick = () => { if (window.DIL) DIL.ayarla(b.dataset.v); });
   $('#ayModel').textContent = (a.ozet_hazir ? `Özet: ${a.ozet_model}` : `Özet: ${a.ozet_model} (hazır değil)`) + (a.ceviri_model ? ` · Çeviri: ${a.ceviri_model}` : '');
-  const adres = `http://${a.ip}:${a.port}`; $('#ayAdres').textContent = adres; $('#ayAdresRow').classList.toggle('hidden', !a.ag_paylasimi);
+  const adres = `http://${a.ip}:${location.port || a.port}`; $('#ayAdres').textContent = adres; $('#ayAdresRow').classList.toggle('hidden', !a.ag_paylasimi);
   $('#ayAdresKopyala').onclick = () => kopyala(adres, 'Adres kopyalandı');
-  const telefonCiz = ag => { $('#ayUygulamaNot').textContent = ag ? `iPhone’da Safari ile ${adres} adresini açın, Paylaş düğmesine basın ve “Ana Ekrana Ekle”yi seçin. Studio ana ekranda uygulama gibi açılır; telefon ve Mac aynı Wi‑Fi’da olmalı.` : 'Önce yukarıdaki “Aynı ağdaki cihazlara aç” ayarını açın; sonra adresi iPhone’da Safari ile açıp “Ana Ekrana Ekle”yi seçin.';
+  const telefonCiz = ag => { $('#ayUygulamaNot').textContent = ag ? `iPhone’da Safari ile ${adres} adresini açın, Paylaş düğmesine basın ve “Ana Ekrana Ekle”yi seçin. ${URUN_AD} ana ekranda uygulama gibi açılır; telefon ve Mac aynı Wi‑Fi’da olmalı.` : 'Önce yukarıdaki “Aynı ağdaki cihazlara aç” ayarını açın; sonra adresi iPhone’da Safari ile açıp “Ana Ekrana Ekle”yi seçin.';
     $('#ayTelefonKopyala').classList.toggle('hidden', !ag); };
   { const tek = `http://${a.ip}:8767/tek`;      // Ghost'un telefon sayfası (24 Ekim): günün sıradaki gönderisi, Kopyala ve X'te paylaş
     $('#ayGhTekNot').textContent = a.ag_paylasimi ? `iPhone’da Safari ile ${tek} adresini açıp Ana Ekrana Ekle’yi seçin: günün sıradaki gönderisi tek dokunuşla kopyalanır ya da X’te açılır.` : 'Önce “Aynı ağdaki cihazlara aç” ayarını açın.';
@@ -6028,7 +6199,7 @@ async function claudeKullanimCiz(){
   let d; try{ d = await (await fetch('/api/claude/kullanim?gun=7')).json(); }catch(e){ return; }
   const t = d.toplam || {}, bin = n => n >= 1000 ? (n / 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {maximumFractionDigits: 0}) + ' bin' : String(n);
   satir.classList.toggle('hidden', !t.istek && !d.sinir);
-  const isler = Object.entries(d.isler || {});
+  const isler = Object.entries(d.isler || {}).sort((a, b) => (b[1].istek || 0) - (a[1].istek || 0));   // sunucu sözlüğü abece sırasıyla geliyor
   $('#ayClaudeKullanimNot').innerHTML = (d.sinir ? `<span style="color:var(--orange)">Abonelik kullanım sınırına ulaşıldı; ${new Date(d.sinir.bitis * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'})} sonrasına kadar bilgisayardaki model kullanılıyor.</span><br>` : '')
     + `Son 7 günde ${t.istek || 0} istek · bugün ${t.bugun || 0}` + (isler.length ? ` · en çok: ${esc(isler.slice(0, 3).map(([k, v]) => `${k} (${v.istek})`).join(', '))}` : '')
     + (isler.length ? `<details style="margin-top:6px"><summary>İş iş göster</summary><table class="kultab">${isler.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v.istek} istek</td><td>${bin(v.giris + v.cikis)} birim</td></tr>`).join('')}</table></details>` : '');
@@ -6175,8 +6346,8 @@ window.addEventListener('popstate', hashAc);
 
 /* ---- Studio v20 (2026-10-22): tanıtım filmindeki "One link. Everything." şeması. Çıktılar videoya noktalı çizgilerle bağlı düğümler; düğüme tıklamak
    mevcut çipi (#sonuc .chipb) tıklar, böylece bütün iş mantığı aynı kalır. Ayar satırları "Ayrıntılı ayarlar" içinde kapalı durur. ---- */
-const ST_DUGUM = {tx: ['Transkript', 'Kim, ne zaman, ne dedi.'], oz: ['Özet', 'Uzun lafın kısası.'],
-  alt: ['Düzenlenmiş video', 'Altyazısı basılmış, paylaşmaya hazır.'], db: ['Dublaj', 'Aynı ses, başka dil.'], dl: ['Videoyu indir', 'Dosyası sizde kalsın.']};
+const ST_DUGUM = {tx: ['Transkript', 'Konuşmanın tamamı, konuşanların adlarıyla.'], oz: ['Özet', 'Ana fikirler, öne çıkanlar ve bölümler.'],
+  alt: ['Düzenlenmiş video', 'Altyazıları üzerinde, paylaşmaya hazır.'], db: ['Dublaj', 'Başka dilde, konuşanın kendi sesiyle.'], dl: ['Videoyu indir', 'Video dosyası bilgisayarınıza iner.']};
 const ST_IK = {tx: 'M5 6h14M5 12h14M5 18h9', oz: 'M5 4h14v16H5zM8.5 9h7M8.5 13h4.5', alt: 'M3 6h18v12H3zM7 14h4M13 14h4', db: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3', dl: 'M12 4v11M7 10l5 5 5-5M5 20h14'};
 // 23 Ekim (ChatGPT brifi, Studio 4): işe göre hazır çıktı seçimleri; tek tık, zorunlu değil, sonra tek tek değiştirilebilir
 // 2026-10-25 (kullanıcı: "menüdeki yazılar anlaşılmıyor"): kullanım adı yerine ne çıkacağı yazılır
@@ -6213,10 +6384,10 @@ function stSonraKur(temel, v){
   $('#stSonra')?.remove(); const tb = $('#doc .toolbar'); if (!tb) return;
   const kaynakVar = !!v.kaynak_video || /^https?:/.test(v.link || ''), dbDil = store.get('dbDil', 'en'), tas = (v.paylasim?.taslaklar || []).filter(t => !t.gizli && !t.paylasildi).length;
   const k = [];
-  if (kaynakVar) k.push(['alt', 'Düzenlenmiş video', 'Altyazısı basılmış, paylaşmaya hazır.']);
-  if (kaynakVar) k.push(['db', `${dilAdi(dbDil)} dublaj`, 'Aynı ses, başka dil.']);
-  if (kaynakVar && v.ozet_hazir !== false) k.push(['klip', 'Kısa videolar', v.klipler?.length ? `${v.klipler.length} an hazır.` : 'En güçlü anlar, dikey.']);
-  if (/^https?:/.test(v.link || '')) k.push(['dl', 'Videoyu indir', 'Dosyası sizde kalsın.']);
+  if (kaynakVar) k.push(['alt', 'Düzenlenmiş video', 'Altyazıları üzerinde, paylaşmaya hazır.']);
+  if (kaynakVar) k.push(['db', `${dilAdi(dbDil)} dublaj`, 'Başka dilde, konuşanın kendi sesiyle.']);
+  if (kaynakVar && v.ozet_hazir !== false) k.push(['klip', 'Kısa videolar', v.klipler?.length ? `${v.klipler.length} an hazır.` : 'En güçlü anlardan dikey kısa videolar.']);
+  if (/^https?:/.test(v.link || '')) k.push(['dl', 'Videoyu indir', 'Video dosyası bilgisayarınıza iner.']);
   k.push(['sen', 'Senaryo belgesi', v.senaryo ? 'Hazır. Sahne sahne.' : 'Sahne sahne, ekrandaki yazılarla.']);
   const d = document.createElement('div'); d.className = 'st-sonra'; d.id = 'stSonra';
   d.innerHTML = `<h4>Sonraki adımlar</h4><div class="sl">${k.map(([a, t, s]) => `<button type="button" data-a="${a}">${esc(t)}<small>${esc(s)}</small></button>`).join('')}`
@@ -6324,7 +6495,7 @@ function stCizgi(){
       ch('cv').remove();
       ch('alt').insertAdjacentHTML('afterend', '<div class="row alts alt-only" id="altDilRow"><div class="l">Altyazı dili</div><button class="sbtn" type="button">Orijinal ▾</button></div>');
       ch('db').insertAdjacentHTML('afterend', '<div class="row alts db-only" id="dbDilRow"><div class="l">Dublaj dili</div><button class="sbtn" type="button">İngilizce ▾</button></div>');
-      ch('db').innerHTML = '<span class="ln">Dublaj<span class="ack">Aynı ses, başka dil.</span></span>'; ch('alt').innerHTML = '<span class="ln">Düzenlenmiş video<span class="ack">Altyazısı basılmış, paylaşmaya hazır.</span></span>'; duzenSatirlari(); islemUygula();
+      ch('db').innerHTML = '<span class="ln">Dublaj<span class="ack">Başka dilde, konuşanın kendi sesiyle.</span></span>'; ch('alt').innerHTML = '<span class="ln">Düzenlenmiş video<span class="ack">Altyazıları üzerinde, paylaşmaya hazır.</span></span>'; duzenSatirlari(); islemUygula();
       ch('dl').insertAdjacentHTML('afterend', '<div class="row alts dl-only" id="dlKaliteRow"><div class="l">Kalite</div><div class="seg mini"></div></div>');
       altSatirlar(); new MutationObserver(() => { altSatirlar(); inceAyarlar(); }).observe($('#preview'), {childList: true}); dbOnizlemeKur(); inceAyarlar();
       $('#adv').remove(); $('#moreBtn')?.remove();
@@ -6346,9 +6517,9 @@ function stCizgi(){
     if (Object.keys(state.jobs).length && !state.timer){ state.timer = setInterval(pollJobs, 1500); pollJobs(); } }catch(e){}
 })();
 </script>
-<script src="/static/studio_ek.js?v=25"></script>
-<script src="/static/meet_ek.js?v=13"></script>
+<script src="/static/studio_ek.js?v=31"></script>
+<script src="/static/meet_ek.js?v=24"></script>
 <script src="/static/teslim_ek.js?v=2"></script>
-<script src="/static/takip_ek.js?v=1"></script>
+<script src="/static/takip_ek.js?v=2"></script>
 </body>
 </html>

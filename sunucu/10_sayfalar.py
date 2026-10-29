@@ -4,7 +4,7 @@
 # Content (2026-10-23), Couple (2026-10-24) ve PT (2026-10-25) kendi modülleriyle kaydolur; modül yoksa o ürün bu kurulumda kapalıdır.
 # Meet ve Ghost sunucu parçalarıyla gelir: parça dosyası yoksa kapalı. Kurulu ürünler sayfaya `data-urunler` ile verilir (menü ona göre).
 URUNLER_KURULU = {"transcript"}
-for _mod, _kod in (("content_site", "content"), ("couple_site", "atolye"), ("pt_site", "pt")):
+for _mod, _kod in (("content_site", "content"), ("couple_site", "atolye"), ("pt_site", "pt")):   # Content 27 Ekim kapatılıp aynı gün geri açıldı
     try:
         globals()[_mod] = __import__(_mod)
         globals()[_mod].kaydet(app)
@@ -80,6 +80,10 @@ def ana():
         html = re.sub(r'<script src="/static/meet_ek\.js[^"]*"></script>\n?', "", html)
     if sayfa == "index.html" and "atolye" not in URUNLER_KURULU:      # teslim kontrolü uçları couple_site'ta; Couple modülleri yoksa eki istenmez
         html = re.sub(r'<script src="/static/teslim_ek\.js[^"]*"></script>\n?', "", html)
+    if sayfa == "index.html":                                         # her ek yalnız kendi ürününde çalışır; ötekiler onu hiç indirmesin (2026-10-29)
+        for ek, sahip in (("meet_ek", "note"), ("takip_ek", "note"), ("studio_ek", "transcript"), ("teslim_ek", "transcript")):
+            if urun != sahip:
+                html = re.sub(rf'<script src="/static/{ek}\.js[^"]*"></script>\n?', "", html)
     if sayfa == "index.html" and urun != "transcript" and (Path(app.static_folder) / f"{urun}.webmanifest").exists():
         # telefonda ana ekrana eklenince ürünün kendi adı ve simgesi (2026-10-25; Meet "Studio" adı ve simgesiyle ekleniyordu)
         ad = json.loads((Path(app.static_folder) / f"{urun}.webmanifest").read_text(encoding="utf-8")).get("short_name") or urun

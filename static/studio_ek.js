@@ -313,7 +313,9 @@ popover = function(anchor, items, opts){   // eslint-disable-line no-global-assi
 function sonrakiEkle(temel, v){
   const sl = $('#stSonra .sl'); if (!sl || sl.querySelector('[data-st]')) return;
   const ek = [['yp', 'Yayın paketi', v.yayin ? 'Hazır. Başlık, açıklama, kapak, Shorts.' : 'Başlık, açıklama, bölümler, kapak, Shorts.'], ['kr', 'Metinden kurgu', 'Paragrafları sırala, çıkar, önizle.']];
-  if (/^https?:/.test(v.link || '') && document.documentElement.dataset.misafir !== '1') ek.push(['ct', 'Kendi versiyonunu yap', 'Content’te bu videonun akımıyla.']);
+  // Content 28 Ekim'den beri video üretmiyor, "bu video nasıl yapılmış?" sorusunu yanıtlıyor; kart yalnız Content kuruluysa
+  const contentVar = (document.documentElement.dataset.urunler || 'content').split(',').includes('content');
+  if (contentVar && /^https?:/.test(v.link || '') && document.documentElement.dataset.misafir !== '1') ek.push(['ct', 'Nasıl yapılmış?', 'Kullanılan araçlar ve adım adım yapılışı (Content).']);
   ek.forEach(([a, t, s]) => { const b = document.createElement('button'); b.type = 'button'; b.dataset.st = a; b.innerHTML = `${esc(t)}<small>${esc(s)}</small>`; sl.appendChild(b);
     b.onclick = () => { if (a === 'yp'){ sekmeSec('yayin', true); if (!v.yayin) yayinBaslat(temel); }
       else if (a === 'kr') kurguAc(); else window.open(port(8769) + '?link=' + encodeURIComponent(v.link) + '&istek=', '_blank'); }; });
@@ -425,7 +427,15 @@ function okumaKur(temel, v, opts){
 document.addEventListener('click', e => { if (e.target.closest('#tamMetin')) sekmeSec('metin', true); }, true);
 
 // yapışkan sekme çubuğu üst menünün altında dursun: menünün gerçek yüksekliği ölçülür (telefonda iki satır; --navh değişkeni bunu tutmuyor)
-const ustOlc = () => { const n = $('.nav') || $('header'); if (n) document.documentElement.style.setProperty('--st-ust', Math.round(n.getBoundingClientRect().bottom) + 'px'); };
+const ustOlc = () => { const n = $('.nav') || $('header'); if (!n) return;
+  const yapisik = /sticky|fixed/.test(getComputedStyle(n).position);    // telefonda menü artık kayıyor (2026-10-29): çubuk en üste yapışır
+  document.documentElement.style.setProperty('--st-ust', (yapisik ? Math.round(n.getBoundingClientRect().bottom) : 0) + 'px'); };
+// telefonda yüzen "Sor", araç çubuğu ekrandayken onun üstüne biniyordu: çubuk görünürken gizlenir
+try{ const aracIzle = new IntersectionObserver(es => es.forEach(e => document.body.classList.toggle('st-arac-gorunur', e.isIntersecting)));
+  // ayar panellerindeki örnek videolar (altyazı, dublaj, arka plan) gizliyken açılışta 15 dosya indiriliyordu: yalnız görünür olunca yüklenir
+  const ornekIzle = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const v = e.target; ornekIzle.unobserve(v); v.preload = 'metadata'; v.load(); }));
+  let izlenen = null; setInterval(() => { const t = $('#doc .toolbar'); if (t && t !== izlenen){ izlenen && aracIzle.unobserve(izlenen); aracIzle.observe(izlenen = t); }
+    $$('.altcar video[preload="none"]').forEach(v => { if (!v._izl){ v._izl = 1; ornekIzle.observe(v); } }); }, 1500); }catch(e){}
 if ($('.nav') || $('header')){ ustOlc(); try{ new ResizeObserver(ustOlc).observe($('.nav') || $('header')); }catch(e){} window.addEventListener('resize', ustOlc); }
 
 /* ---------------------------------------------------------------- 10) ana sayfa: çift birincil düğme ve tekrar eden çıktı satırları */
@@ -505,16 +515,19 @@ secimBasla = function(v, tur){   // eslint-disable-line no-global-assign
   }catch(e){ console.warn(e); } }
   return r;
 };
-async function kesDolguKur(){
+async function kesDolguKur(tekrar){
   let b = $('#kesDolguBtn'); if (!b){ b = document.createElement('button'); b.type = 'button'; b.className = 'sbtn'; b.id = 'kesDolguBtn'; $('#kesSecenek').before(b);
-    b.onclick = () => { $('#kesDolgu').checked = !$('#kesDolgu').checked; secimCiz(); dolguYaz(); }; }
-  b.hidden = true; const temel = aktif();
-  try{ const d = await json('/api/dolgu/' + encodeURIComponent(temel)); if (aktif() !== temel) return;
-    const a = d['aralıklar'] || []; if (!d.kelime_zamani_var || !a.length) return;
-    b.dataset.n = a.length; b.dataset.sn = Math.round(a.reduce((t, x) => t + (x[1] - x[0]), 0)); b.hidden = false; dolguYaz(); }catch(e){}
+    b.onclick = () => { if (b.dataset.arama) return; $('#kesDolgu').checked = !$('#kesDolgu').checked; secimCiz(); dolguYaz(); }; }
+  const temel = aktif(); if (!tekrar) b.hidden = true;
+  try{ const d = await json('/api/dolgu/' + encodeURIComponent(temel) + (tekrar ? '?tara=0' : '')); if (aktif() !== temel || state.secim !== 'kes') return;
+    const a = d['aralıklar'] || []; if (!d.kelime_zamani_var){ b.hidden = true; return; }
+    b.dataset.n = a.length; const sn = a.reduce((t, x) => t + (x[1] - x[0]), 0); b.dataset.sn = sn < 10 ? sn.toFixed(1).replace('.', ',') : Math.round(sn);
+    if (d.taraniyor){ b.dataset.arama = '1'; b.hidden = false; dolguYaz(); setTimeout(() => kesDolguKur(true), 4000); return; }
+    delete b.dataset.arama; b.hidden = !a.length; dolguYaz(); }catch(e){}
 }
 function dolguYaz(){ const b = $('#kesDolguBtn'); if (!b) return; const on = $('#kesDolgu').checked;
-  b.setAttribute('aria-pressed', on); b.classList.toggle('blue', false); b.textContent = (on ? '✓ ' : '') + `Duraksamalar (${b.dataset.n}) · ${b.dataset.sn} sn`; b.title = on ? 'Duraksamalar videodan çıkarılacak; geri almak için tıklayın' : 'ee, ıı, hmm gibi duraksamaları videodan çıkar'; }
+  if (b.dataset.arama){ b.disabled = true; b.setAttribute('aria-pressed', false); b.textContent = 'Duraksamalar aranıyor…'; b.title = 'ee, ıı, hmm gibi sesler için konuşma yeniden dinleniyor'; return; }
+  b.disabled = false; b.setAttribute('aria-pressed', on); b.classList.toggle('blue', false); b.textContent = (on ? '✓ ' : '') + `Duraksamalar (${b.dataset.n}) · ${b.dataset.sn} sn`; b.title = on ? 'Duraksamalar videodan çıkarılacak; geri almak için tıklayın' : 'ee, ıı, hmm gibi duraksamaları videodan çıkar'; }
 const _secimCiz = secimCiz;
 secimCiz = function(){ const r = _secimCiz(); try{ if (state.secim === 'kes') dolguYaz(); }catch(e){} return r; };   // eslint-disable-line no-global-assign
 /* ---------------------------------------------------------------- 14) ana sayfa: kurulum denetimi ve son çalışmalar (2026-10-27)
@@ -579,11 +592,21 @@ stSonraKur = function(temel, v){ _stSonraKur(temel, v); try{ sonrakiEkle(temel, 
 const _altDlgAc = altDlgAc;
 altDlgAc = function(temel, v){ _altDlgAc(temel, v); try{ altOnizleKur(); }catch(e){} };   // eslint-disable-line no-global-assign
 const _sistemCiz = sistemCiz;
-sistemCiz = async function(){ const r = await _sistemCiz(); try{ await gelisimCiz(); await davetCiz(); }catch(e){} return r; };   // eslint-disable-line no-global-assign
+sistemCiz = async function(){ const r = await _sistemCiz(); try{ await gelisimCiz(); await davetCiz(); }catch(e){} gelismisKur(); return r; };   // eslint-disable-line no-global-assign
+// Ayarlar: "Sistem" ve "Studio gelişimi" tanı bölümleri günlük kullanıcının önünde durmasın; kaldırılmadı, en alttaki "Gelişmiş"te katlı (2026-10-29)
+function gelismisKur(){
+  const s = $('#aySistem'), dlg = s?.closest('dialog'); if (!s || !dlg) return;
+  let d = $('#stGelismis');
+  if (!d){ d = document.createElement('details'); d.id = 'stGelismis';
+    d.innerHTML = '<summary><span>Gelişmiş</span><small>Sistem durumu, yedekler, araç güncellemeleri</small></summary>';
+    (dlg.querySelector(':scope > .bt') ? dlg.querySelector(':scope > .bt').before(d) : dlg.appendChild(d)); }
+  const h = s.previousElementSibling?.classList.contains('ayh') ? s.previousElementSibling : null;
+  [h, s, $('#stGelisim')].forEach(e => { if (e && e.parentElement !== d) d.appendChild(e); });
+}
 const _libGoster = libGoster;
 libGoster = function(tab, kaydir){ _libGoster(tab, kaydir); try{ $('#stSuz')?.classList.toggle('hidden', tab !== 'tx'); $('#stSahne')?.classList.toggle('hidden', tab !== 'tx' || !SZ.sahne); if (tab === 'tx' && SZ.sahne) $('#hist').classList.add('hidden'); if (tab === 'dl') temizlikKur(); }catch(e){} };   // eslint-disable-line no-global-assign
 
-const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=16'; document.head.appendChild(css);
+const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=18'; document.head.appendChild(css);
 const bekle = setInterval(() => { if ($('#hist')){ clearInterval(bekle); suzgecKur(); } }, 300);
 if ($('#dls')) new MutationObserver(() => temizlikKur()).observe($('#dls'), {childList: true});
 if ($('#aySistem') && $('#aySistem').textContent.trim() && !$('#aySistem').textContent.includes('Yükleniyor')) gelisimCiz();

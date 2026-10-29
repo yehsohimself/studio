@@ -6,7 +6,7 @@ Katmanlar:
   birim  : saf hesaplar (atölye kuralları, süper sayımı, kalıp yakalama, marka brief'i, Radar tohumları, viral puanı, paylaşım planı).
   canli  : çalışan sitenin uçları 200 ve geçerli JSON döner mi.
   tam    : macOS'in Türkçe sesiyle (Yelda) kısa ses üretilir, transkript.py ile yazıya dökülür, Türkçe kelimeler aranır (~1-2 dk).
-  studio : aynı sentetik örnek VİDEOyla Studio zinciri: yazıya dökme → YouTube altyazısı kuralları → altyazılı video → klip (her gece, ~15 sn).
+  studio : aynı sentetik örnek VİDEOyla Studio zinciri: yazıya dökme → YouTube altyazısı kuralları → altyazılı video → klip → metinden kesme (her gece, ~20 sn).
   studio_dublaj : studio + 8 sn'lik dublaj önizlemesi, ses var mı (haftada bir; ağır model).
 yeniden_baslat.py yeniden başlatmadan ÖNCE hizli+birim çalıştırır; başarısızsa siteyi yeniden başlatmaz (bozuk kod devreye girmez),
 sonra canli. Sonuç: kayitlar/.duman.json. Elle: python duman_testi.py [hizli|birim|canli|tam|studio|studio_dublaj|meet|meet_kisaca|hepsi]
@@ -36,7 +36,7 @@ def hizli():
         r = subprocess.run([PY, "-m", "py_compile", str(f)], capture_output=True, text=True)
         if r.returncode:
             hatalar.append(f"{f.name}: derlenmiyor: {r.stderr.strip().splitlines()[-1][:200]}")
-    _adlar = [a.strip() for a in "atolye, atolye_bilgi, atolye_kaynak, atolye_analiz, paylasim, claude_yaz, ozet, marka, yedek, ghost_gelisim, ghost_hikaye, ghost_yanit, couple, couple_site, couple_kaynak, couple_takip, couple_video, studio_duzelt, yayin, sahne_dizin, studio_gelisim, pt, pt_beslenme, pt_hareket, pt_rota, pt_site, pt_sohbet, pt_saglik, pt_yemek, pt_form, pt_kanit, pt_push, pt_koc, pt_kart, pt_gorsel, pt_storyboard, pt_youtube, pt_ses, pt_oyun, pt_kitaplik, pt_hizli, pt_anatomi, pt_programlar".split(",") if a.strip()]
+    _adlar = [a.strip() for a in "atolye, atolye_bilgi, atolye_kaynak, atolye_analiz, paylasim, claude_yaz, ozet, marka, yedek, ghost_gelisim, ghost_hikaye, ghost_yanit, couple, couple_site, couple_kaynak, couple_takip, couple_video, studio_duzelt, yayin, sahne_dizin, studio_gelisim, pt, pt_beslenme, pt_hareket, pt_rota, pt_site, pt_sohbet, pt_saglik, pt_yemek, pt_form, pt_kanit, pt_push, pt_koc, pt_kart, pt_gorsel, pt_storyboard, pt_youtube, pt_ses, pt_oyun, pt_kitaplik, pt_hizli, pt_anatomi, pt_programlar, pt_oneri, pt_kisayol, pt_bls".split(",") if a.strip()]
     _adlar = [a for a in _adlar if (KLASOR / f"{a}.py").exists()]            # kesilen depoda bazı ürünler yok (2026-10-25)
     modul = "import " + ", ".join(_adlar)
     r = subprocess.run([PY, "-c", f"import sys; sys.path.insert(0, {str(KLASOR)!r}); {modul}"], capture_output=True, text=True, cwd=str(KLASOR))
@@ -467,6 +467,20 @@ def studio(dublaj_da=False):
                 hatalar.append(f"studio {etiket}: oluşmadı ({(son[-1] if son else 'çıktı yok')[:120]})")
             elif abs(_sure(cikti) - beklenen) > 1.2:
                 hatalar.append(f"studio {etiket}: süre {_sure(cikti):.1f} sn, beklenen {beklenen:.1f} sn")
+        seg = veri["segmentler"]                          # metinden kesme: ortadaki cümle çıkarılır, kenarlar sese oturtulmalı
+        if len(seg) >= 3:
+            tut = [(0.0, seg[0]["bit"] + 0.05), (seg[-1]["bas"] - 0.05, sure)]
+            cikti = d / "kesim.mp4"
+            r = subprocess.run([PY, "-u", str(KLASOR / "yakma.py"), str(js), "--video", str(video), "--cikti", str(cikti), "--altyazisiz",
+                                "--tut", ",".join(f"{a:.2f}-{b:.2f}" for a, b in tut)], capture_output=True, text=True, timeout=600, cwd=str(KLASOR))
+            beklenen = sum(b - a for a, b in tut)
+            if not cikti.exists():
+                son = [x for x in (r.stdout + r.stderr).strip().splitlines() if x.strip()]
+                hatalar.append(f"studio kesim: oluşmadı ({(son[-1] if son else 'çıktı yok')[:120]})")
+            elif abs(_sure(cikti) - beklenen) > 1.2:
+                hatalar.append(f"studio kesim: süre {_sure(cikti):.1f} sn, beklenen {beklenen:.1f} sn")
+            elif "sese oturtuldu" not in r.stdout:
+                hatalar.append("studio kesim: kesim kenarları sese oturtulmadı")
         if dublaj_da:
             veri["veri"]["ceviriler"] = {"en": {"segmentler": ["This is a short test sentence for the dubbing check."] * len(veri["segmentler"]),
                                                 "ozet": {}, "model": "duman", "tarih": time.strftime("%Y-%m-%d")}}

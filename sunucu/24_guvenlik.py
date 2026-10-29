@@ -116,6 +116,16 @@ def _sikistir(yanit):
     return yanit
 
 
+# Sıkıştırma EN SON çalışmalı (2026-10-29 bulundu): Flask after_request işlevlerini kayıt sırasının tersiyle çalıştırır; bu parça 22/23'ten sonra
+# yüklendiği için sıkıştırma onlardan ÖNCE çalışıyordu. Tarayıcı gzip istediğinde yanıtı okuyup yeniden yazan süzgeçler (davetliye yalnız kendi
+# kayıtları, sır maskeleme, davet listesine Meet bağlantıları) sıkıştırılmış gövdeyi okuyamıyor, ya hiç süzmüyor ya da gövdeyi bozuyordu. Testler gzip
+# istemediği için görünmüyordu. Listenin başına alınınca hangi parça sonradan kaydolursa olsun en son çalışır.
+_sonra = app.after_request_funcs.setdefault(None, [])
+if _sikistir in _sonra:
+    _sonra.remove(_sikistir)
+_sonra.insert(0, _sikistir)
+
+
 # ---- Arka plan hataları görünür olsun (2026-10-25: 110 traceback günlerce fark edilmedi). threading.excepthook + sayaç + /api/hatalar.
 import threading as _threading
 

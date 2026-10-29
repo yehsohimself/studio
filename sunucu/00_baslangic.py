@@ -115,10 +115,50 @@ except Exception:  # noqa: BLE001
 app = Flask(__name__, static_folder=str(KLASOR / "static"), static_url_path="/static")
 
 
+def _guvenilir_ana_bilgisayar(ad):
+    """Bu sitenin kendi adresleri: IP, localhost, Bonjour (.local), Tailscale (.ts.net), davet tüneli (.trycloudflare.com), Mac'in adı.
+    2026-10-27 (güvenlik incelemesi): başka bir alan adıyla gelen istek DNS yeniden bağlama saldırısı olabilir."""
+    import ipaddress
+    import socket
+    ad = (ad or "").split(":")[0].strip("[]").lower()
+    if not ad or ad == "localhost" or ad.endswith((".local", ".ts.net", ".trycloudflare.com", ".localhost")) or ad == socket.gethostname().lower():
+        return True
+    try:
+        ipaddress.ip_address(ad); return True
+    except ValueError:
+        return False
+
+
+def _guvenilir_koken(koken):
+    if not koken:
+        return False
+    if koken.startswith("chrome-extension://"):                  # uzantının sayfaları (yan panel, arka plan)
+        return True
+    from urllib.parse import urlparse
+    yer = urlparse(koken).netloc
+    return bool(yer) and _guvenilir_ana_bilgisayar(yer)
+
+
+@app.before_request
+def _kaynak_kapisi():
+    """2026-10-27: her /api yanıtı 'Access-Control-Allow-Origin: *' taşıyordu; tarayıcıda açık herhangi bir site toplantıları okuyup silebilirdi.
+    Artık: tanınmayan Host reddedilir; başka bir siteden gelen yazma/silme isteği (Origin ya da Sec-Fetch-Site) reddedilir."""
+    if not _guvenilir_ana_bilgisayar(request.host):
+        return ("Bu adres tanınmıyor.", 403)
+    if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+        koken = request.headers.get("Origin")
+        if koken and not _guvenilir_koken(koken):                  # "null" (gömülü, korumalı sayfa) da reddedilir
+            return jsonify({"hata": "Başka bir siteden gelen istek reddedildi."}), 403
+        if not koken and request.headers.get("Sec-Fetch-Site") == "cross-site":
+            return jsonify({"hata": "Başka bir siteden gelen istek reddedildi."}), 403
+
+
 @app.after_request
 def _cors(resp):
-    if request.path.startswith("/api/") and str(request.environ.get("SERVER_PORT")) != "8770":   # 8770 (davetli kapısı, internete açık) hariç; 2026-10-25
-        resp.headers["Access-Control-Allow-Origin"] = "*"
+    koken = request.headers.get("Origin")
+    if request.path.startswith("/api/") and str(request.environ.get("SERVER_PORT")) != "8770" and _guvenilir_koken(koken):   # yalnız kendi adresleri ve uzantı
+        resp.headers["Access-Control-Allow-Origin"] = koken
+        resp.headers["Vary"] = "Origin"
         resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
         resp.headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE, OPTIONS"
     return resp

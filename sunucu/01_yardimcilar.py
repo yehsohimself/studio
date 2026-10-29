@@ -31,7 +31,7 @@ def _bildir(baslik, metin, url=""):
         pass
     try:
         subprocess.Popen(["/usr/bin/osascript", "-e",
-                          f'display notification "{metin.replace(chr(34), " ")}" with title "{baslik.replace(chr(34), " ")}"'],
+                          f'display notification "{metin.replace(chr(92), " ").replace(chr(34), " ")}" with title "{baslik.replace(chr(92), " ").replace(chr(34), " ")}"'],
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception:  # noqa: BLE001
         pass

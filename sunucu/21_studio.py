@@ -536,6 +536,35 @@ def studio_gelisim_oneri():
     return jsonify({"tamam": bool(x)})
 
 
+def _kapak_tamamla(en_cok=30):
+    """Kapağı olmayan videolara kapak (2026-10-29; kitaplıkta 70 video gri kutuyla görünüyordu): YouTube kimliği linkte ya da indirilen dosyanın
+    adında ([YouTube-xxxx]) varsa YouTube'un küçük resmi, bilgisayardaki video dosyasıysa 3. saniyedeki kare. Toplantılar kapak kullanmaz."""
+    import kitaplik_onbellek
+    import requests
+    n = 0
+    for x in kitaplik_onbellek.hepsi():
+        v, temel = x["veri"], x["temel"]
+        hedef = KLASOR / f"{temel}.jpg"
+        if n >= en_cok or v.get("toplanti") or hedef.exists():
+            continue
+        link = str(v.get("link") or "")
+        m = re.search(r"\[YouTube-([\w-]{11})\]", link) or re.search(r"(?:youtu\.be/|[?&]v=|/shorts/)([\w-]{11})", link)
+        try:
+            if m:
+                for boy in ("maxresdefault", "hqdefault"):
+                    r = requests.get(f"https://i.ytimg.com/vi/{m.group(1)}/{boy}.jpg", timeout=15)
+                    if r.ok and len(r.content) > 5000:
+                        hedef.write_bytes(r.content); n += 1
+                        break
+            elif Path(link).suffix.lower() in (".mp4", ".mov", ".m4v", ".webm", ".mkv") and Path(link).exists():
+                subprocess.run([FFMPEG, "-y", "-v", "error", "-ss", "3", "-i", link, "-frames:v", "1", "-vf", "scale=1280:-2", str(hedef)],
+                               capture_output=True, timeout=60)
+                n += hedef.exists()
+        except Exception:  # noqa: BLE001
+            hedef.unlink(missing_ok=True)
+    return n
+
+
 def _studio_isaret(ad, anahtar):
     """Günde/haftada bir işler için işaret dosyası (kayitlar/.gg_<ad>): anahtar değiştiyse True ve yazar. (19_ghost_gelisim'deki _gg_isaret ile aynı;
     Studio tek başına kurulduğunda Ghost olmayabilir, 2026-10-25.)"""
@@ -583,6 +612,11 @@ def _studio_dongu():
                         f.unlink()
             except Exception:  # noqa: BLE001
                 pass
+            if bos and _studio_isaret("studio_kapak", time.strftime("%Y-%m-%d-%H")):   # saatte bir: kapağı olmayan videolar
+                try:
+                    _kapak_tamamla()
+                except Exception:  # noqa: BLE001
+                    pass
             if _studio_isaret("studio_jsonl", time.strftime("%Y-%m-%d")):      # 2026-10-25: büyüyen ekleme dosyaları 5 MB'ı aşınca döndürülür
                 for f in (KAYIT / ".claude_kullanim.jsonl", KAYIT / "uzanti_olaylar.jsonl", KAYIT / "canli_notlar.jsonl", KAYIT / ".kalite.jsonl"):
                     try:
@@ -659,3 +693,25 @@ def kurulum_durum():
     d = {"hazir": all(a["tamam"] for a in adim if a["zorunlu"]), "eksik": sum(not a["tamam"] for a in adim), "adimlar": adim}
     _kurulum_onb.update(t=time.time(), d=d)
     return jsonify(d)
+
+
+# ----------------------------------------------------------------------------- paylaşıma hazırla (2026-10-27; kapanan Content'ten taşındı)
+@app.post("/api/indirilen-paylas/<path:dosya>")
+def indirilen_paylas(dosya):
+    import paylas_video
+    kaynak = _indirilen_dogrula(dosya)
+    if kaynak.suffix.lower() in (".mp3", ".m4a"):
+        return jsonify({"hata": "Bu bir ses dosyası."}), 400
+    hedef = kaynak.with_name(f"{kaynak.stem} [Reels-TikTok-Shorts].mp4")
+    i = 2
+    while hedef.exists():
+        hedef = kaynak.with_name(f"{kaynak.stem} [Reels-TikTok-Shorts]_{i}.mp4"); i += 1
+    try:
+        r = paylas_video.hazirla(kaynak, hedef)
+    except (ValueError, RuntimeError) as e:
+        return jsonify({"hata": str(e)}), 400
+    with kilit:
+        d = _dizin_oku()
+        d[hedef.name] = {**d.get(kaynak.name, {}), "kalite": "paylas", "zaman": time.time()}
+        _dizin_yaz(d)
+    return jsonify({"dosya": hedef.name, **r})

@@ -246,6 +246,35 @@ def sinir_durumu():
         return None
 
 
+# Kullanım özetinde (Ayarlar) iş adları: kayıtta modül adı kalmış olanlar okunur ada çevrilir (kayıttaki ham ad değişmez;
+# BEKLER_ONEK onunla eşleşir).
+GORUNUR_AD = {
+    "04_toplanti": "Toplantı adı ve müşteri", "kisaca": "Toplantı özeti (Kısaca)", "danisman": "Koçluk notu", "sinyaller": "Toplantı sinyalleri",
+    "toplanti_kapisi": "Toplantı mı kontrolü", "canli_asistan": "Canlı öneriler", "meet_altyazi": "Altyazıyla düzeltme",
+    "meet_gelisim": "Meet bakımı", "karar_zinciri": "Karar zinciri", "tarifler": "Tarifler", "sohbet": "Toplantıyla sohbet",
+    "sirketler": "Şirket seçimi", "kisiler": "Kişi profilleri", "notlarim": "Toplantı notlarınız", "duzenle": "Düzenleme",
+    "atolye": "Atölye", "atolye_analiz": "Atölye", "atolye_bilgi": "Atölye", "kesif": "Ghost keşif", "yayin": "Yayın paketi",
+    "dublaj": "Dublaj", "dil_cevir": "Arayüz çevirisi", "studio_gelisim": "Studio bakımı", "sahne_dizin": "Görüntü araması",
+    "<string>": "Diğer", "<stdin>": "Diğer",
+}
+
+
+def gorunur_ad(ad):
+    ad = ad or "Diğer"
+    if ad in GORUNUR_AD:
+        return GORUNUR_AD[ad]
+    if ad.startswith("<"):                     # "<string>", "<module>": sunucu parçalarından (exec) gelen çağrı (2026-10-29: Ayarlar'da ham ad görünüyordu)
+        return "Diğer"
+    m = re.match(r"^\d\d_(\w+)$", ad)          # sunucu/04_toplanti.py gibi parça dosyası adı
+    if m:
+        return {"toplanti": "Toplantı notları", "ghost": "Ghost", "marka": "İçerik paketi", "meet_gelisim": "Meet gelişimi",
+                "studio": "Studio", "video_isleri": "Video işleri", "api": "Studio"}.get(m.group(1), "Diğer")
+    for on, gorunur in (("content", "Content"), ("couple", "Couple"), ("pt", "PT")):
+        if ad == on or ad.startswith(on + "_"):
+            return gorunur
+    return ad
+
+
 def kullanim_ozeti(gun=7):
     """Son N günün Claude kullanımı: toplam ve iş başına (istek, giriş/çıkış token, süre)."""
     sinir = time.time() - gun * 86400
@@ -262,7 +291,7 @@ def kullanim_ozeti(gun=7):
             continue
         if x.get("t", 0) < sinir or x.get("misafir"):
             continue
-        i = isler.setdefault(x.get("is") or "Diğer", {"istek": 0, "giris": 0, "cikis": 0, "sn": 0.0})
+        i = isler.setdefault(gorunur_ad(x.get("is")), {"istek": 0, "giris": 0, "cikis": 0, "sn": 0.0})
         for d in (i, top):
             d["istek"] += 1; d["giris"] += x.get("giris", 0); d["cikis"] += x.get("cikis", 0); d["sn"] += x.get("sn", 0)
         top["hata"] += 0 if x.get("ok", True) else 1
@@ -270,13 +299,73 @@ def kullanim_ozeti(gun=7):
     return {"gun": gun, "toplam": top, "isler": dict(sorted(isler.items(), key=lambda kv: -kv[1]["istek"])), "sinir": sinir_durumu()}
 
 
-def sor(istem, sistem="", zaman_asimi=600, model_adi=None):
-    """İstemi Claude'a verir, yanıt metnini döndürür. Araç yok; yalnızca metin."""
+# Toplantılara öncelik (2026-10-28; ölçüm: 7 günde 2.518 çağrının 1.688'i Ghost'un X taslakları). Abonelik sınırına takılınca toplantı notları
+# yerel modele düşüyor ve Kısaca hiç yazılamıyordu. Kural: (1) toplantı kaydedilirken ya da notları hazırlanırken (son 10 dk'da toplantı içerikli
+# bir çağrı olduysa) kendiliğinden çalışan arka plan işleri bekler; (2) son 5 saatin çağrısı arka plan eşiğini (ARKA_PLAN_ESIK) aştıysa aynı işler
+# eşiğin altına inene dek bekler. Kullanıcının elle başlattığı işler (site isteğinden gelen) ve toplantı içeriği hiç beklemez.
+TOPLANTI_ISARETI = KLASOR / "kayitlar" / ".toplanti_claude"
+BEKLER_ONEK = ("X taslakları", "karisim", "kesif", "tetik", "fikir_kartlari", "konu_toplantisi", "yerimleri", "performans", "bultenler",
+               "seckiler", "ghost", "hesaplar", "studio_gelisim", "sahne_dizin", "atolye", "couple", "content", "pt_kanit", "dil_cevir")
+
+
+def toplanti_suruyor():
+    """Toplantı kaydediliyor mu ya da notları hazırlanıyor mu (son 10 dk'da toplantı içerikli Claude çağrısı)."""
+    try:
+        k = json.loads((KLASOR / "kayitlar" / ".kayit_canli.json").read_text(encoding="utf-8"))
+        if k.get("kayit") and time.time() - float(k.get("guncelleme", 0)) < 60:
+            return True
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        return time.time() - TOPLANTI_ISARETI.stat().st_mtime < 600
+    except OSError:
+        return False
+
+
+def _istekten_mi():
+    try:
+        from flask import has_request_context
+        return has_request_context()
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _oncelik(is_adi):
+    """Toplantı işi işaret bırakır; kendiliğinden çalışan arka plan işi gerekirse bekler (en çok 2 saat)."""
+    if misafir():
+        return
+    if toplanti_mi():
+        try:
+            TOPLANTI_ISARETI.parent.mkdir(parents=True, exist_ok=True); TOPLANTI_ISARETI.touch()
+        except OSError:
+            pass
+        return
+    if not str(is_adi).startswith(BEKLER_ONEK) or _istekten_mi():
+        return
+    son, yazdi = time.time() + 7200, False
+    while time.time() < son:
+        neden = "toplantı sürüyor" if toplanti_suruyor() else ("Claude bütçesi toplantılara ayrıldı" if not arka_plan_uygun() and not sinir_durumu() else "")
+        if not neden:
+            return
+        if not yazdi:
+            print(f"Claude: {is_adi} bekliyor ({neden})", flush=True); yazdi = True
+        time.sleep(20)
+    raise ClaudeHata("Arka plan işi Claude'u bekledi; toplantı işleri önce geldi")
+
+
+def sor(istem, sistem="", zaman_asimi=600, model_adi=None, araclar=""):
+    """İstemi Claude'a verir, yanıt metnini döndürür. Varsayılan araç yok; yalnızca metin. `araclar` yalnız web için verilir
+    ("WebSearch,WebFetch"; 2026-10-29 Content'in akım araması: anahtarsız arama motorları otomatik sorguyu engelliyor)."""
     p = program()
     if not p:
         raise ClaudeHata("Claude programı bulunamadı")
-    komut = [p, "-p", "--tools", "", "--strict-mcp-config", "--setting-sources", "", "--no-session-persistence",
+    if araclar and set(araclar.split(",")) - {"WebSearch", "WebFetch"}:
+        raise ClaudeHata("yalnız web araçlarına izin var")
+    _oncelik(_is_adi())
+    komut = [p, "-p", "--tools", araclar, "--strict-mcp-config", "--setting-sources", "", "--no-session-persistence",
              "--output-format", "json", "--model", model_adi or model()]
+    if araclar:
+        komut += ["--allowedTools", araclar]
     if sistem:
         komut += ["--system-prompt", sistem]
     is_adi, t0, m_adi = _is_adi(), time.time(), model_adi or model()
@@ -355,6 +444,7 @@ def sor_gorsel(istem, resimler, sistem="", zaman_asimi=900, model_adi=None):
     p = program()
     if not p:
         raise ClaudeHata("Claude programı bulunamadı")
+    _oncelik(_is_adi())
     icerik = [{"type": "text", "text": istem}]
     for r in resimler:
         tur = "image/png" if str(r).lower().endswith(".png") else "image/jpeg"

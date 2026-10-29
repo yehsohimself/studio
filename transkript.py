@@ -967,13 +967,13 @@ def yaz_txt(yol, veri, paragraflar):
         if ks:
             f.write("\n--- Kısaca ---\n\n" + "\n\n".join(ks.get("ozet") or []) + "\n")
             for k in (ks.get("kisiler") or []) + ([{"ad": "Sorumlu belirtilmedi", "isler": ks["belirsiz"]}] if ks.get("belirsiz") else []):
-                f.write(f"\n{k['ad']}:\n" + "".join(f"  {'☑' if x.get('bitti') else '☐'} {x['is']}" + (f" ({x['ne_zaman']})" if x.get("ne_zaman") else "") + "\n" for x in k["isler"]))
+                f.write(f"\n{k['ad']}:\n" + "".join(f"  {'☑' if x.get('bitti') else '☐'} {x['is']}" + (f" ({x['ne_zaman']})" if x.get("ne_zaman") else "") + (f" [{x['musteri']}]" if x.get("musteri") else "") + "\n" for x in k["isler"]))
         if ks and ks.get("kararlar"):
-            f.write("\nKararlar:\n" + "".join(f"  • {x['karar']}\n" + "".join(f"    ↳ {_zincir_metni(z)}\n" for z in _zincirler(x)) for x in ks["kararlar"]))
+            f.write("\nKararlar:\n" + "".join(f"  • {x['karar']}" + (f" [{x['musteri']}]" if x.get("musteri") else "") + "\n" + "".join(f"    ↳ {_zincir_metni(z)}\n" for z in _zincirler(x)) for x in ks["kararlar"]))
         if ks and ks.get("oneriler"):
-            f.write("\nÖneriler (karar değil):\n" + "".join(f"  – {x['oneri']}\n" for x in ks["oneriler"]))
+            f.write("\nÖneriler (karar değil):\n" + "".join(f"  – {x['oneri']}" + (f" [{x['musteri']}]" if x.get("musteri") else "") + "\n" for x in ks["oneriler"]))
         if ks and ks.get("acik_sorular"):
-            f.write("\nAçık sorular:\n" + "".join(f"  ? {x['soru']}\n" for x in ks["acik_sorular"]))
+            f.write("\nAçık sorular:\n" + "".join(f"  ? {x['soru']}" + (f" [{x['musteri']}]" if x.get("musteri") else "") + "\n" for x in ks["acik_sorular"]))
         if veri.get("goruntu"):
             f.write("\n--- Görüntü notları ---\n\n")
             sg = any(g["sn"] >= 3600 for g in veri["goruntu"])
@@ -1173,21 +1173,21 @@ def yaz_docx(yol, veri, paragraflar, yalniz_danisman=False):
         if ks.get("kararlar"):
             par(_t("Kararlar"), 11, True, KOYU, once=6, sonra=3)
             for x in ks["kararlar"]:
-                madde("•  ", x["karar"], " · ".join(e for e in (x.get("kim"), zk(x), *map(_zincir_metni, _zincirler(x))) if e))
+                madde("•  ", x["karar"], " · ".join(e for e in (x.get("musteri"), x.get("kim"), zk(x), *map(_zincir_metni, _zincirler(x))) if e))
         if ks.get("kisiler") or ks.get("belirsiz"):
             par("Kim ne yapacak", 11, True, KOYU, once=6, sonra=3)
             for k in (ks.get("kisiler") or []) + ([{"ad": "Sorumlu belirtilmedi", "isler": ks["belirsiz"]}] if ks.get("belirsiz") else []):
                 par(k["ad"], 10.5, True, KOYU, once=4, sonra=1)
                 for x in k["isler"]:
-                    madde("☑  " if x.get("bitti") else "☐  ", x["is"], " · ".join(e for e in (x.get("ne_zaman") or ("tarih belirtilmedi" if ks.get("surum", 1) >= 2 else ""), zk(x)) if e))
+                    madde("☑  " if x.get("bitti") else "☐  ", x["is"], " · ".join(e for e in (x.get("musteri"), x.get("ne_zaman") or ("tarih belirtilmedi" if ks.get("surum", 1) >= 2 else ""), zk(x)) if e))
         if ks.get("oneriler"):
             par("Öneriler (karar değil)", 11, True, KOYU, once=6, sonra=3)
             for x in ks["oneriler"]:
-                madde("–  ", x["oneri"], " · ".join(e for e in (x.get("kim"), zk(x)) if e))
+                madde("–  ", x["oneri"], " · ".join(e for e in (x.get("musteri"), x.get("kim"), zk(x)) if e))
         if ks.get("acik_sorular"):
             par("Açık sorular", 11, True, KOYU, once=6, sonra=3)
             for x in ks["acik_sorular"]:
-                madde("?  ", x["soru"], " · ".join(e for e in (x.get("kime"), zk(x)) if e))
+                madde("?  ", x["soru"], " · ".join(e for e in (x.get("musteri"), x.get("kime"), zk(x)) if e))
 
     # Özet
     o = veri.get("ozet")
@@ -1653,7 +1653,10 @@ def main():
     # Kontrol noktası (2026-10-19): indirme ve ses çözümü (+ konuşmacı ayırma) sonuçları işe özel klasöre yazılır; site iş ortasında
     # yeniden başlarsa yeniden sıraya giren iş bu adımları atlar. İş başarıyla bitince klasör silinir (eskiler site döngüsünde 3 günde).
     import hashlib
-    kn = KLASOR / ".onbellek" / "is" / hashlib.sha1(f"{link}|{dil}|{model_kisa}|{konusmaci_ayir}|{konusmaci_sayisi}|{SES_TEMIZLE}".encode()).hexdigest()[:16]
+    # yerel dosyada boyut ve zaman da anahtara girer (2026-10-27): birleştirilen toplantı kaydı ilk parçayla aynı yolu alıyor, eski parçanın sesi kullanılıyordu
+    _yerel = os.stat(link) if os.path.isfile(link) else None
+    _ek = f"|{_yerel.st_size}|{int(_yerel.st_mtime)}" if _yerel else ""
+    kn = KLASOR / ".onbellek" / "is" / hashlib.sha1(f"{link}|{dil}|{model_kisa}|{konusmaci_ayir}|{konusmaci_sayisi}|{SES_TEMIZLE}{_ek}".encode()).hexdigest()[:16]
     kn_ses, kn_bilgi, kn_cozum = kn / "ses.m4a", kn / "bilgi.json", kn / "cozum.json"
     with tempfile.TemporaryDirectory(prefix="transkript_") as gecici:
         if kn_ses.exists() and kn_bilgi.exists() and not goruntu:
@@ -1774,7 +1777,7 @@ def main():
     taninan = []
     if sesler_v and not os.environ.get("VH_MISAFIR"):        # misafir işinde sahibin tanınan sesleri (kişileri) kullanılmaz
         import sesler as sesler_modulu
-        for k, tanin_ad in sesler_modulu.tani(sesler_v).items():
+        for k, tanin_ad in sesler_modulu.tani(sesler_v, toplanti="/kayitlar/" in str(link)).items():   # toplantıda video sesleri kullanılmaz
             anahtar = k if k in etiket else (int(k) if str(k).isdigit() and int(k) in etiket else None)
             if anahtar is not None and str(etiket[anahtar]).startswith("Konuşmacı ") and tanin_ad not in etiket.values():
                 etiket[anahtar] = tanin_ad

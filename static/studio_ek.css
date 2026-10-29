@@ -170,3 +170,27 @@ body:is(.yuz-kitaplik,.linkVar) #stAna,body:has(#resultSec:not(.hidden)) #stAna{
 @media (max-width:640px){.st-sonl{grid-template-columns:repeat(2,1fr)}#stAna{margin-top:18px}}
 /* telefonda link kutusu: "Yapıştır" telefonun kendi yapıştırmasıyla zaten var; kutu birkaç harfe iniyordu */
 @media (max-width:520px){body.urun-transcript .composer #paste{display:none}body.urun-transcript .composer .bar input#link{min-width:0;flex:1}}
+
+/* 12) Geniş kitle kalite geçişi (2026-10-29) */
+/* koyu temada ikincil yazı okunurluk eşiğinin altındaydı (#6c6c76: zeminde 3,8:1); 5,5:1 ve üstü */
+html[data-urun="transcript"][data-urun]:not([data-theme="light"]){--muted:#8e8e98}
+/* kapaktaki tek satır bilgi: genel ".chips" kuralı arkasına hap zemini çiziyordu (telefonda taşan gri leke) */
+#doc .cover .chips.st-meta{background:none!important;border-radius:0!important;padding:0!important}
+/* çıktı açıklamaları ve selamlama okunur boyda */
+body.urun-transcript #sonuc .chipb .ack,body.urun-transcript .st-d small{font-size:12.5px}
+body.urun-transcript #selam{font-size:12px}
+/* Ayarlar: sistem durumu ve Studio gelişimi "Gelişmiş" altında (kaldırılmadı, katlandı) */
+#stGelismis{margin:18px 0 4px;border-top:1px solid var(--hair2);padding-top:6px}
+#stGelismis>summary{cursor:pointer;list-style:none;padding:10px 0;font-weight:600;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+#stGelismis>summary::-webkit-details-marker{display:none}
+#stGelismis>summary small{font-weight:400;color:var(--muted);font-size:12.5px}
+#stGelismis>summary::after{content:"›";color:var(--muted);transition:transform .2s}
+#stGelismis[open]>summary::after{transform:rotate(90deg)}
+@media (max-width:640px){
+  /* telefonda üst menü ekranın beşte birini sürekli kaplıyordu: kaydırınca kalkar, sekme çubuğu en üste yapışır */
+  html[data-urun="transcript"] .nav{position:relative!important}
+  /* yüzen "Sor" düğmesi araç çubuğu görünürken onun üstüne biniyordu; çubuk ekrandayken gizli (çubukta zaten "Sor" var) */
+  body.st-arac-gorunur #sbFab{opacity:0;pointer-events:none}
+}
+/* açık temada da ikincil yazı #86868b zeminde 3,4:1 kalıyordu; Apple'ın ikincil gri tonu, 4,9:1 */
+html[data-urun="transcript"][data-theme="light"]{--muted:#6e6e73}

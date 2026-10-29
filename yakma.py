@@ -309,6 +309,15 @@ def _bos_png(w, h, yol):
 
 
 # ----------------------------------------------------------------------------- ana iş
+YUMUSATMA = 0.03     # her parçanın sesi 30 ms içinde açılır/kapanır: birleşme yerinde "tık" sesi olmaz (Manticore fade_ms)
+
+
+def _yumusat(sure):
+    if sure < 4 * YUMUSATMA:
+        return ""
+    return f",afade=t=in:st=0:d={YUMUSATMA},afade=t=out:st={sure - YUMUSATMA:.3f}:d={YUMUSATMA}"
+
+
 def _kes_birlestir(video, tut, cikti, log=log):
     """Videodan yalnızca tut=[(bas,bit),...] aralıklarını alır, art arda ekler (yeniden kodlama, donanım)."""
     n = len(tut)
@@ -317,10 +326,10 @@ def _kes_birlestir(video, tut, cikti, log=log):
         girdi = []
         for b, e in tut:
             girdi += ["-ss", f"{b:.3f}", "-t", f"{e - b:.3f}", "-i", str(video)]
-        fc = "".join(f"[{i}:v]setpts=PTS-STARTPTS[v{i}];[{i}:a]asetpts=PTS-STARTPTS[a{i}];" for i in range(n))
+        fc = "".join(f"[{i}:v]setpts=PTS-STARTPTS[v{i}];[{i}:a]asetpts=PTS-STARTPTS{_yumusat(e - b)}[a{i}];" for i, (b, e) in enumerate(tut))
     else:
         girdi = ["-i", str(video)]
-        fc = "".join(f"[0:v]trim=start={b:.3f}:end={e:.3f},setpts=PTS-STARTPTS[v{i}];[0:a]atrim=start={b:.3f}:end={e:.3f},asetpts=PTS-STARTPTS[a{i}];"
+        fc = "".join(f"[0:v]trim=start={b:.3f}:end={e:.3f},setpts=PTS-STARTPTS[v{i}];[0:a]atrim=start={b:.3f}:end={e:.3f},asetpts=PTS-STARTPTS{_yumusat(e - b)}[a{i}];"
                      for i, (b, e) in enumerate(tut))
     fc += "".join(f"[v{i}][a{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=1[v][a]"
     komut = [FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-stats", *girdi, "-filter_complex", fc,
@@ -609,6 +618,33 @@ def cueler_json(json_yolu, dil=None, tut=None):
     return altyazi_parcalari(seg), d["veri"]
 
 
+def _dolgu_pencereleri(d):
+    try:
+        import dolgu
+        return dolgu.gecerli_pencereler(d)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _sinirlari_oturt(js, video, tut):
+    """Kesim kenarlarını sesin sessizlik haritasına taşır (kesim_sinir): kenar kelimenin ortasına düşmez, konuşmanın yanında
+    kısa bir nefes payı kalır. Herhangi bir sorun olursa aralıklar olduğu gibi kalır."""
+    try:
+        import kesim_sinir
+        d = json.loads(Path(js).read_text(encoding="utf-8"))
+        harita = kesim_sinir.ses_haritasi(video)
+        toplam = harita["sure"] or video_bilgi(Path(video))["sure"]
+        yeni, r = kesim_sinir.oturt(tut, harita["sessizlik"], kesim_sinir.kelimeler(d["segmentler"], _dolgu_pencereleri(d)), toplam)
+        if yeni:
+            log(f"      Kesim kenarları sese oturtuldu: {r['kenar']} kenar, {r['sessizlige']} tanesi sessizliğe"
+                + (f", {r['kelime_arasina']} tanesi kelime arasına" if r["kelime_arasina"] else "")
+                + (f", {r['oturmadi']} tanesi yerinde kaldı" if r["oturmadi"] else ""))
+            return yeni
+    except Exception as e:  # noqa: BLE001
+        log(f"      Kesim kenarları sese oturtulamadı ({e}); yazı zamanları kullanılıyor")
+    return tut
+
+
 def _saniye(t):
     t = t.strip()
     if not t:
@@ -700,6 +736,8 @@ def main():
             if kesit:
                 t2 = duzenle.kesisim(t2, [(k0, k1)]); kesit_etiketi = kesit; kesit = None
             tut = duzenle.kesisim(tut, t2) if tut else t2
+    if tut and video:
+        tut = _sinirlari_oturt(js, video, tut)
     cueler, veri = cueler_json(js, dil, tut)
     global TURKCE
     TURKCE = (dil if dil and dil != "orijinal" else veri.get("dil", "tr")) in ("tr", "az")

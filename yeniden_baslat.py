@@ -59,7 +59,18 @@ def nedenler():
         except Exception:  # noqa: BLE001
             pass
         time.sleep(10)
-    print("Site yanıt vermiyor; yine de yeniden başlatılıyor.", flush=True)
+    # 2026-10-27: site yoğunken ~50 sn takıldı, araç "yanıt vermiyor" deyip 15.29 toplantısının işini yarıda kesti. Artık kayıtlı işlere bakılır:
+    # süren ya da sırada iş varsa beklenir; yoksa (gerçekten donmuş, kaybedilecek iş yok) yeniden başlatılır.
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".isler.json"), encoding="utf-8") as f:
+            I = json.load(f)
+        I = I.values() if isinstance(I, dict) else I
+        suren = sum(1 for i in I if isinstance(i, dict) and i.get("durum") in ("sirada", "calisiyor"))
+    except Exception:  # noqa: BLE001
+        suren = 0
+    if suren:
+        return [f"Site yanıt vermiyor; kayıtlarda {suren} süren iş var"]
+    print("Site yanıt vermiyor ve süren iş yok; yeniden başlatılıyor.", flush=True)
     return []
 
 

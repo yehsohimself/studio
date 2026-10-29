@@ -186,3 +186,24 @@ def test_kurulum_denetimi(istemci):
 
 def test_davetli_kurulum_denetimini_gormez(misafir_istemci):
     assert misafir_istemci.get("/api/kurulum", base_url=M).status_code in (401, 403)
+
+
+def test_sikistirma_suzgeclerden_sonra_calisir(istemci, misafir_istemci, kok):
+    """Tarayıcı gzip ister: sıkıştırma bütün süzgeçlerden SONRA olmalı (2026-10-29: önce çalışıyor, davetli listesi süzülmüyordu)."""
+    import gizli
+    Z = {"Accept-Encoding": "gzip"}
+    gizli.koy("asana_token", "2/1234/5678:abcdef0123456789abcdef0123456789")
+    for r in (istemci.get("/api/ayarlar", headers=Z), istemci.post("/api/ayarlar", data=json.dumps({"ozet": False}), headers={**J, **Z})):
+        d = jj(r)
+        assert r.status_code == 200 and not any(k.endswith(("_token", "_anahtar", "_pin")) or k == "takvim_ics" for k in d)
+    for i in range(14):
+        transkript_yaz(kok, f"transkript_tr_sahip_{i}", baslik=f"Sahibin uzunca bir video başlığı {i}")
+    assert istemci.get("/api/gecmis", headers=Z).headers.get("Content-Encoding") == "gzip"     # liste gerçekten sıkıştırılacak kadar uzun
+    gid = davet_olustur(istemci, "Sikistirma")
+    transkript_yaz(kok, "transkript_tr_misafirin", baslik="Misafirin videosu", misafir=gid)
+    assert misafir_istemci.get(f"/d/{token_bul(kok, gid)}", base_url=M).status_code == 302
+    L = jj(misafir_istemci.get("/api/gecmis", base_url=M, headers=Z))
+    assert [x["temel"] for x in L] == ["transkript_tr_misafirin"]
+    assert "transkript_tr_misafirin" not in [x["temel"] for x in jj(istemci.get("/api/gecmis", headers=Z))]
+    d = jj(istemci.get("/api/davetler", headers=Z))
+    assert isinstance(d.get("kisiler"), list) and d["kisiler"]

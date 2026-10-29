@@ -10,3 +10,4 @@ auto-editor
 mcp>=2.3
 mlx-embeddings
 pytest
+shazamio>=0.9  # Content: şarkıyı sesten tanıma (resmi olmayan Shazam istemcisi)

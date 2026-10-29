@@ -63,6 +63,10 @@ def ayar_sozlugu():
     except Exception:  # noqa: BLE001
         pass
     musteriler = [str(x).strip() for x in (d.get("musteriler") or []) if str(x).strip()]
+    # şirketlerin müşteri listeleri de (2026-10-28): eski düz liste yalnız 5 addı, 31 müşterinin çoğu ses tanımaya hiç verilmiyordu ("ING" → "YNG")
+    for sk in d.get("sirketler") or []:
+        if isinstance(sk, dict):
+            musteriler += [str(x).strip() for x in (sk.get("musteriler") or []) if str(x).strip()]
     return terimler, musteriler
 
 
@@ -75,18 +79,61 @@ def _tekil(liste):
     return sonuc
 
 
+_TOKEN = None
+
+
+def _parca_sayisi(metin):
+    """Whisper'ın ipucu parça (token) sayısı; ayırıcı yüklenemezse kaba tahmin (3,2 harf ≈ 1 parça)."""
+    global _TOKEN
+    if _TOKEN is None:
+        try:
+            from mlx_whisper.tokenizer import get_tokenizer
+            _TOKEN = get_tokenizer(multilingual=True, num_languages=100)
+        except Exception:  # noqa: BLE001
+            _TOKEN = False
+    return len(_TOKEN.encode(metin)) if _TOKEN else int(len(metin) / 3.2) + 1
+
+
+def _musteri_sirasi(musteriler):
+    """Müşteri adları son 60 günün toplantılarında ne sıklıkta geçtiyse o sırada (toplantının müşterisi ×3, Kısaca maddesi ×1); bütçeye en çok
+    çalışılanlar sığsın. Okunamazsa sıra değişmez."""
+    try:
+        import time
+        import kitaplik_onbellek
+        say = {}
+        for x in kitaplik_onbellek.hepsi():
+            v = x.get("veri") or {}
+            if not v.get("toplanti") or (v.get("olusturma") or 0) < time.time() - 60 * 86400:
+                continue
+            if v.get("musteri"):
+                say[str(v["musteri"]).casefold()] = say.get(str(v["musteri"]).casefold(), 0) + 3
+            for m in (v.get("kisaca") or {}).get("musteriler") or []:
+                say[str(m.get("ad")).casefold()] = say.get(str(m.get("ad")).casefold(), 0) + int(m.get("adet") or 1)
+        return sorted(musteriler, key=lambda m: -say.get(m.casefold(), 0))
+    except Exception:  # noqa: BLE001
+        return musteriler
+
+
+IPUCU_BUTCE = 190            # Whisper ipucunu 223 parçada soldan keser (baştaki "Türkçe konuşuyoruz" çerçevesi gider); payla
+
+
 def ipucu_yap(dil, isimler=None, ekstra=None):
-    """Whisper başlangıç ipucu. dil: çözülecek dil kodu (None = bilinmiyor)."""
+    """Whisper başlangıç ipucu. dil: çözülecek dil kodu (None = bilinmiyor). 2026-10-28: şirketlerin bütün müşterileri girince ipucu 242 parçaya
+    çıkıyordu; artık parça bütçesiyle kurulur: kullanıcının sözlüğü, en sık 10 terim, müşteri adları, kalan yere öteki terimler; en çok 8 kişi adı."""
     isimler = [x for x in (isimler or []) if x]
     ozel, musteriler = ayar_sozlugu()
     ozel = _tekil(ozel + (ekstra or []))
     if dil == "tr":
-        terimler = _tekil(ozel + musteriler + IPUCU_TERIMLER)[:60]
-        metin = ("Sohbet ediyoruz. Türkçe konuşuyoruz ama " + ", ".join(terimler)
-                 + " gibi İngilizce terimler de kullanıyoruz.")
-        if isimler:
-            metin += " " + ", ".join(isimler) + " sohbet ediyor."
-        return metin
+        ad_kismi = (" " + ", ".join(isimler[:8]) + " sohbet ediyor.") if isimler else ""
+        kalip = lambda T: "Sohbet ediyoruz. Türkçe konuşuyoruz ama " + ", ".join(T) + " gibi İngilizce terimler de kullanıyoruz." + ad_kismi   # noqa: E731
+        terimler = []
+        for t in _tekil(ozel + IPUCU_TERIMLER[:10] + _musteri_sirasi(_tekil(musteriler)) + IPUCU_TERIMLER[10:])[:90]:   # en sık 10 terim ("session", "creative") önce
+            if _parca_sayisi(kalip(terimler + [t])) > IPUCU_BUTCE:
+                if len(terimler) >= 12:
+                    break
+                continue
+            terimler.append(t)
+        return kalip(terimler)
     parcalar = []
     if isimler:
         parcalar.append(", ".join(isimler) + (" sohbet ediyor." if dil in (None, "tr") else "."))

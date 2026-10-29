@@ -78,9 +78,43 @@ def izleri_cikar(ornekler, parcalar, model_yolu, num_threads=4, log=lambda *_: N
     return izler
 
 
-def tani(izler, esik=ESIK):
-    """{k: vektor} -> {k: ad}; her ad en çok bir kümeye, her küme en çok bir ada (en yüksek benzerlik önce)."""
-    profiller = oku()
+def toplanti_sayilarini_kur():
+    """Her profilin 'toplanti' sayısını kayıtlardan yeniden kurar: adın bir toplantıda sesten tanınmadan (elle, uzantıyla, mikrofondan)
+    verildiği toplantı sayısı. Davetli kayıtları sayılmaz. Döner: {ad: sayı}."""
+    import glob
+    P = oku(); say = {a: 0 for a in P}
+    for f in glob.glob(str(KLASOR / "transkript_*.json")):
+        try:
+            with open(f, encoding="utf-8") as fh:
+                v = json.loads(fh.read()).get("veri") or {}
+        except Exception:  # noqa: BLE001
+            continue
+        if not v.get("toplanti") or v.get("misafir") or v.get("onay_bekliyor"):
+            continue
+        tan = set(v.get("taninan") or [])
+        for ad in set((v.get("etiket") or {}).values()):
+            if ad in say and ad not in tan:
+                say[ad] += 1
+    for a, n in say.items():
+        if n:
+            P[a]["toplanti"] = n
+        else:
+            P[a].pop("toplanti", None)
+    yaz(P)
+    return say
+
+
+def toplanti_profilleri(profiller=None):
+    """Toplantılarda kullanılabilen profiller: en az bir toplantıda elle (sesten tanınmadan) adı verilmiş olanlar. 2026-10-27: YouTube
+    videolarından öğrenilen 'Umut' ve 'Aysan' sesleri toplantılarda başka kişilere verilmişti; video sesleri toplantıya taşınmaz."""
+    profiller = oku() if profiller is None else profiller
+    return {a: p for a, p in profiller.items() if int(p.get("toplanti", 0)) > 0}
+
+
+def tani(izler, esik=ESIK, toplanti=False):
+    """{k: vektor} -> {k: ad}; her ad en çok bir kümeye, her küme en çok bir ada (en yüksek benzerlik önce).
+    toplanti=True: yalnız toplantılarda öğrenilmiş profiller (toplanti_profilleri)."""
+    profiller = toplanti_profilleri() if toplanti else oku()
     if not profiller or not izler:
         return {}
     adaylar = []
@@ -105,12 +139,14 @@ def ogren(veri, log=lambda *_: None):
         return []
     profiller = oku()
     ogrenilen = []
+    taninan = set(veri.get("taninan") or [])
     for k, ad in (veri.get("etiket") or {}).items():
         ad = (ad or "").strip()
         if not ad or ad.lower().startswith("konuşmacı ") or k not in izler:
             continue
         v = izler[k]
         p = profiller.get(ad)
+        toplanti = int((p or {}).get("toplanti", 0)) + (1 if veri.get("toplanti") and ad not in taninan else 0)   # sesten tanınan ad toplantı sayılmaz
         if p and p.get("vektor"):
             n = int(p.get("sayac", 1))
             if benzerlik(v, p["vektor"]) < 0.3:       # bambaşka bir ses: aynı ad farklı kişiye verilmiş olabilir, üzerine yazma
@@ -119,6 +155,8 @@ def ogren(veri, log=lambda *_: None):
             profiller[ad] = {"vektor": _norm(yeni), "sayac": min(n + 1, 20)}
         else:
             profiller[ad] = {"vektor": _norm(v), "sayac": 1}
+        if toplanti:
+            profiller[ad]["toplanti"] = min(toplanti, 50)
         ogrenilen.append(ad)
     if ogrenilen:
         yaz(profiller)
@@ -160,6 +198,8 @@ def _olc(dosyalar):
 if __name__ == "__main__":
     if len(sys.argv) >= 3 and sys.argv[1] == "--olc":
         _olc(sys.argv[2:])
+    elif len(sys.argv) >= 2 and sys.argv[1] == "--toplanti-say":
+        print(toplanti_sayilarini_kur())
     elif len(sys.argv) >= 3 and sys.argv[1] == "--sil":
         print("silindi" if sil(sys.argv[2]) else "yok")
     else:

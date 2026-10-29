@@ -961,21 +961,35 @@ def sor_():
         return jsonify({"hata": f"Yanıt alınamadı: {e}"}), 500
 
 
-DOLGU = {"ee", "ıı", "eee", "ııı", "hmm", "hm", "ımm", "ım", "aa", "ıh", "eh", "öö", "uh", "um", "hmmm", "mmm"}
-
-
 @app.get("/api/dolgu/<temel>")
 def dolgu(temel):
-    """Duraksama sözcüklerinin (ee, ıı, hmm) zaman aralıkları; metinden kesme için."""
+    """Duraksama seslerinin (ee, ıı, hmm) zaman aralıkları; metinden kesme için. Whisper bunları çoğu zaman yazmadığı için ilk
+    istekte şüpheli parçalar arka planda yeniden dinlenir (dolgu.py); o sürerken taraniyor: true döner."""
+    import dolgu as dolgu_modulu
     t = _temel_dogrula(temel)
     d = json.loads(t.with_suffix(".json").read_text(encoding="utf-8"))
-    ar = []
-    for s_ in d["segmentler"]:
-        for k in s_.get("kelimeler") or []:
-            w = re.sub(r"[^\wıİğüşöç]", "", str(k[2]).lower().replace("İ", "i"))
-            if w in DOLGU and k[1] - k[0] >= 0.12:
-                ar.append([round(k[0], 2), round(k[1], 2), str(k[2])])
-    return jsonify({"aralıklar": ar, "kelime_zamani_var": any(s_.get("kelimeler") for s_ in d["segmentler"])})
+    ar = dolgu_modulu.birlesik(d)
+    kelime_var = any(s_.get("kelimeler") for s_ in d["segmentler"])
+    tarandi = (d["veri"].get("dolgu") or {}).get("imza") == dolgu_modulu.imza(d["segmentler"])
+    ad = f"dolgu:{temel}"
+    is_ = (globals().get("studio_durum") or {}).get(ad) or {}
+    taraniyor = bool(is_.get("calisiyor"))
+    misafir = globals().get("_misafir_istek")
+    if not tarandi and not taraniyor and kelime_var and request.args.get("tara", "1") != "0" and not is_.get("hata") \
+            and not (misafir and misafir()) and float(d["veri"].get("sure") or 0) <= 7200:   # davetli sırasız iş başlatmasın; 2 sa üstü çok uzun
+        kaynak, _ = _kaynak_video(temel)
+        if kaynak is None and d["veri"].get("kayit") and Path(d["veri"]["kayit"]).is_file():
+            kaynak = Path(d["veri"]["kayit"])
+        baslat = globals().get("_studio_is")
+        if kaynak and baslat:
+            def _tara(log, _k=kaynak):
+                r = subprocess.run([str(KLASOR / ".venv/bin/python"), "-u", str(KLASOR / "dolgu.py"), temel, str(_k)], cwd=str(KLASOR), env=_env(),
+                                   capture_output=True, text=True, timeout=3 * 3600)
+                if r.returncode != 0:
+                    raise RuntimeError((r.stderr or r.stdout or "").strip()[-300:] or "Duraksamalar aranamadı.")
+            taraniyor = bool(baslat(ad, _tara))
+    return jsonify({"aralıklar": ar, "kelime_zamani_var": kelime_var, "taraniyor": taraniyor, "tarandi": tarandi,
+                    "hata": is_.get("hata") or ""})
 
 
 klip_calisan = set()
