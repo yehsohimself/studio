@@ -15,6 +15,7 @@ const post = (url, body) => json(url, {method: 'POST', headers: {'Content-Type':
 const aktif = () => state.aktifTemel, veri = () => state.sonuc?.veri || {};
 const port = p => `${location.protocol}//${location.hostname}:${p}/`;
 const isGoster = () => { $('#jobsSec')?.classList.remove('hidden'); setTimeout(isleriTara, 600); };
+const T = x => (window.DIL?.t || (y => y))(x);
 const MB = b => b >= 1073741824 ? (b / 1073741824).toFixed(1).replace('.', ',') + ' GB' : Math.round(b / 1048576) + ' MB';
 
 /* ---------------------------------------------------------------- 1) metni yerinde düzeltme */
@@ -707,6 +708,84 @@ function nasilCiz(){
 const _sonCiz = sonCiz;
 sonCiz = function(){ const r = _sonCiz(); try{ nasilCiz(); }catch(e){} return r; };   // eslint-disable-line no-global-assign
 
+/* ---------------------------------------------------------------- 20) Bir bakışta (2026-10-31; kullanıcı: "görselleştirme hâlâ artabilir")
+   Özet sekmesinin başında üç canlı kutu: kim ne kadar konuştu (halka), konuşma temposu (kelime/dk + zaman içindeki eğrisi; dokununca o ana gider),
+   en çok geçen kelimeler (dokununca metinde aranır). Hepsi elde olan metinden tarayıcıda hesaplanır; sunucuya istek yok. */
+const DURAK_K = new Set(('ve veya ama fakat ile için gibi daha çok çok az bir bu şu o ki de da mi mı mu mü ne nasıl neden niye hangi kim nerede ben sen biz siz onlar ' +
+  'var yok evet hayır şey şeyi şeyler olan olarak oldu olur olacak etti eder yapıyor yapmış bunu şunu onu bunun şunun onun bana sana ona bize size onlara benim senin onun bizim sizin ' +
+  'diye kadar sonra önce şimdi zaten yani işte aslında tamam peki hani böyle şöyle öyle bunlar şunlar hem gerçekten herhalde belki bile sadece değil degil ' +
+  'çünkü eğer ise iken içinde üzerinde arasında bütün tüm her hiç hep birşey birisi bazı biraz falan filan hani şimdi bugün yine artık oluyor olduğu olduğunu ' +
+  'the and that this with have from they were their what there about would which when your will just like know really going think yeah okay right also because ' +
+  'them then than been into could more some only very well these those over here even much where something things thing want said make made does dont youre ' +
+  'bizi bize sizi size onları onlara kendi kendimiz kendini kendine bunları şunları bunu şeyler şekilde şekilde gerçek güzel büyük küçük önemli lazım gerek gerekiyor ' +
+  'göre gibi olsun olsa diyor dedi fazla diğer başka aynı yeni eski tabii mesela örneğin özellikle genelde dolayı zaman yani orada burada şurada').split(' '));
+// fiil çekimleri ve ek yığını kelimeleri listeye girmesin (ör. "dedik", "yapabiliriz", "isteklerimize"); özetinde geçen kelimeler öne çıkar
+const FIIL = /(iyor|ıyor|uyor|üyor|yoruz|yorum|yorsun|dık|dik|duk|dük|tık|tik|tuk|tük|mış|miş|muş|müş|ecek|acak|ebilir|abilir|ebiliriz|abiliriz|meli|malı|mıyor|miyor|madı|medi|ımıza|imize|umuza|ümüze|larımız|lerimiz|dır|dir|dur|dür|tır|tir|ing|ed)$/;
+function bakisKur(temel, v, d){
+  $('#stBakis')?.remove();
+  const P = d.paragraflar || [], sure = +v.sure || 0, sag = $('#doc .sagk');
+  if (v.toplanti || !sag || P.length < 3 || sure < 60) return;
+  const adlar = Object.values(v.etiket || {}), renk = ad => `var(${SPK[Math.max(0, adlar.indexOf(ad)) % SPK.length]})`;
+  // konuşma payları ve tempo
+  const pay = {}; let toplamSn = 0, toplamK = 0; const kova = 24, K = Array(kova).fill(0), Ks = Array(kova).fill(0), sayac = {}, bicim = {};
+  P.forEach(p => { const a = +(p.bas ?? p.sn) || 0, b = Math.max(a + .5, +(p.bit ?? a) || a), sn = b - a, kel = (p.metin || '').split(/\s+/).filter(Boolean);
+    pay[p.ad] = (pay[p.ad] || 0) + sn; toplamSn += sn; toplamK += kel.length;
+    const i = Math.min(kova - 1, Math.floor(a / sure * kova)); K[i] += kel.length; Ks[i] += sn;
+    kel.forEach(w => { const yal = w.replace(/^[^\p{L}\d]+|[^\p{L}\d]+$/gu, '').replace(/['’].*$/, ''); const k = yal.toLocaleLowerCase(DIL?.locale || 'tr-TR');
+      if (k.length < 4 || DURAK_K.has(k) || /^\d+$/.test(k) || FIIL.test(k)) return; const kok = k.slice(0, 6); sayac[kok] = (sayac[kok] || 0) + 1;
+      const bb = bicim[kok] || (bicim[kok] = {}); bb[yal] = (bb[yal] || 0) + 1; }); });
+  if (!toplamSn || !toplamK) return;
+  const wpm = Math.round(toplamK / (toplamSn / 60));
+  const hiz = wpm < 115 ? 'Yavaş ve tane tane' : wpm < 145 ? 'Sakin' : wpm < 175 ? 'Doğal hız' : 'Hızlı';
+  const egri = K.map((k, i) => Ks[i] > 4 ? k / (Ks[i] / 60) : null);
+  const mx = Math.max(60, ...egri.filter(x => x != null)), mn = Math.min(...egri.filter(x => x != null), mx);
+  const W = 240, H = 64, nok = egri.map((x, i) => x == null ? null : [i / (kova - 1) * W, H - 6 - ((x - mn) / Math.max(1, mx - mn)) * (H - 16)]);
+  const yol = nok.filter(Boolean).map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+  const enHizli = egri.indexOf(Math.max(...egri.filter(x => x != null)));
+  const alan = yol ? yol + ` L${nok.filter(Boolean).slice(-1)[0][0].toFixed(1)} ${H} L${nok.find(Boolean)[0].toFixed(1)} ${H} Z` : '';
+  // halka
+  const dilim = Object.entries(pay).sort((a, b) => b[1] - a[1]); const r = 34, C = 2 * Math.PI * r; let ofs = 0;
+  const tek = dilim.length < 2;
+  const halka = tek ? [[T('Konuşma'), toplamSn, 'var(--vurgu)'], [T('Sessizlik'), Math.max(0, sure - toplamSn), 'var(--fill2, rgba(127,127,127,.25))']] : dilim.map(([ad, sn]) => [ad, sn, renk(ad)]);
+  const top = halka.reduce((a, x) => a + x[1], 0) || 1;
+  const yaylar = halka.map(([ad, sn, rk], i) => { const u = sn / top * C, s = `<circle r="${r}" cx="44" cy="44" fill="none" stroke="${rk}" stroke-width="10" stroke-dasharray="0 ${C.toFixed(2)}" data-d="${Math.max(0, u - 1.5).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-ofs).toFixed(2)}" style="transition-delay:${(i * .12).toFixed(2)}s"/>`; ofs += u; return s; }).join('');
+  const ozetMetni = ((v.ozet?.ozet || '') + ' ' + (v.ozet?.maddeler || []).join(' ')).toLocaleLowerCase(DIL?.locale || 'tr-TR');
+  const agirlik = (kok, n) => n * (ozetMetni.includes(kok) ? 2.5 : 1);
+  const kel = Object.entries(sayac).filter(([, n]) => n >= 2).sort((a, b) => agirlik(b[0], b[1]) - agirlik(a[0], a[1])).slice(0, 9);
+  const kmax = kel[0]?.[1] || 1;
+  const kelAd = kok => Object.entries(bicim[kok]).sort((a, b) => b[1] - a[1])[0][0];
+  const okuma = Math.max(1, Math.round(toplamK / 230));
+  const el = document.createElement('section'); el.id = 'stBakis'; el.className = 'st-bakis'; el.dataset.stsek = 'ozet';
+  el.innerHTML = `<div class="sb-ust"><b>${T('Bir bakışta')}</b><span>${zamanK(sure)} ${T('video')} · ${toplamK.toLocaleString(DIL?.locale || 'tr-TR')} ${T('kelime')} · ${T('okuması')} ${okuma} ${T('dk')}</span></div>
+    <div class="sb-izgara">
+      <div class="sb-kutu"><small>${tek ? T('Konuşma oranı') : T('Kim ne kadar konuştu')}</small>
+        <div class="sb-halka"><svg viewBox="0 0 88 88" aria-hidden="true"><circle r="${r}" cx="44" cy="44" fill="none" stroke="var(--fill)" stroke-width="10"/><g transform="rotate(-90 44 44)">${yaylar}</g></svg>
+          <span><em><b data-say="${tek ? Math.round(toplamSn / Math.max(1, sure) * 100) : dilim.length}">0</b>${tek ? '<i>%</i>' : ''}</em><small>${tek ? T('konuşma') : T('kişi')}</small></span></div>
+        <ul class="sb-lej">${(tek ? halka.slice(0, 1) : halka.slice(0, 4)).map(([ad, sn, rk]) => `<li><i style="background:${rk}"></i><span>${esc(ad)}</span><b>${Math.round(sn / top * 100)}%</b></li>`).join('')}</ul></div>
+      <div class="sb-kutu"><small>${T('Konuşma temposu')}</small>
+        <div class="sb-sayi"><b data-say="${wpm}">0</b><span>${T('kelime/dk')}<em>${T(hiz)}</em></span></div>
+        <svg class="sb-egri" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="${T('Zaman içinde tempo; dokununca o ana gider')}"><defs><linearGradient id="sbG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--vurgu)" stop-opacity=".35"/><stop offset="1" stop-color="var(--vurgu)" stop-opacity="0"/></linearGradient></defs>
+          <path class="sb-alan" d="${alan}" fill="url(#sbG)"/><path class="sb-cizgi" d="${yol}" fill="none" stroke="var(--vurgu)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" pathLength="1"/>
+          ${enHizli >= 0 && nok[enHizli] ? `<circle class="sb-tepe" cx="${nok[enHizli][0].toFixed(1)}" cy="${nok[enHizli][1].toFixed(1)}" r="3.5" fill="var(--vurgu)"/>` : ''}<line class="sb-imlec" x1="0" x2="0" y1="0" y2="${H}" stroke="var(--ink)" stroke-opacity=".35" hidden/></svg>
+        <div class="sb-alt"><span>0:00</span>${enHizli >= 0 ? `<button type="button" class="sb-tepe-b" data-sn="${Math.round(enHizli / kova * sure)}">${T('En hızlı an')} · ${zamanK(enHizli / kova * sure)}</button>` : ''}<span>${zamanK(sure)}</span></div></div>
+      <div class="sb-kutu"><small>${T('En çok geçenler')}</small>
+        <div class="sb-kel">${kel.length ? kel.map(([kok, n], i) => `<button type="button" data-k="${esc(kelAd(kok))}" style="--o:${(.55 + .45 * n / kmax).toFixed(2)};--s:${(12.5 + 6 * n / kmax).toFixed(1)}px;animation-delay:${(i * .05).toFixed(2)}s" title="${n} ${T('kez')}">${esc(kelAd(kok))}</button>`).join('') : `<p>${T('Tekrar eden kelime az.')}</p>`}</div></div>
+    </div>`;
+  const ust = $('#stSek'); (ust ? ust.after(el) : sag.prepend(el));
+  // görünür olunca canlan: sayılar sayar, halka dolar, eğri çizilir
+  const halkaDoldur = () => el.querySelectorAll('[data-d]').forEach(c => c.setAttribute('stroke-dasharray', c.dataset.d));
+  const canlan = () => { el.classList.add('canli'); requestAnimationFrame(() => requestAnimationFrame(halkaDoldur)); el.querySelectorAll('[data-say]').forEach(b => { const hedef = +b.dataset.say, t0 = performance.now();
+    const ad = t => { const k = Math.min(1, (t - t0) / 900); b.textContent = Math.round(hedef * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(ad); }; requestAnimationFrame(ad); }); };
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) { el.classList.add('canli'); halkaDoldur(); el.querySelectorAll('[data-say]').forEach(b => b.textContent = b.dataset.say); }
+  else new IntersectionObserver((g, o) => { if (g[0].isIntersecting){ o.disconnect(); canlan(); } }, {threshold: .3}).observe(el);
+  el.querySelector('.sb-tepe-b')?.addEventListener('click', e => gitSn(+e.currentTarget.dataset.sn));
+  const eg = el.querySelector('.sb-egri'), im = el.querySelector('.sb-imlec');
+  eg.addEventListener('mousemove', e => { const b = eg.getBoundingClientRect(), x = (e.clientX - b.left) / b.width; im.hidden = false; im.setAttribute('x1', x * W); im.setAttribute('x2', x * W); eg.title = zamanK(x * sure); });
+  eg.addEventListener('mouseleave', () => im.hidden = true);
+  eg.addEventListener('click', e => { const b = eg.getBoundingClientRect(); gitSn(Math.max(0, (e.clientX - b.left) / b.width * sure)); });
+  el.querySelectorAll('.sb-kel button').forEach(b => b.onclick = () => { const a = $('#ara'); if (!a) return; sekmeSec('metin', true); a.value = b.dataset.k; a.dispatchEvent(new Event('input', {bubbles: true})); });
+}
+
 /* ---------------------------------------------------------------- 19) YouTube gömmeyi kapatmışsa (2026-10-31; denemede "This video is unavailable" kutusu)
    Sahibi gömmeye izin vermeyen videoda oynatıcı kara kutu kalıyordu. Kaynak video bilgisayardaysa onunla oynatılır; yoksa kapak + "YouTube'da aç". */
 function oyHataBekle(temel, v){
@@ -728,7 +807,7 @@ sonucGoster = async function(temel, opts = {}){   // eslint-disable-line no-glob
   const r = await _sonucGoster(temel, opts);
   try{ const v = veri();
     duzeltKur(); miniOyBekle(); tekKonusmaci(v);
-    if (!v.toplanti){ yayinCiz(temel); sonrakiEkle(temel, v); okumaKur(temel, v, opts); haritaKur(temel, v, state.sonuc || {}); oyHataBekle(temel, v); }
+    if (!v.toplanti){ yayinCiz(temel); sonrakiEkle(temel, v); okumaKur(temel, v, opts); haritaKur(temel, v, state.sonuc || {}); try{ bakisKur(temel, v, state.sonuc || {}); }catch(e){} oyHataBekle(temel, v); }
     if (KR.acik && aktif() === temel){ $('#doc').classList.add('kurgu'); kurguCiz(); }
   }catch(e){ console.warn('Studio eki:', e); }
   return r;
@@ -758,11 +837,12 @@ function gelismisKur(){
 const _libGoster = libGoster;
 libGoster = function(tab, kaydir){ _libGoster(tab, kaydir); try{ $('#stSuz')?.classList.toggle('hidden', tab !== 'tx'); $('#stSahne')?.classList.toggle('hidden', tab !== 'tx' || !SZ.sahne); if (tab === 'tx' && SZ.sahne) $('#hist').classList.add('hidden'); if (tab === 'dl') temizlikKur(); }catch(e){} };   // eslint-disable-line no-global-assign
 
-const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=22'; document.head.appendChild(css);
+const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=25'; document.head.appendChild(css);
 const bekle = setInterval(() => { if ($('#hist')){ clearInterval(bekle); suzgecKur(); } }, 300);
 if ($('#dls')) new MutationObserver(() => temizlikKur()).observe($('#dls'), {childList: true});
 if ($('#aySistem') && $('#aySistem').textContent.trim() && !$('#aySistem').textContent.includes('Yükleniyor')) gelisimCiz();
 if (matchMedia('(max-width:520px)').matches && $('#link')) $('#link').placeholder = (window.DIL?.t || (x => x))('Video linki');
+{ const sc = document.createElement('script'); sc.src = '/static/studio_asistan.js?v=11'; document.body.appendChild(sc); }
 kurulumCiz(); { let n = 0; const t = setInterval(() => { if (state.tumListe || ++n > 60){ clearInterval(t); try{ sonCiz(); }catch(e){} } }, 300); }
 if (state.aktifTemel && state.sonuc){ duzeltKur(); if (!veri().toplanti){ yayinCiz(state.aktifTemel); sonrakiEkle(state.aktifTemel, veri()); } }
 })();

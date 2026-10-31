@@ -323,3 +323,44 @@ body.urun-transcript .job:has(.st-akis) .tick{display:none}
 .oyc.oy-yok .oy-not b{font-size:15px}.oyc.oy-yok .oy-not span{font-size:13px;color:rgba(255,255,255,.72);line-height:1.45}
 .oyc.oy-yok .oy-not .sbtn{margin-top:4px;background:#fff!important;color:#111!important}
 .oynatici.mini .oyc.oy-yok .oy-not span{display:none}
+
+/* 20) Bir bakışta: konuşma payı halkası, tempo eğrisi, en çok geçen kelimeler (2026-10-31) */
+.st-bakis{margin:4px 0 22px;padding:16px 16px 14px;border-radius:18px;background:var(--surface,rgba(255,255,255,.03));box-shadow:0 0 0 1px var(--hair) inset;position:relative;overflow:hidden}
+.st-bakis::before{content:"";position:absolute;inset:-40% -10% auto auto;width:60%;height:120%;pointer-events:none;background:radial-gradient(closest-side,rgba(var(--vurgu-rgb),.10),transparent)}
+.sb-ust{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sb-ust b{font:700 15px var(--sans)}.sb-ust span{color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.sb-izgara{display:grid;grid-template-columns:1fr 1.25fr 1.15fr;gap:10px}
+.st-bakis{container-type:inline-size}
+@container (max-width:640px){.sb-izgara{grid-template-columns:1fr 1fr}.sb-izgara .sb-kutu:last-child{grid-column:1/-1}}
+@container (max-width:400px){.sb-izgara{grid-template-columns:1fr}}
+.sb-kutu{position:relative;padding:12px;border-radius:14px;background:var(--fill);min-width:0}
+.sb-kutu>small{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}
+.sb-halka{position:relative;width:88px;height:88px;margin:2px auto 8px}
+.sb-halka svg{width:88px;height:88px}
+.sb-halka g circle{transition:stroke-dasharray 1s cubic-bezier(.2,.8,.2,1)}
+.sb-halka>span{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 20px var(--sans);font-variant-numeric:tabular-nums}
+.sb-halka>span small{font:500 10.5px var(--sans);color:var(--muted);margin-top:-2px}
+.sb-halka>span b{font:inherit}.sb-halka>span em{font-style:normal;display:flex;align-items:baseline}.sb-halka>span em i{font-style:normal;font-size:12px;margin-left:1px}
+.sb-lej{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:12.5px}
+.sb-lej li{display:grid;grid-template-columns:8px 1fr auto;gap:7px;align-items:center}
+.sb-lej i{width:8px;height:8px;border-radius:50%}.sb-lej span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sb-lej b{font-variant-numeric:tabular-nums;font-weight:600}
+.sb-sayi{display:flex;align-items:flex-end;gap:8px;margin-bottom:6px}
+.sb-sayi>b{font:700 34px/1 var(--sans);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sb-sayi span{font-size:12px;color:var(--muted);line-height:1.2;padding-bottom:3px}.sb-sayi em{display:block;font-style:normal;color:var(--vurgu);font-weight:600}
+.sb-egri{display:block;width:100%;height:64px;cursor:crosshair;overflow:visible}
+.sb-cizgi{stroke-dasharray:1;stroke-dashoffset:1}
+.st-bakis.canli .sb-cizgi{animation:sbCiz 1.4s cubic-bezier(.4,0,.2,1) .15s forwards}
+@keyframes sbCiz{to{stroke-dashoffset:0}}
+.sb-alan{opacity:0;transition:opacity .8s .6s}.st-bakis.canli .sb-alan{opacity:1}
+.sb-tepe{opacity:0}.st-bakis.canli .sb-tepe{animation:sbTepe 2.4s ease-in-out 1.4s infinite}
+@keyframes sbTepe{0%,100%{opacity:1;r:3.5}50%{opacity:.6;r:6}}
+.sb-alt{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.sb-tepe-b{border:0;background:rgba(var(--vurgu-rgb),.12);color:var(--vurgu);font:600 11.5px var(--sans);padding:3px 9px;border-radius:999px;cursor:pointer}
+.sb-tepe-b:hover{background:var(--vurgu);color:#fff}
+.sb-kel{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:baseline}
+.sb-kel button{border:0;background:none;color:var(--ink);opacity:var(--o);font:600 var(--s) var(--sans);padding:2px 4px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s}
+.st-bakis.canli .sb-kel button{animation:sbKel .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes sbKel{from{opacity:0;transform:translateY(5px)}}
+.sb-kel button:hover{background:rgba(var(--vurgu-rgb),.14);color:var(--vurgu);opacity:1}
+.sb-kel p{margin:0;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){.st-bakis .sb-halka g circle,.st-bakis .sb-cizgi,.st-bakis .sb-kel button,.sb-tepe{animation:none!important;stroke-dashoffset:0;opacity:1}}

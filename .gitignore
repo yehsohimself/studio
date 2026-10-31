@@ -74,6 +74,14 @@ static/logolar/
 # Chrome uzantısının simgeleri (Meet deposu kesimi bunları ister)
 !uzanti/ikonlar/*.png
 
+# Office: kişisel dosyalar ve sentetik örnek deposu (2026-10-31)
+/office/
+
+# Capital veri kökü (sentetik kök dahil; kod ayrı dosyalarda)
+capital/
+/ledger/
+/.sentetik/
+
 # kesilen depo: örnek medya ve ekran görüntüsü depoya girer (monorepo'da *.mp4/*.jpg dışarıdaydı)
 !static/*_ornek/*.mp4
 !docs/ekran.jpg

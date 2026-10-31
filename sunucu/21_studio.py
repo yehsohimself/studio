@@ -719,3 +719,127 @@ def indirilen_paylas(dosya):
         d[hedef.name] = {**d.get(kaynak.name, {}), "kalite": "paylas", "zaman": time.time()}
         _dizin_yaz(d)
     return jsonify({"dosya": hedef.name, **r})
+
+
+# ---- Studio asistanı (2026-10-31; kullanıcı: "çok kısıtlı hissediyorum, soruya soruyla karşılık verebilmeliyim, chatbox olmalı").
+# Konuşma ve önerilen işler studio_asistan.py'de; işleri tarayıcı kendi uçlarından başlatır (kapılar aynen geçerli). Davetliye kapalı (IZINLI'de yok).
+OZELLIK_ADLARI.update({"/api/asistan": "Studio asistanı", "/api/asistan/ses": "Studio asistanı: sesle yazma"})
+ASISTAN_TUR = {None: "Yazıya dökme", "": "Yazıya dökme", "indir": "İndirme", "altyazili": "Altyazılı video", "klip": "Klip", "kesim": "Kesim",
+               "dublaj": "Dublaj", "sessizlik": "Sessizlik kesme", "dudak": "Dudak senkronu"}
+
+
+def _asistan_isler():
+    out = []
+    for j in sorted(list(isler.values()), key=lambda x: -float(x.get("olusturma") or 0))[:10]:
+        if j.get("toplanti") or j.get("ghost") or "/.atolye/" in str(j.get("link") or ""):
+            continue
+        ad = ASISTAN_TUR.get(j.get("tur"), j.get("tur") or "İş")
+        d = {"sirada": "sırada", "calisiyor": f"sürüyor %{int(j.get('ilerleme') or 0)}", "bitti": "bitti", "hata": "hata verdi", "durdu": "durduruldu"}.get(j.get("durum"), j.get("durum"))
+        out.append(f"{ad} · {(j.get('baslik') or j.get('link') or '')[:70]} · {d}" + (f" · {j['temel']}" if j.get("temel") else ""))
+    return out
+
+
+@app.route("/api/asistan", methods=["GET", "POST", "DELETE"])
+def studio_asistan_uc():
+    import studio_asistan
+    if request.method == "GET":
+        import ortak, claude_yaz
+        h = studio_asistan.hafiza()
+        return jsonify({"mesajlar": h["mesajlar"][-60:], "tercihler": h["tercihler"], "kartlar": h["kartlar"], "ad": ortak.kimlik()["ilk_ad"], "hazir": claude_yaz.hazir()})
+    if request.method == "DELETE":
+        studio_asistan.temizle()
+        return jsonify({"tamam": True})
+    g = request.get_json(silent=True) or {}
+    mesaj = str(g.get("mesaj") or "").strip()[:4000]
+    if not mesaj:
+        return jsonify({"hata": "Mesaj boş."}), 400
+    temel = str(g.get("temel") or "")
+    if temel and not re.match(r"^[\w\-]+$", temel):
+        temel = ""
+    link = str(g.get("link") or "").strip()[:600]
+    link = link if re.match(r"^https?://\S+$", link) else ""
+    ciktilar, onizleme = [], {}
+    if temel:
+        try:
+            for ad, x in _dizin_oku().items():
+                if x.get("temel") == temel:
+                    ciktilar.append(f"{x.get('kalite') or 'video'}" + (f" {x.get('dil')}" if x.get("dil") else "") + f" ({ad})")
+        except Exception:  # noqa: BLE001
+            pass
+    if link:
+        for (l, _c), oz in onizleme_bellek.items():
+            if l == link:
+                onizleme = {k: oz.get(k) for k in ("baslik", "sure", "kanal")}
+                if isinstance(oz.get("mevcut"), dict):
+                    onizleme["mevcut"] = oz["mevcut"].get("temel") or ""
+                break
+    isl = _asistan_isler()
+
+    def _akis():
+        try:
+            for tur, p in studio_asistan.akis(mesaj, temel, link, isl, ciktilar, onizleme):
+                if tur == "metin":
+                    yield p
+                elif tur == "ek":
+                    yield "\x00EK:" + json.dumps(p, ensure_ascii=False)
+                else:
+                    yield "\x00HATA:" + str(p)
+        except Exception as e:  # noqa: BLE001
+            print(f"Studio asistanı: {e}", flush=True)
+            yield "\x00HATA:Bir şey ters gitti; yeniden dener misiniz?"
+    return Response(stream_with_context(_akis()), mimetype="text/plain; charset=utf-8", headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"})
+
+
+@app.post("/api/asistan/not")
+def studio_asistan_not():
+    """Tarayıcının sohbete eklediği bilgi satırı (ör. sohbetten başlatılan iş bitti) ya da bir işin başlatıldığı."""
+    import studio_asistan
+    g = request.get_json(silent=True) or {}
+    metin = str(g.get("metin") or "").strip()[:600]
+    if not metin:
+        return jsonify({"hata": "Boş."}), 400
+    ek = g.get("ek") if isinstance(g.get("ek"), dict) else {}
+    if any(m.get("rol") == "not" and m.get("metin") == metin for m in studio_asistan.hafiza()["mesajlar"][-6:]):
+        return jsonify({"tamam": True, "tekrar": True})            # aynı iş iki cihazda izlenince not bir kez düşer
+    studio_asistan.mesaj_ekle({"rol": "not", "metin": metin, **{k: str(v)[:200] for k, v in ek.items() if k in ("temel", "is", "tur")}})
+    return jsonify({"tamam": True})
+
+
+@app.post("/api/asistan/kart")
+def studio_asistan_kart():
+    import studio_asistan
+    g = request.get_json(silent=True) or {}
+    return jsonify({"tamam": studio_asistan.kart_yaz(g.get("anahtar"), g.get("durum"))})
+
+
+@app.post("/api/asistan/tercih")
+def studio_asistan_tercih():
+    import studio_asistan
+    g = request.get_json(silent=True) or {}
+    if "sil" in g:
+        return jsonify({"tamam": studio_asistan.tercih_sil(int(g.get("sil") or -1))})
+    return jsonify({"tamam": studio_asistan.tercih_ekle(g.get("metin"))})
+
+
+@app.post("/api/asistan/ses")
+def studio_asistan_ses():
+    """Asistana sesle yazma: kullanıcının KENDİ kısa sesi (düğmeye basınca kaydeder, bırakınca gönderir) → metin. Ses saklanmaz."""
+    f = request.files.get("dosya")
+    if not f:
+        return jsonify({"hata": "Ses gelmedi."}), 400
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        yol = Path(tmp) / ("s" + (Path(f.filename).suffix if f.filename else ".webm"))
+        f.save(str(yol))
+        if yol.stat().st_size < 1500:
+            return jsonify({"hata": "Ses çok kısa."}), 400
+        dil = request.form.get("dil") or "tr"
+        dil = dil if re.match(r"^[a-z]{2}$", dil) else "tr"
+        p = subprocess.run([str(KLASOR / ".venv" / "bin" / "python"), str(KLASOR / "sesnot.py"), str(yol), dil], capture_output=True, text=True, timeout=180)
+    try:
+        metin = json.loads(p.stdout.strip().splitlines()[-1]).get("metin", "").strip()
+    except Exception:  # noqa: BLE001
+        return jsonify({"hata": "Sesi yazıya dökemedim."}), 500
+    if not metin:
+        return jsonify({"hata": "Seste konuşma duyamadım."}), 400
+    return jsonify({"metin": metin})
