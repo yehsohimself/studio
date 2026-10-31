@@ -63,7 +63,7 @@ def kes(urun, hedef, log=print):
 
     for p in U["parcalar"]:
         kopyala(KOK / "sunucu" / f"{p}.py", f"sunucu/{p}.py")
-    for m in sorted(set(U["moduller"]) | set(_kapanis(U["parcalar"], U["kapanis"]) if U.get("kapanis") else [])):
+    for m in sorted(set(U["moduller"]) | set(_kapanis(U["parcalar"], U["kapanis"], U.get("haric", MEET_HARIC)) if U.get("kapanis") else [])):
         if (KOK / f"{m}.py").exists():
             kopyala(KOK / f"{m}.py", f"{m}.py")
         else:
@@ -113,7 +113,7 @@ def kes(urun, hedef, log=print):
     for f in list(hedef.rglob("*")):
         rel = f.relative_to(hedef).as_posix()
         if f.is_file() and rel not in kopyalanan and not rel.startswith(".git/") and f.suffix in {".py", ".js", ".css", ".html", ".svg", ".png", ".md", ".txt", ".json", ".webmanifest", ".command", ".mp4", ".ini", ".sh"} \
-                and not rel.startswith(("kayitlar/", "profil/", "indirilenler/", "yuklemeler/", ".onbellek/", "static/derlenmis/", "pt/", "pt_medya/", "modeller/")) and rel not in ("ayarlar.json", "sesler.json", "takip.json", "CLAUDE.md"):
+                and not rel.startswith(("kayitlar/", "profil/", "ghost/", "indirilenler/", "yuklemeler/", ".onbellek/", "static/derlenmis/", "pt/", "pt_medya/", "modeller/", ".yedek/", ".cop/")) and rel not in ("ayarlar.json", "sesler.json", "takip.json", "CLAUDE.md"):
             f.unlink()
     for d in sorted((x for x in hedef.rglob("*") if x.is_dir() and ".git" not in x.parts), key=lambda x: -len(x.parts)):
         if not any(d.iterdir()):
@@ -221,22 +221,22 @@ gider) ya da yerel Ollama modeli gerekir. Kurulum: yukarıdaki dört komut, sonr
 
 
 # ----------------------------------------------------------------------------- PT (2026-10-29)
-PT_MEDYA_JSON = ["kartlar.json", "youtube.json", "youtube_sorgu.json", "anatomi.json", "storyboard.json"]
+PT_MEDYA_JSON = ["kartlar.json", "youtube.json", "youtube_sorgu.json", "anatomi.json", "storyboard.json", "modul_video.json"]
 PT_MEDYA_HARIC = ("istekler.json", "_kisi.png", "_onizleme.png", "_ses_model", "bekleyen.json", "ham.mp4", "bas.png", "bit.png")
 
 URUNLER["pt"] = {
-    "ad": "PT",
+    "ad": "Health",
     "parcalar": [],
     "moduller": ["pt", "pt_site", "pt_sunucu", "pt_beslenme", "pt_bls", "pt_form", "pt_hareket", "pt_hizli", "pt_ilk", "pt_kanit", "pt_kart",
-                 "pt_kitaplik", "pt_koc", "pt_oneri", "pt_oyun", "pt_programlar", "pt_push", "pt_rota", "pt_saglik", "pt_ses", "pt_sohbet",
+                 "pt_kitaplik", "pt_koc", "pt_oneri", "pt_oyun", "pt_programlar", "pt_hedef", "pt_kontrol", "pt_uzun", "pt_modul", "pt_yeniden", "pt_push", "pt_rota", "pt_saglik", "pt_ses", "pt_sohbet",
                  "pt_storyboard", "pt_anatomi", "pt_yemek", "pt_youtube", "claude_yaz", "ortak", "gizli", "sizinti"],
-    "static": ["pt.html", "pt-sw.js", "pt.webmanifest", "pt-ikon-180.png", "pt-ikon-192.png", "pt-ikon-512.png", "pt-ikon-512-maskable.png", "logo/pt.svg"],
-    "dosyalar": ["LICENSE", "pytest.ini", "tests/test_pt_oyun.py"],
+    "static": ["pt.html", "pt_gorsel.js", "pt_gorsel.css", "pt-sw.js", "pt.webmanifest", "pt-ikon-180.png", "pt-ikon-192.png", "pt-ikon-512.png", "pt-ikon-512-maskable.png", "logo/pt.svg"],
+    "dosyalar": ["LICENSE", "pytest.ini", "tests/test_pt_oyun.py", "tests/test_pt_hedef.py", "tests/test_pt_uzun.py", "tests/test_pt_modul.py", "tests/test_pt_yeniden.py"],
     "kopya": [f"pt_medya/{a}" for a in PT_MEDYA_JSON] + ["modeller/bls/bls.json"],
     "sablon": "disa/pt",
     "requirements_cikar": [],
     "requirements": "flask\nrequests\npillow\nnumpy\npyobjc-framework-Vision\npytest\n",
-    "komut": ("", "PT.command"),
+    "komut": ("", "Health.command"),
 }
 
 
@@ -244,7 +244,7 @@ URUNLER["pt"] = {
 URUNLER["content"] = {
     "ad": "Content",
     "parcalar": [],
-    "moduller": ["content", "content_site", "content_sunucu", "content_yontem", "content_kanit", "content_araclar", "content_dogrulama",
+    "moduller": ["content", "content_site", "content_sunucu", "content_yontem", "content_kanit", "content_araclar", "content_dogrulama", "content_benzer",
                  "content_test", "claude_yaz", "goruntu", "sesnot", "ortak", "gizli", "sizinti"],
     "static": ["content.html", "logo/content.svg"],
     "dosyalar": ["LICENSE", "pytest.ini"],
@@ -267,7 +267,7 @@ URUNLER["meet"] = {
     "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "04_toplanti", "05_asana", "07_cekirdek", "07_meet", "08_canli",
                  "09_cekirdek", "09_meet", "10_sayfalar", "11_ozellik_sayaci", "12_api", "14_haftalik", "16_altyapi_ve_meet", "16_meet",
                  "17_disa_aktarim", "18_indirilenler", "20_meet_gelisim", "22_misafir", "23_misafir_meet", "24_guvenlik", "25_sahip_uzak",
-                 "27_meet_altyazi", "28_meet_devam", "29_meet_saglik", "30_kayit_disi", "31_yazi_dili"],
+                 "27_meet_altyazi", "28_meet_devam", "29_meet_saglik", "30_kayit_disi", "31_yazi_dili", "33_kayit_bekci"],
     "kapanis": ["site", "transkript", "canli", "canli_asistan", "sesnot", "duman_testi", "yeniden_baslat", "sizinti", "disa_depo", "yedek",
                 "geri_yukle", "videohub_mcp", "isimlendir", "takip", "dolgu", "studio_duzelt"],
     "moduller": [],
@@ -277,7 +277,7 @@ URUNLER["meet"] = {
     "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "ayarlar.ornek.json", ".gitignore", "kaydedici/kaydedici.swift", "kaydedici/Info.plist",
                  "uzanti", "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_yedek.py", "tests/test_meet_acil.py",
                  "tests/test_meet_altyazi.py", "tests/test_meet_bekleme.py", "tests/test_meet_devam.py", "tests/test_meet_gelisimim.py",
-                 "tests/test_meet_kayit_disi.py"],
+                 "tests/test_meet_kayit_disi.py", "tests/test_kayit_bekci.py"],
     "sablon": "disa/meet",
     "requirements_cikar": ["python-pptx", "scenedetect", "opencv-python-headless", "pywebpush", "auto-editor", "shazamio"],
     "komut": ("", "Meet.command"),
@@ -311,6 +311,32 @@ def _meet_son(hedef):
     gi = hedef / ".gitignore"
     if "!uzanti/ikonlar/*.png" not in gi.read_text(encoding="utf-8"):
         gi.write_text(gi.read_text(encoding="utf-8") + "!uzanti/ikonlar/*.png\n", encoding="utf-8")
+
+
+# ----------------------------------------------------------------------------- Ghost (2026-10-29)
+# Ghost + yazıya dökme motoru (video ve podcast linklerinden taslak için). Meet, Content, Couple, PT, Atölye modülleri alınmaz; Ghost'un bunları
+# çağıran yerleri try/except ile korunur. Kişiye özel kaynaklar, konular ve ses kodda değil: ilk açılışta kullanıcı kurar (ghost_kurulum.py).
+GHOST_HARIC = re.compile(r"^(atolye|content|couple|pt|pt_|meet_|danisman|kisaca|sinyaller|onbrifing|canli|davetler|karar_zinciri|toplanti_kapisi|"
+                         r"gorevler|sozler|kisiler|tarifler|sesli_ozet|teslim|sirketler)")
+URUNLER["ghost"] = {
+    "ad": "Ghost",
+    "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "07_cekirdek", "07_ghost", "09_cekirdek", "10_sayfalar",
+                 "11_ozellik_sayaci", "12_api", "16_altyapi_ve_meet", "17_disa_aktarim", "18_indirilenler", "19_ghost_gelisim", "24_guvenlik",
+                 "32_ghost_kurulum", "33_ghost_danisman"],
+    "kapanis": ["site", "transkript", "sesnot", "duman_testi", "yeniden_baslat", "sizinti", "yedek", "geri_yukle", "isimlendir", "takip",
+                "ghost_kurulum", "ghost_danisman", "paylasim", "kesif", "karisim", "tetik", "konu_toplantisi", "fikir_kartlari", "hesaplar", "performans", "yerimleri",
+                "ghost_blog", "ghost_defter", "ghost_gelisim", "ghost_hikaye", "ghost_kaynak", "ghost_kendi", "ghost_rehber", "ghost_tempo", "ghost_yanit",
+                "abonelik", "bultenler", "kantan", "seckiler", "reklam_arsivi", "oranlar", "dil_cevir"],
+    "haric": GHOST_HARIC,
+    "moduller": [],
+    "static": ["index.html", "ghost_tek.html", "dil.js", "dil", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
+               "ikon-512-maskable.png", "il", "logo", "ikon"],
+    "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "uzanti/x.js", "uzanti/ig.js", "uzanti/ikonlar",
+                 "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_ghost_tempo.py", "tests/test_ghost_kurulum.py", "tests/test_ghost_danisman.py"],
+    "sablon": "disa/ghost",
+    "requirements_cikar": ["python-pptx", "scenedetect", "opencv-python-headless", "pywebpush", "auto-editor", "shazamio", "segno"],
+    "komut": ("", "Ghost.command"),
+}
 
 
 def _kapanis(parcalar, tohum, haric=MEET_HARIC):
@@ -354,7 +380,16 @@ def _mimari(urun):
     # ürün bölümünden yalnız bu ürün ve motor kalır
     a = s.find("## Ürünler"); b = s.find("## Veri")
     if a > 0 and b > a:
-        satirlar = [l for l in s[a:b].splitlines() if l.startswith("## ") or l.startswith(f"- **{URUNLER[urun]['ad']}**") or (l.startswith("  ") and "**" not in l)]
+        satirlar, tut = [], False                         # bir madde ve devam satırları birlikte kalır ya da çıkar
+        for l in s[a:b].splitlines():
+            if l.startswith("## "):
+                satirlar.append(l); tut = False
+            elif l.startswith("- "):
+                tut = l.startswith(f"- **{URUNLER[urun]['ad']}**")
+                if tut:
+                    satirlar.append(l)
+            elif l.startswith("  ") and tut:
+                satirlar.append(l)
         s = s[:a] + "\n".join(satirlar) + "\n\n" + s[b:]
     return s.replace("Altı ürün, tek sunucu süreci, ortak motor.", f"{URUNLER[urun]['ad']} ve ortak motor; kardeş ürünler kurulu değilse kapalıdır.")
 

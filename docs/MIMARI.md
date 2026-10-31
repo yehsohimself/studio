@@ -35,12 +35,6 @@ Studio ve ortak motor; kardeş ürünler kurulu değilse kapalıdır. Bu belge k
 - **Studio** (`sunucu/21_studio.py`, `static/studio_ek.js`): yerinde düzeltme (`studio_duzelt.py`), yayın paketi (`yayin.py`), metinden kurgu,
   altyazı önizlemesi (`studio_onizle.py`), görüntü araması (`sahne_dizin.py`), gelişim döngüsü (`studio_gelisim.py`: araç sürümleri, haftalık
   takip, öz değerlendirme). Marka serileri `markalar/<kod>/stil.json` ile tanımlanır (`marka.py`); kodda marka adı yoktur.
-  `tarifler.py`, `sohbet.py`, `sirketler.py`, `kisiler.py`, `takvim.py`, `gorevler.py`): kayıt (`kaydedici/`, Swift, ScreenCaptureKit) ve Chrome
-  uzantısı (`uzanti/`) sinyalleri → yazıya dökme → şirket/müşteri seçimi → Kısaca, danışman notu, sinyaller → Drive ve Asana. Şirketler ve
-  müşteriler yalnız `ayarlar.json` `sirketler` listesinden okunur.
-  `yerimleri.py`): keşif (RSS + Google Haberler + izlenen hesaplar) → açı elemesi → günün karışımı → hakem → kartlar; profil `profil/x.json`
-  (ses, görüşler, tercihler, takım, X hesabı).
-  müşteri dosyası (Meet, Asana, Drive); Atölye motoru (`atolye*.py`) araştırma için.
 
 ## Veri (git dışı)
 

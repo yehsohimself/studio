@@ -532,7 +532,7 @@ const _secimCiz = secimCiz;
 secimCiz = function(){ const r = _secimCiz(); try{ if (state.secim === 'kes') dolguYaz(); }catch(e){} return r; };   // eslint-disable-line no-global-assign
 /* ---------------------------------------------------------------- 14) ana sayfa: kurulum denetimi ve son çalışmalar (2026-10-27)
    Yeni kuran biri eksikleri (ffmpeg, ses modeli, Claude/yerel model) tek kartta görür; geri gelen kullanıcı son videolarına tek tıkla döner. */
-function anaKutu(){ let k = $('#stAna'); if (!k){ k = document.createElement('div'); k.id = 'stAna'; $('.composer')?.after(k); } return k; }
+function anaKutu(){ let k = $('#stAna'); if (!k){ k = document.createElement('div'); k.id = 'stAna'; ($('#jobsSec') || $('.composer'))?.after(k); } return k; }   // süren iş kartı son çalışmaların ÜSTÜNDE
 async function kurulumCiz(yenile){
   let d; try{ d = await json('/api/kurulum' + (yenile ? '?yenile=1' : '')); }catch(e){ return; }
   const k = anaKutu(); let kart = $('#stKurulum');
@@ -573,6 +573,154 @@ document.addEventListener('keydown', e => {
   else if (e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'l'){ e.preventDefault(); oyGit(Math.max(0, sn + (e.key.toLowerCase() === 'j' ? -10 : 10))); }
 });
 
+/* ---------------------------------------------------------------- 15) iş kartında akış görseli (2026-10-31; kullanıcı: "anlatımı netleştiren, hareketli görseller")
+   Beş metin adımı ve ince çubuk yerine: düğümlerden geçen bir hat (biten dolu, süren nabızlı, bekleyen soluk; süren düğüme akan ışık) ve
+   altında o adımın ne yaptığını gösteren küçük sahne: ses dalgası dolar, konuşmacı blokları belirir, satırlar yazılır, özet maddeleri sıralanır. */
+const AKIS_IK = {ceviri: 'M4 5h7M7 3v2c0 4-2 7-5 9M5 8c1 3 3 5 6 6M12 20l4-9 4 9M13.5 17h5', seslendir: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4M8 21h8', ses: 'M4 12h2l2-6 3 12 3-9 2 5 2-2h2', kim: 'M16 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M21 20v-2a4 4 0 0 0-3-3.9M15.5 4.1a3.5 3.5 0 0 1 0 6.8',
+  metin: 'M5 7h14M5 12h10M5 17h7', belge: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6', ozet: 'M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2zM19 15l1 2 2 1-2 1-1 2-1-2-2-1 2-1z',
+  baglan: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1', indir: 'M12 4v12m0 0l-5-5m5 5l5-5M4 20h16', birles: 'M6 4v6a4 4 0 0 0 4 4h4M18 4v6a4 4 0 0 1-4 4M12 14v6',
+  kaydet: 'M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6', video: 'M4 6h16v12H4zM4 10h16M8 6v12M16 6v12', altyazi: 'M4 5h16v14H4zM7 14h4M13 14h4M7 11h10', yaz: 'M4 20h4L19 9l-4-4L4 16zM14 6l4 4'};
+const AKIS_ADIM = {tx: [['ses', 'Ses'], ['kim', 'Konuşmacılar'], ['metin', 'Metin'], ['belge', 'Belge'], ['ozet', 'Özet']],
+  indir: [['baglan', 'Bağlan'], ['indir', 'İndir'], ['birles', 'Birleştir'], ['kaydet', 'Kaydet']], video: [['video', 'Video'], ['altyazi', 'Altyazı'], ['yaz', 'Yaz'], ['kaydet', 'Kaydet']],
+  dublaj: [['video', 'Video'], ['ceviri', 'Hazırlık'], ['seslendir', 'Seslendir'], ['kaydet', 'Kaydet']], dudak: [['belge', 'Hazırla'], ['indir', 'Gönder'], ['kim', 'Eşle'], ['kaydet', 'İndir']]};
+const AKIS_ANLAT = {ses: 'Videonun sesi alınıyor', kim: 'Kim ne zaman konuşmuş, ayrılıyor', metin: 'Konuşma yazıya dökülüyor', belge: 'Word, metin ve altyazı dosyaları yazılıyor', ozet: 'Özet, öne çıkanlar ve bölümler çıkarılıyor',
+  baglan: 'Siteye bağlanılıyor', indir: 'Dosya iniyor', ceviri: 'Konuşanın sesi örnekleniyor, cümleler hazırlanıyor', seslendir: 'Konuşanın sesiyle yeni dilde söyleniyor', birles: 'Görüntü ve ses birleştiriliyor', kaydet: 'İndirilenler’e kaydediliyor', video: 'Kaynak video bulunuyor', altyazi: 'Her altyazı parçası çiziliyor', yaz: 'Altyazılar videoya işleniyor'};
+const DALGA = Array.from({length: 36}, (_, i) => 22 + Math.round(34 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * .61)) + (i % 5) * 4));
+function akisTuru(d){ return d.tur === 'indir' ? 'indir' : d.tur === 'dudak' ? 'dudak' : d.tur === 'dublaj' ? 'dublaj' : d.tur ? 'video' : 'tx'; }
+function akisKur(el, d){
+  let a = el.querySelector('.st-akis');
+  if (!a){ a = document.createElement('div'); a.className = 'st-akis'; const tur = akisTuru(d), adimlar = AKIS_ADIM[tur];
+    a.innerHTML = `<div class="sa-yol"><svg class="sa-cizgi" aria-hidden="true"></svg>${adimlar.map(([k, ad], i) => `<div class="sa-d" data-n="${i + 1}"><i><svg viewBox="0 0 24 24"><path d="${AKIS_IK[k]}"/></svg></i><b>${ad}</b></div>`).join('')}</div><div class="sa-sahne" aria-hidden="true"></div>`;
+    (el.querySelector('.steps') || el.querySelector('.top')).after(a); a._tur = tur; a._n = adimlar.length; }
+  const n = d.durum === 'bitti' ? a._n + 1 : (d.adim || 0), bitti = ['hata', 'iptal', 'kesildi'].includes(d.durum);
+  a.dataset.durum = d.durum === 'bitti' ? 'bitti' : bitti ? 'durdu' : d.durum === 'sirada' ? 'sirada' : 'calisiyor';
+  a.querySelectorAll('.sa-d').forEach(x => { const k = +x.dataset.n; x.className = 'sa-d ' + (k < n ? 'ok' : k === n && !bitti && d.durum === 'calisiyor' ? 'on' : ''); });
+  akisCizgi(a, n, d.durum === 'calisiyor');
+  akisSahne(a, d, n);
+}
+function akisCizgi(a, n, calisiyor){
+  const svg = a.querySelector('.sa-cizgi'), ds = [...a.querySelectorAll('.sa-d i')]; if (!svg || ds.length < 2) return;
+  const r = a.querySelector('.sa-yol').getBoundingClientRect(); if (!r.width) return;
+  const c = ds.map(e => { const b = e.getBoundingClientRect(); return [b.left + b.width / 2 - r.left, b.top + b.height / 2 - r.top]; });
+  let p = '';
+  for (let i = 0; i < c.length - 1; i++){ const [x1, y] = c[i], [x2] = c[i + 1]; const d = `M${x1 + 17} ${y} L${x2 - 17} ${y}`;
+    const k = i + 1; p += `<path class="sa-p ${k < n - 1 || (k === n - 1 && n > a._n) ? 'ok' : k === n - 1 && calisiyor ? 'ak' : ''}" d="${d}"/>`; }
+  svg.setAttribute('viewBox', `0 0 ${r.width} ${r.height}`); svg.innerHTML = p;
+}
+function akisSahne(a, d, n){
+  const s = a.querySelector('.sa-sahne'), tur = a._tur, adim = AKIS_ADIM[tur][Math.min(n, a._n) - 1]?.[0] || '', iler = Math.max(0, Math.min(100, d.ilerleme || 0));
+  const anahtar = `${a.dataset.durum}:${adim}`;
+  if (s.dataset.k !== anahtar){ s.dataset.k = anahtar;
+    if (a.dataset.durum === 'bitti') s.innerHTML = `<div class="sa-bitti"><svg viewBox="0 0 24 24"><path class="sa-tik" d="M5 12.5l4.5 4.5L19 7"/></svg><span>${d.tur === 'indir' ? 'İndi' : d.tur ? 'Video hazır' : 'Transkript hazır'}</span></div>`;
+    else if (a.dataset.durum === 'durdu') s.innerHTML = '';
+    else if (a.dataset.durum === 'sirada') s.innerHTML = `<div class="sa-bekle"><i></i><i></i><i></i><span>Önündeki iş bitince başlar</span></div>`;
+    else if (adim === 'ses' || adim === 'indir' || adim === 'video' || adim === 'seslendir') s.innerHTML = `<div class="sa-dalga">${DALGA.map(h => `<i style="height:${h}%"></i>`).join('')}</div><div class="sa-not"></div>`;
+    else if (adim === 'kim') s.innerHTML = `<div class="sa-kim">${[0, 1, 0, 2, 0, 1, 2, 0, 1, 0, 2, 1].map((k, i) => `<i style="--k:var(--s${k + 1});flex:${[9, 5, 7, 4, 6, 8, 3, 7, 5, 6, 4, 8][i]};animation-delay:${(i * .28).toFixed(2)}s"></i>`).join('')}</div><div class="sa-not">${AKIS_ANLAT.kim}</div>`;
+    else if (adim === 'metin' || adim === 'altyazi' || adim === 'yaz' || adim === 'ceviri') s.innerHTML = `<div class="sa-metin">${[92, 78, 88, 64, 84].map((w, i) => `<i style="width:${w}%;animation-delay:${(i * .35).toFixed(2)}s"></i>`).join('')}</div><div class="sa-zaman"><div class="sa-dolu"></div><div class="sa-kafa"></div></div><div class="sa-not"></div>`;
+    else if (adim === 'belge' || adim === 'birles' || adim === 'kaydet' || adim === 'baglan') s.innerHTML = `<div class="sa-belge">${['docx', 'txt', 'srt'].map((x, i) => `<i style="animation-delay:${i * .4}s"><b>${x}</b></i>`).join('')}</div><div class="sa-not">${AKIS_ANLAT[adim] || ''}</div>`;
+    else if (adim === 'ozet') s.innerHTML = `<div class="sa-ozet">${[0, 1, 2].map(i => `<i style="animation-delay:${i * .45}s"><u></u><span style="width:${[86, 62, 74][i]}%"></span></i>`).join('')}</div><div class="sa-not">${AKIS_ANLAT.ozet}</div>`;
+    else s.innerHTML = '';
+  }
+  const ind = !(iler > 0);
+  const dalga = s.querySelector('.sa-dalga'); if (dalga){ dalga.classList.toggle('ind', ind); const bars = dalga.children, kac = Math.round(iler / 100 * bars.length); [...bars].forEach((b, i) => b.classList.toggle('ok', !ind && i < kac)); }
+  const zaman = s.querySelector('.sa-zaman'); if (zaman){ zaman.classList.toggle('ind', ind); zaman.querySelector('.sa-dolu').style.width = iler + '%'; zaman.querySelector('.sa-kafa').style.left = iler + '%';
+    const m = s.querySelector('.sa-metin'); if (m) m.style.setProperty('--iler', iler + '%'); }
+  const not = s.querySelector('.sa-not'); if (not){ const satir = (!d.tur && adim === 'metin' && d.son_satir) ? `“${d.son_satir}”` : (d.model_iniyor ? 'Ses modeli indiriliyor; bir kereliktir' : (AKIS_ANLAT[adim] || '')); if (not.textContent !== satir) not.textContent = satir; }
+}
+const _renderJob = renderJob;
+renderJob = function(d){   // eslint-disable-line no-global-assign
+  _renderJob(d);
+  try{ const el = $('#job-' + d.id); if (el && kullaniciIsi(d)){ akisKur(el, d);
+    if (d.tur === 'dublaj' && d.durum === 'calisiyor'){ const st = el.querySelector('.st'), m = {1: 'Video hazırlanıyor', 2: 'Ses hazırlanıyor', 3: d.ilerleme > 0 ? `Seslendiriliyor · ${d.ilerleme}%` : 'Seslendiriliyor', 4: 'Kaydediliyor'}[d.adim];
+      if (st && m) st.innerHTML = m + (d.onizleme ? '<small>ilk 30 saniye, önizleme</small>' : ''); } } }catch(e){ console.warn('akış görseli:', e); }
+};
+window.addEventListener('resize', () => $$('.st-akis').forEach(a => { const el = a.closest('.job'), d = state.jobData?.[el?.id.replace('job-', '')]; if (d) akisCizgi(a, d.durum === 'bitti' ? a._n + 1 : (d.adim || 0), d.durum === 'calisiyor'); }));
+
+/* ---------------------------------------------------------------- 16) videonun haritası (okuma görünümü)
+   Başlığın altında tek şerit: bölümler (üst sıra, adlarıyla), kim ne zaman konuşmuş (alt sıra, konuşmacı renkleriyle), öne çıkan anlar (işaret),
+   oynatma başı (video çalarken ilerler). Tıklayınca o ana gider. Kısa videoda (90 sn altı) gösterilmez: anlatacak bir şey yok. */
+let smZam = null;
+function haritaKur(temel, v, d){
+  $('#stMap')?.remove(); clearInterval(smZam);
+  const sure = +v.sure || 0, P = d.paragraflar || [];
+  if (v.toplanti || sure < 90 || P.length < 3) return;
+  const cover = $('#doc .cover'); if (!cover) return;
+  const adlar = Object.values(v.etiket || {}), renk = ad => `var(${SPK[Math.max(0, adlar.indexOf(ad)) % SPK.length]})`;
+  const bol = [...(v.ozet?.bolumler || [])].filter(b => b && b.sn != null).sort((a, b) => a.sn - b.sn).map((b, i) => i ? b : {...b, sn: 0});   // ilk bölüm videonun başından sayılır (YouTube kuralı)
+  const tekKisi = adlar.length < 2;
+  const yuz = sn => Math.max(0, Math.min(100, sn / sure * 100));
+  // konuşmacı blokları: ardışık aynı kişi birleşir; 0,6 sn'den kısa parçalar çizilmez
+  const blok = []; P.forEach(p => { const a = p.bas ?? p.sn, b = p.bit ?? a; const son = blok[blok.length - 1];
+    if (son && son.ad === p.ad && a - son.bit < 2){ son.bit = Math.max(son.bit, b); } else blok.push({ad: p.ad, bas: a, bit: b}); });
+  const klip = (v.klipler || []).filter(k => k.bas != null);
+  const m = document.createElement('div'); m.id = 'stMap'; m.className = 'st-map';
+  m.classList.toggle('tek', tekKisi);
+  m.innerHTML = `<div class="sm-ust"><span>${bol.length ? `${bol.length} bölüm` : 'Zaman çizgisi'}${adlar.length > 1 ? ` · ${adlar.length} konuşmacı` : ''}${klip.length ? ` · ${klip.length} öne çıkan an` : ''}</span><span class="sm-ip" hidden></span></div>
+    <div class="sm-serit" role="slider" aria-label="Videoda bir ana git" aria-valuemin="0" aria-valuemax="${Math.round(sure)}" tabindex="0">
+      ${bol.length ? `<div class="sm-bol">${bol.map((b, i) => { const bit = bol[i + 1] ? bol[i + 1].sn : sure, w = yuz(bit) - yuz(b.sn); return `<i style="left:${yuz(b.sn)}%;width:${w}%;animation-delay:${(i * .06).toFixed(2)}s" title="${esc(zamanK(b.sn))} · ${esc(b.baslik)}"><span>${esc(b.baslik)}</span></i>`; }).join('')}</div>` : ''}
+      ${tekKisi ? '' : `<div class="sm-kon">${blok.map((b, i) => (b.bit - b.bas) < .6 ? '' : `<i style="left:${yuz(b.bas)}%;width:${Math.max(.15, yuz(b.bit) - yuz(b.bas))}%;--k:${renk(b.ad)};animation-delay:${Math.min(1.2, i * .02).toFixed(2)}s" title="${esc(b.ad)} · ${esc(zamanK(b.bas))}"></i>`).join('')}</div>`}
+      ${klip.length ? `<div class="sm-klip">${klip.map(k => `<i style="left:${yuz(k.bas)}%;width:${Math.max(.4, yuz(k.bit) - yuz(k.bas))}%" title="${esc(k.kanca || k.baslik || 'Öne çıkan an')} · ${esc(zamanK(k.bas))}"></i>`).join('')}</div>` : ''}
+      <div class="sm-oy" hidden></div>
+    </div>`;
+  cover.after(m);
+  const serit = m.querySelector('.sm-serit'), ip = m.querySelector('.sm-ip');
+  const bolumAdi = sn => { let ad = ''; bol.forEach(b => { if (b.sn <= sn) ad = b.baslik; }); return ad; };
+  const konusan = sn => { const b = blok.find(x => x.bas <= sn && sn <= x.bit); return b ? b.ad : ''; };
+  const snAl = e => { const r = serit.getBoundingClientRect(); return Math.max(0, Math.min(sure, (e.clientX - r.left) / r.width * sure)); };
+  serit.addEventListener('mousemove', e => { const sn = snAl(e); ip.hidden = false; ip.textContent = [zamanK(sn), konusan(sn), bolumAdi(sn)].filter(Boolean).join(' · '); });
+  serit.addEventListener('mouseleave', () => { ip.hidden = true; });
+  serit.addEventListener('click', e => { const sn = snAl(e); gitSn(sn); OY.kullaniciKaydirdi = 0; });
+  serit.addEventListener('keydown', e => { const t = oyZaman(); if (e.key === 'ArrowRight'){ e.preventDefault(); gitSn(Math.min(sure, t + 10)); } if (e.key === 'ArrowLeft'){ e.preventDefault(); gitSn(Math.max(0, t - 10)); } });
+  const oy = m.querySelector('.sm-oy');
+  smZam = setInterval(() => { if (!document.body.contains(m)){ clearInterval(smZam); return; } if (!OY.p){ oy.hidden = true; return; }
+    const t = oyZaman(); oy.hidden = !(t > 0.5 || oyCaliyor()); oy.style.left = yuz(t) + '%'; serit.setAttribute('aria-valuenow', Math.round(t)); }, 250);
+}
+
+/* ---------------------------------------------------------------- 17) "çıkarım" etiketi yalnız anlamlıyken
+   Özet başka dilde yazıldıysa (İngilizce video, Türkçe özet) hiçbir cümle transkriptle eşleşmez ve her cümleye "çıkarım" yapışıyordu: gürültü.
+   Eşleşen cümle yoksa etiketler hiç gösterilmez; eşleşme varsa yalnız karşılığı bulunamayanlar işaretlenir. */
+const _ozetHtml = ozetHtml;
+ozetHtml = function(v){   // eslint-disable-line no-global-assign
+  const h = _ozetHtml(v);
+  try{ const kyn = (h.match(/class="zt kyn/g) || []).length, cik = (h.match(/class="cikarim"/g) || []).length;
+    if (cik && kyn === 0) return h.replace(/ ?<span class="cikarim"[^>]*>[^<]*<\/span>/g, ''); }catch(e){}
+  return h;
+};
+
+/* ---------------------------------------------------------------- 18) ilk açılış: "nasıl çalışır" (kitaplık boşken)
+   Yeni kuran biri boş bir sayfa görmesin: linkten çıktılara giden yolu gösteren kısa, kendiliğinden akan şema. İlk video bitince kalkar. */
+function nasilCiz(){
+  const k = anaKutu(); let s = $('#stNasil');
+  const bos = Array.isArray(state.tumListe) && !state.tumListe.some(x => !x.toplanti && !x.atolye);
+  if (!bos){ s?.remove(); return; } if (s) return;
+  s = document.createElement('section'); s.id = 'stNasil'; s.className = 'st-nasil';
+  s.innerHTML = `<div class="st-sonb"><h3>Nasıl çalışır</h3></div>
+    <div class="sn-akis">
+      <div class="sn-k"><i class="sn-ik"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i><b>Bir link yapıştırın</b><span>YouTube, Instagram, TikTok ya da bilgisayarınızdaki bir dosya.</span></div>
+      <svg class="sn-ok" viewBox="0 0 60 24" aria-hidden="true"><path class="sn-cz" d="M2 12h56"/><path class="sn-ak" d="M2 12h56"/></svg>
+      <div class="sn-k"><i class="sn-ik sn-dalga"><span></span><span></span><span></span><span></span><span></span></i><b>Bu bilgisayarda çözülür</b><span>Konuşma yazıya dökülür, konuşanlar ayrılır. Ses dışarı çıkmaz.</span></div>
+      <svg class="sn-ok" viewBox="0 0 60 24" aria-hidden="true"><path class="sn-cz" d="M2 12h56"/><path class="sn-ak" d="M2 12h56" style="animation-delay:.9s"/></svg>
+      <div class="sn-k"><i class="sn-ik sn-cikti"><em>Transkript</em><em>Özet</em><em>Altyazı</em><em>Dublaj</em></i><b>Çıktılar hazır</b><span>Metin, özet, altyazılı video, başka dilde seslendirme; hepsini tek tıkla.</span></div>
+    </div>`;
+  k.appendChild(s);
+}
+const _sonCiz = sonCiz;
+sonCiz = function(){ const r = _sonCiz(); try{ nasilCiz(); }catch(e){} return r; };   // eslint-disable-line no-global-assign
+
+/* ---------------------------------------------------------------- 19) YouTube gömmeyi kapatmışsa (2026-10-31; denemede "This video is unavailable" kutusu)
+   Sahibi gömmeye izin vermeyen videoda oynatıcı kara kutu kalıyordu. Kaynak video bilgisayardaysa onunla oynatılır; yoksa kapak + "YouTube'da aç". */
+function oyHataBekle(temel, v){
+  let n = 0; const t = setInterval(() => { if (++n > 80 || aktif() !== temel){ clearInterval(t); return; } if (OY.tur !== 'yt' || !OY.p?.addEventListener) return; clearInterval(t);
+    try{ OY.p.addEventListener('onError', ev => { if ([2, 5, 100, 101, 150].includes(+(ev?.data))) oyYedek(temel, v); }); }catch(e){} }, 250);
+}
+async function oyYedek(temel, v){
+  const kutu = $('#oynatici'); if (!kutu || aktif() !== temel) return;
+  const r = await fetch('/medya/' + encodeURIComponent(temel), {method: 'HEAD'}).catch(() => null);
+  if (r?.ok){ kutu.innerHTML = `<div class="oyc"><video controls preload="metadata" playsinline src="/medya/${encodeURIComponent(temel)}"></video></div>`; OY.tur = 'yerel'; OY.p = kutu.querySelector('video'); kutu.classList.remove('mini-gizli'); return; }
+  OY.p = null; OY.tur = null;
+  kutu.innerHTML = `<div class="oyc oy-yok">${v.kapak ? `<img src="${esc(v.kapak)}" alt="" referrerpolicy="no-referrer">` : ''}<div class="oy-not"><b>Bu video yalnızca YouTube’da oynatılıyor</b><span>Sahibi başka sitelerde gösterilmesini kapatmış. Metin ve özet burada; videoyu YouTube’da açabilirsiniz.</span>${/^https?:/.test(v.link || '') ? `<a class="sbtn" href="${esc(v.link)}" target="_blank" rel="noopener">YouTube’da aç ↗</a>` : ''}</div></div>`;
+}
+
 /* ---------------------------------------------------------------- bağlantılar */
 const _sonucGoster = sonucGoster;
 sonucGoster = async function(temel, opts = {}){   // eslint-disable-line no-global-assign
@@ -580,15 +728,19 @@ sonucGoster = async function(temel, opts = {}){   // eslint-disable-line no-glob
   const r = await _sonucGoster(temel, opts);
   try{ const v = veri();
     duzeltKur(); miniOyBekle(); tekKonusmaci(v);
-    if (!v.toplanti){ yayinCiz(temel); sonrakiEkle(temel, v); okumaKur(temel, v, opts); }
+    if (!v.toplanti){ yayinCiz(temel); sonrakiEkle(temel, v); okumaKur(temel, v, opts); haritaKur(temel, v, state.sonuc || {}); oyHataBekle(temel, v); }
     if (KR.acik && aktif() === temel){ $('#doc').classList.add('kurgu'); kurguCiz(); }
   }catch(e){ console.warn('Studio eki:', e); }
   return r;
 };
 const _gitSn = gitSn;
 gitSn = function(sn){ sekmeSec('metin'); return _gitSn(sn); };   // eslint-disable-line no-global-assign
+const SONRA_IK = {alt: AKIS_IK.altyazi, db: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4M8 21h8', klip: 'M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12',
+  dl: AKIS_IK.indir, sen: AKIS_IK.belge, yp: 'M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM15 9a3 3 0 0 1 0 6M17.5 6.5a7 7 0 0 1 0 11', kr: AKIS_IK.yaz, ct: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01'};
+function sonrakiSimge(){ $$('#stSonra .sl > [data-a], #stSonra .sl > [data-st]').forEach(b => { if (b.querySelector('.sn-i')) return; const k = b.dataset.a || b.dataset.st, p = SONRA_IK[k]; if (!p) return;
+  const i = document.createElement('i'); i.className = 'sn-i'; i.innerHTML = `<svg viewBox="0 0 24 24"><path d="${p}"/></svg>`; b.prepend(i); }); }
 const _stSonraKur = stSonraKur;
-stSonraKur = function(temel, v){ _stSonraKur(temel, v); try{ sonrakiEkle(temel, v); }catch(e){} };   // eslint-disable-line no-global-assign
+stSonraKur = function(temel, v){ _stSonraKur(temel, v); try{ sonrakiEkle(temel, v); sonrakiSimge(); }catch(e){} };   // eslint-disable-line no-global-assign
 const _altDlgAc = altDlgAc;
 altDlgAc = function(temel, v){ _altDlgAc(temel, v); try{ altOnizleKur(); }catch(e){} };   // eslint-disable-line no-global-assign
 const _sistemCiz = sistemCiz;
@@ -606,7 +758,7 @@ function gelismisKur(){
 const _libGoster = libGoster;
 libGoster = function(tab, kaydir){ _libGoster(tab, kaydir); try{ $('#stSuz')?.classList.toggle('hidden', tab !== 'tx'); $('#stSahne')?.classList.toggle('hidden', tab !== 'tx' || !SZ.sahne); if (tab === 'tx' && SZ.sahne) $('#hist').classList.add('hidden'); if (tab === 'dl') temizlikKur(); }catch(e){} };   // eslint-disable-line no-global-assign
 
-const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=18'; document.head.appendChild(css);
+const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=22'; document.head.appendChild(css);
 const bekle = setInterval(() => { if ($('#hist')){ clearInterval(bekle); suzgecKur(); } }, 300);
 if ($('#dls')) new MutationObserver(() => temizlikKur()).observe($('#dls'), {childList: true});
 if ($('#aySistem') && $('#aySistem').textContent.trim() && !$('#aySistem').textContent.includes('Yükleniyor')) gelisimCiz();

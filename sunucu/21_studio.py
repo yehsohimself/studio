@@ -233,15 +233,19 @@ def _kaynak_indir(temel, en_az=720, log=print):
         return k
     if _disk_bos_gb() < 3:
         raise SystemExit(f"Diskte yer az ({_disk_bos_gb():.1f} GB); kaynak video indirilmedi.")
-    log("Kaynak video indiriliyor (720p)...")
-    p = subprocess.run([PYTHON, "-u", str(INDIR_SCRIPT), link, "--kalite", "720", "--klasor", str(INDIRILENLER)],
-                       capture_output=True, text=True, timeout=3600, cwd=str(KLASOR))
-    m = re.search(r"Bitti\. Dosya: (.+)", p.stdout)
-    if not m or not Path(m.group(1).strip()).is_file():
-        raise SystemExit("Kaynak video indirilemedi.")
-    _indirme_bitir({"dosya": m.group(1).strip(), "link": link, "baslik": veri.get("baslik") or temel, "kanal": veri.get("kanal", ""),
-                    "kalite": "720", "sure": veri.get("sure", 0), "kapak": _kapak_yolu(temel, veri.get("kapak")), "platform": veri.get("platform", ""), "log": []})
-    return Path(m.group(1).strip())
+    with _kaynak_kilidi(link):                       # aynı videoyu başka bir iş de indiriyor olabilir: bekle, sonra yeniden bak
+        k, _ = _kaynak_video(temel, en_az=en_az)
+        if k:
+            return k
+        log("Kaynak video indiriliyor (720p)...")
+        p = subprocess.run([PYTHON, "-u", str(INDIR_SCRIPT), link, "--kalite", "720", "--klasor", str(INDIRILENLER)],
+                           capture_output=True, text=True, timeout=3600, cwd=str(KLASOR))
+        m = re.search(r"Bitti\. Dosya: (.+)", p.stdout)
+        if not m or not Path(m.group(1).strip()).is_file():
+            raise SystemExit("Kaynak video indirilemedi.")
+        _indirme_bitir({"dosya": m.group(1).strip(), "link": link, "baslik": veri.get("baslik") or temel, "kanal": veri.get("kanal", ""),
+                        "kalite": "720", "sure": veri.get("sure", 0), "kapak": _kapak_yolu(temel, veri.get("kapak")), "platform": veri.get("platform", ""), "log": []})
+        return Path(m.group(1).strip())
 
 
 def _yayin_uret(temel, marka="", kapak=True, log=print):
