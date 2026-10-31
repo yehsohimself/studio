@@ -7,10 +7,13 @@ Built for Apple silicon. Open source under the MIT license.
 
 ## What you can do
 
-Paste a video link (YouTube, Instagram, TikTok, Vimeo…) or drop a file, then pick what you want:
+Paste a video link (YouTube, Instagram, TikTok, Vimeo…) or drop a file, then pick what you want, or just say it:
 
+- **Talk to Studio:** type a request in plain words ("cut a 40-second vertical clip from the best moment", "what does she say about
+  savings?"). It has read the whole video and your library, asks back when something is unclear, and hands you the work as a card
+  you start with one tap. Voice input, remembered preferences, live progress.
 - **Transcript** with speaker labels and voice recognition; Word, text and SRT files.
-- **Summary**, highlights, timestamped chapters; ask questions about the video.
+- **Summary**, highlights, timestamped chapters, an at-a-glance view (who spoke how much, speaking pace, recurring words).
 - **Subtitled video** (five caption styles), **clips** and face-tracked vertical **Shorts**, text-based editing, silence removal,
   export to Final Cut / Premiere / DaVinci.
 - **Translation** and **dubbing** in the speaker's own voice.
