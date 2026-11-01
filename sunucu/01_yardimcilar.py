@@ -150,7 +150,7 @@ def mesgul_nedenler():
         n.append("atölye çalışması sürüyor")
     if ozet_calisan or klip_calisan:
         n.append("özet ya da öne çıkan anlar hazırlanıyor")
-    for _m in ("content_site", "couple_site", "pt_site"):
+    for _m in ("content_site", "couple_site", "pt_site", "capital_site", "office_site"):
         if _m in globals():
             n += globals()[_m].mesgul()
     n += [f"Ghost: {ad}" for ad, d in globals().get("ghost_gelisim_durum", {}).items() if d.get("calisiyor")]
@@ -219,6 +219,8 @@ def _hata_metni(kayit):
         return "Bu video kopya korumalı; sesi alınamıyor. Bu tür videolar yazıya dökülemez."
     if "giriş istiyor" in k or "login required" in k or "sign in" in k or "cookies" in k or "rate-limit" in k:
         return "Bu site giriş istiyor. Tarayıcınızdaki oturumla tekrar deneyin."
+    if "no video" in k or "there is no video in this post" in k:
+        return "Bu gönderide video yok. Linki yeniden yapıştırın; görsel olarak alabilirim."
     if "not a bot" in k or "please update" in k or "yt-dlp -u" in k or "update to the latest" in k:
         return "Video sitesi yöntem değiştirmiş; indirme aracının güncellenmesi gerekiyor."
     if "bulunamadı ya da gizli" in k or "private video" in k or "404" in k or "not available" in k:

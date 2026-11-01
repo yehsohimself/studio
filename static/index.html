@@ -1371,6 +1371,7 @@
   #kisacaKutu li input{accent-color:var(--vurgu);margin-top:2px;flex:none}
   #kisacaKutu li em{font-style:normal;font-size:12px;color:var(--vurgu);background:rgba(var(--vurgu-rgb),.1);border-radius:999px;padding:1px 8px}
   #kisacaKutu li .zt{border:0;background:var(--fill);color:var(--muted);font:500 11.5px var(--sans);font-variant-numeric:tabular-nums;padding:1px 7px;border-radius:999px!important;cursor:pointer}
+  #kisacaKutu .ktes{display:block;margin:3px 0 0 26px;font-size:12px;color:var(--green,#2e9e5b)} #kisacaKutu .ktes a{color:inherit}
   #kisacaKutu li.bitti span{text-decoration:line-through;color:var(--muted)}
   #kisacaKutu .ksk i{display:block;height:12px;border-radius:6px;background:var(--fill);margin:10px 0;animation:ksk 1.4s ease-in-out infinite}
   @keyframes ksk{50%{opacity:.45}}
@@ -2890,7 +2891,7 @@
   <div class="sbo" id="sbOneri"></div>
   <form class="sbg" id="sbForm"><textarea id="sbGir" rows="1" placeholder="Bir şey sorun… (ör. bütçe için ne dendi?)" aria-label="Soru"></textarea><button type="submit" id="sbGonder" aria-label="Gönder"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></form>
 </aside>
-<dialog class="sheet panel bekdlg" id="bekDlg"><div class="ktop"><h4>Sizden beklenenler</h4><button type="button" class="tiny" onclick="this.closest('dialog').close()">Kapat</button></div><div class="tsoz" id="bekIc"></div></dialog>
+<dialog class="sheet panel bekdlg" id="bekDlg"><div class="ktop"><h4>Sizden beklenenler</h4><button type="button" class="tiny" id="isKanitBtn" title="Asana ve e-postalarınızda bu işlerin yapıldığına dair kanıt arar; bulunanları kanıtıyla kapatır" onclick="isKanitKontrol(this)">Yapılanları kontrol et</button><button type="button" class="tiny" onclick="this.closest('dialog').close()">Kapat</button></div><div class="tsoz" id="bekIc"></div></dialog>
 <dialog class="sheet" id="sheet"><h4 id="shT"></h4><p id="shP"></p><div class="bt"><button id="shNo" type="button">Vazgeç</button><button id="shYes" type="button" class="danger">Sil</button></div></dialog>
 <dialog class="sheet oynat" id="oynat"><div id="oynatIc"></div><div class="ttl" id="oynatT"></div><div class="mt" id="oynatM"></div><div class="bt"><a class="sbtn" id="oynatKaydet" download>Tarayıcıya indir</a><button class="sbtn" id="oynatFinder" type="button">Finder</button><button id="oynatKapat" type="button">Kapat</button></div></dialog>
 
@@ -3113,7 +3114,7 @@ async function onizle(link){
     const d = await r.json();
     if (!r.ok){
       const giris = d.hata === 'giris';
-      pv.innerHTML = `<div class="ph still"></div><div style="min-width:0"><div class="t" style="color:var(--muted);font-weight:500">${giris ? 'Bu site giriş istiyor.' : 'Bilgiler alınamadı; yine de başlatabilirsiniz.'}</div><div class="m">${giris && !state.cerezAc ? '<button class="sbtn blue" id="oturumAc" type="button">Tarayıcı oturumumu kullan</button>' : (giris ? 'Oturum açıkken de alınamadı; tarayıcıda o siteye giriş yaptığınızdan emin olun.' : '&nbsp;')}</div></div>`;
+      pv.innerHTML = `<div class="ph still"></div><div style="min-width:0"><div class="t" style="color:var(--muted);font-weight:500">${giris ? 'Bu site giriş istiyor.' : esc(d.mesaj || 'Bilgiler alınamadı; yine de başlatabilirsiniz.')}</div><div class="m">${giris && !state.cerezAc ? '<button class="sbtn blue" id="oturumAc" type="button">Tarayıcı oturumumu kullan</button>' : (giris ? 'Oturum açıkken de alınamadı; tarayıcıda o siteye giriş yaptığınızdan emin olun.' : '&nbsp;')}</div></div>`;
       const b = $('#oturumAc'); if (b) b.onclick = () => { openAdv(); $('#cerezAc').click(); };
       return;
     }
@@ -3202,7 +3203,7 @@ async function indirilendenBaslat(x){
 /* ürünler: aynı motor ve ortak hafıza, ayrı adresler (2026-10-20) */
 const URUNLER = {transcript:{ad:'Studio', port:8765, yuz:['video','kitaplik'], acik:'video'}, note:{ad:'Meet', port:8766, yuz:['toplanti'], acik:'toplanti'},
   ghost:{ad:'Ghost', port:8767, yuz:['paylasim'], acik:'paylasim'}, atolye:{ad:'Couple', port:8768, yuz:['atolye'], acik:'atolye', menude:false},   /* 25 Ekim: Couple kapandı (teslim kontrolü Studio'da, müşteri takibi Meet'te) */
-  content:{ad:'Content', port:8769, yuz:[], acik:''}, pt:{ad:'Health', port:8771, yuz:[], acik:''}, ledger:{ad:'Ledger', port:8773, yuz:[], acik:''}};   // Ledger 31 Ekim: 8772 Office'in   // 24 Ekim: Atölye → Couple (8768, kendi sayfası static/couple.html); Content 8769
+  content:{ad:'Content', port:8769, yuz:[], acik:''}, pt:{ad:'Health', port:8771, yuz:[], acik:''}, ledger:{ad:'Money', port:8773, yuz:[], acik:''}, office:{ad:'Legal', port:8772, yuz:[], acik:''}, capital:{ad:'Money', port:8774, yuz:[], acik:'', ayri:true, menude:false}};   /* 1 Kasım: Ledger + Capital = Money (Hesaplar 8773, Yatırım 8774), Office = Legal */   /* Capital kendi sunucusunda (8774) */   // Ledger 31 Ekim: 8772 Office'in   // 24 Ekim: Atölye → Couple (8768, kendi sayfası static/couple.html); Content 8769
 const URUN = document.documentElement.dataset.urun || 'transcript', URUN_AD = URUNLER[URUN].ad;
 /* Şirket renkleri (24 Ekim): kırık beyaz #F4F2EE, mor #9A1FF4 gibi açık renkler. Açık renk zeminde yazı koyu; açık temada açık renk çizgi kaybolmasın diye bir ton koyusu */
 function srAcik(h){ const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return false; const v = parseInt(m[1], 16), r = (v >> 16 & 255) / 255, g = (v >> 8 & 255) / 255, b = (v & 255) / 255; return .2126 * r + .7152 * g + .0722 * b > .7; }
@@ -6346,10 +6347,12 @@ function kisacaHtml(v){
   // 2026-10-23 (ChatGPT brifi): konuşulan, önerilen, kararlaştırılan ve üstlenilen ayrı; her iş ve karar birebir alıntı + zaman kodu; sorumlu ya da tarih söylenmediyse "belirtilmedi"
   const tg = toplantiZamani({baslik: v.baslik, olusturma: v.olusturma}), ben = (window.BEN_AD || '').split(' ')[0].toLocaleLowerCase('tr');
   const zt = sn => sn != null ? `<button type="button" class="zt" data-sn="${sn}">${zamanK(sn)}</button>` : '';
+  // 2026-10-31 (is_kanit.py): Asana/Gmail'de bulunan teslim kanıtı; işareti kaldırırsanız bir daha kendiliğinden kapanmaz
+  const tes = x => x.bitti && x.teslim ? `<small class="ktes">${x.teslim.oto ? 'Kendiliğinden kapandı · ' : ''}${x.teslim.link ? `<a href="${esc(x.teslim.link)}" target="_blank" rel="noopener">${esc(x.teslim.kanit)}</a>` : esc(x.teslim.kanit)}${x.teslim.tarih ? ' · ' + esc(x.teslim.tarih) : ''}</small>` : '';
   const kanit = x => x.alinti ? `<q class="kanit${x.alinti_dogru === false ? ' supheli' : ''}" title="${x.alinti_dogru === false ? 'Bu alıntı transkriptte birebir bulunamadı; kayda bakın' : 'Söylendiği an'}">${esc(x.alinti)}</q>` : '';
   // Çok müşterili toplantı (2026-10-28, kisaca.musteri_ata): her maddede müşteri etiketi, üstte müşteriye göre süzme
   const mk = (k.musteriler || []).length >= 2, mc = x => mk && x.musteri ? `<span class="kmus">${esc(x.musteri)}</span>` : '', dm = x => mk ? ` data-m="${esc(x.musteri || '')}"` : '';
-  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"${dm(x)}><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${mc(x)}${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarih yok</em>' : '')}${zt(x.sn)}${kanit(x)}</li>`;
+  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"${dm(x)}><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${mc(x)}${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarih yok</em>' : '')}${zt(x.sn)}${kanit(x)}${tes(x)}</li>`;
   const bas = ad => ad.split(/\s+/).filter(Boolean).slice(0, 2).map(ilkHarf).join('');
   const benim = p => ben && p.ad.toLocaleLowerCase('tr').split(/\s+/)[0] === ben;
   const kisiHtml = (p, ki) => { const kalan = p.isler.filter(x => !x.bitti).length;
@@ -6657,14 +6660,23 @@ $('#ayarBtn').onclick = ayarlarAc;
 
 let claudeBekle = null;
 async function claudeKullanimCiz(){
+  // 2026-10-31: Claude dengeleyicisi (claude_butce.py). Aboneliğin gerçek doluluğu (5 saat / hafta), ürün ürün pay, dengeleyicinin yaptıkları.
   const satir = $('#ayClaudeKullanim'); if (!satir) return;
-  let d; try{ d = await (await fetch('/api/claude/kullanim?gun=7')).json(); }catch(e){ return; }
-  const t = d.toplam || {}, bin = n => n >= 1000 ? (n / 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {maximumFractionDigits: 0}) + ' bin' : String(n);
-  satir.classList.toggle('hidden', !t.istek && !d.sinir);
-  const isler = Object.entries(d.isler || {}).sort((a, b) => (b[1].istek || 0) - (a[1].istek || 0));   // sunucu sözlüğü abece sırasıyla geliyor
-  $('#ayClaudeKullanimNot').innerHTML = (d.sinir ? `<span style="color:var(--orange)">Abonelik kullanım sınırına ulaşıldı; ${new Date(d.sinir.bitis * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'})} sonrasına kadar bilgisayardaki model kullanılıyor.</span><br>` : '')
-    + `Son 7 günde ${t.istek || 0} istek · bugün ${t.bugun || 0}` + (isler.length ? ` · en çok: ${esc(isler.slice(0, 3).map(([k, v]) => `${k} (${v.istek})`).join(', '))}` : '')
-    + (isler.length ? `<details style="margin-top:6px"><summary>İş iş göster</summary><table class="kultab">${isler.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v.istek} istek</td><td>${bin(v.giris + v.cikis)} birim</td></tr>`).join('')}</table></details>` : '');
+  let d; try{ d = await (await fetch('/api/claude/butce?gun=7&tazele=1')).json(); }catch(e){ return; }
+  const sv = d.seviye || {}, loc = ((window.DIL || {}).locale || 'tr-TR');
+  satir.classList.toggle('hidden', !(d.urunler || []).length && !sv.olcum);
+  const renk = {bol:'var(--green)', normal:'var(--green)', dikkat:'var(--orange)', kritik:'var(--orange)', sinir:'var(--red)'}[sv.seviye] || 'var(--muted)';
+  const saat = t => t ? new Date(t * 1000).toLocaleString(loc, {weekday:'short', hour:'2-digit', minute:'2-digit'}) : '';
+  const cubuk = (ad, v, isaret, alt) => `<div style="margin:6px 0 2px;font-size:12px">${ad} <b>%${Math.round((v || 0) * 100)}</b>${alt ? ` · <span style="color:var(--muted)">${alt}</span>` : ''}</div>
+    <div style="position:relative;height:6px;border-radius:3px;background:var(--line,rgba(127,127,127,.2))"><div style="height:6px;border-radius:3px;width:${Math.min(100, Math.round((v || 0) * 100))}%;background:${renk};transition:width .6s"></div>${isaret != null ? `<div title="Haftanın bu noktasında beklenen" style="position:absolute;top:-3px;left:${Math.min(100, Math.round(isaret * 100))}%;width:2px;height:12px;background:var(--fg,#888);opacity:.55"></div>` : ''}</div>`;
+  const ol = d.dengeleyici || {}, urun = (d.urunler || []).filter(u => u.pay >= 1);
+  $('#ayClaudeKullanimNot').innerHTML =
+    `<span class="chip" style="color:${renk};border-color:${renk}">${esc(d.seviye_ad || '')}</span> ${esc(sv.neden || '')}`
+    + (sv.olcum ? cubuk('5 saatlik pencere', sv.p5, null, sv.r5 ? `${saat(sv.r5)} yenilenir` : '') + cubuk('Bu hafta', sv.p7, sv.beklenen, sv.r7 ? `${saat(sv.r7)} yenilenir` : '') : '')
+    + ((d.oneriler || []).length ? `<ul style="margin:8px 0 0;padding-left:18px">${d.oneriler.map(o => `<li>${esc(o)}</li>`).join('')}</ul>` : '')
+    + (urun.length ? `<div style="margin-top:8px;font-size:12px">Son 7 günde kullanım: ${urun.slice(0, 6).map(u => `${esc(u.ad)} %${Math.round(u.pay)}`).join(' · ')}</div>` : '')
+    + ((ol.bekletildi || ol.hafif_model || ol.atlandi) ? `<div style="font-size:12px;color:var(--muted)">Dengeleyici bu hafta: ${ol.bekletildi || 0} iş bekletti, ${ol.hafif_model || 0} işi hafif modele geçirdi, ${ol.atlandi || 0} işi atladı.</div>` : '')
+    + ((d.isler || []).length ? `<details style="margin-top:6px"><summary>İş iş göster</summary><table class="kultab">${d.isler.map(x => `<tr><td>${esc(x.ad)}</td><td>${esc(x.urun)}</td><td>%${x.pay}</td><td>${x.istek} istek</td></tr>`).join('')}</table></details>` : '');
 }
 function claudeCiz(a){
   const act = $('#ayClaudeAct'), not = $('#ayClaudeNot'), d = a.claude_durum || {};
@@ -6966,7 +6978,7 @@ function stCizgi(){
       m.before($('#modehint')); stHaritaKur(m); }
     if (URUN === 'atolye'){ const h2 = $('#atolyeSec .sh h2'); if (h2) h2.textContent = URUNLER.atolye.ad; }
     $$('#yuz button').forEach(b => b.hidden = !URUNLER[URUN].yuz.includes(b.dataset.v)); document.body.classList.add('urun-' + URUN);
-    const g = document.createElement('div'); g.className = 'urunler'; const KURULU = (document.documentElement.dataset.urunler || '').split(',').filter(Boolean); g.innerHTML = Object.entries(URUNLER).filter(([k, u]) => (u.menude !== false || k === URUN) && (!KURULU.length || KURULU.includes(k) || k === URUN)).map(([k, u]) => `<a href="${k === URUN ? location.origin + '/' : ((location.protocol === 'https:' && /\.ts\.net$/.test(location.hostname) ? 'http:' : location.protocol) + '//' + location.hostname + ':' + u.port + '/')}" class="${k === URUN ? 'on' : ''}"><img src="/static/logo/${k}.svg" alt="">${u.ad}</a>`).join('');
+    const g = document.createElement('div'); g.className = 'urunler'; const KURULU = (document.documentElement.dataset.urunler || '').split(',').filter(Boolean); g.innerHTML = Object.entries(URUNLER).filter(([k, u]) => (u.menude !== false || k === URUN) && (!KURULU.length || KURULU.includes(k) || k === URUN || u.ayri)).map(([k, u]) => `<a href="${k === URUN ? location.origin + '/' : ((location.protocol === 'https:' && /\.ts\.net$/.test(location.hostname) ? 'http:' : location.protocol) + '//' + location.hostname + ':' + u.port + '/')}" class="${k === URUN ? 'on' : ''}"><img src="/static/logo/${k}.svg" alt="">${u.ad}</a>`).join('');
     const ub = document.createElement('button'); ub.type = 'button'; ub.className = 'urunbtn'; ub.setAttribute('aria-label', 'Diğer ürünler'); ub.title = 'Diğer ürünler';
     ub.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>'; const mg = document.createElement('span'); mg.className = 'markaGrup'; $('.brand').before(mg); mg.append($('.brand'), ub, g);
     ub.onclick = e => { e.stopPropagation(); g.classList.toggle('acik'); }; document.addEventListener('click', e => { if (!e.target.closest('.urunbtn,.urunler')) g.classList.remove('acik'); });
@@ -6980,12 +6992,13 @@ function stCizgi(){
     if (Object.keys(state.jobs).length && !state.timer){ state.timer = setInterval(pollJobs, 1500); pollJobs(); } }catch(e){}
 })();
 </script>
-<script src="/static/studio_ek.js?v=48"></script>
+<script src="/static/studio_ek.js?v=55"></script>
 <script src="/static/meet_ek.js?v=26"></script>
-<script src="/static/meet_asistan.js?v=9"></script>
+<script src="/static/meet_asistan.js?v=10"></script>
 <script src="/static/teslim_ek.js?v=2"></script>
 <script src="/static/takip_ek.js?v=2"></script>
 <script src="/static/ghost_ek.js?v=5"></script>
 <script src="/static/ghost_oneri.js?v=1"></script>
+<script src="/static/ghost_arsiv.js?v=1"></script>
 </body>
 </html>

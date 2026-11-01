@@ -296,7 +296,7 @@ async function temizlikKur(){
 const _popover = popover;
 popover = function(anchor, items, opts){   // eslint-disable-line no-global-assign
   const v = veri(), temel = aktif();
-  if (anchor?.id === 'dosyaMenu' && temel){
+  if (anchor?.id === 'dosyaMenu' && temel && !v.yazi){
     const tur = (v.turemisler || []).length;
     items = [['Paylaşılabilir sayfa (tek dosya)', () => { location.href = '/disa/' + encodeURIComponent(temel) + '.html?indir=1'; toast('Sayfa indiriliyor; e-postayla ya da mesajla gönderebilirsiniz'); }],
       ['Sayfayı önizle ↗', () => window.open('/disa/' + encodeURIComponent(temel) + '.html', '_blank')], null, ...items, null, ['Hepsi tek dosyada (zip)', () => { location.href = '/zip/' + encodeURIComponent(temel) + '.zip'; toast('Zip hazırlanıyor'); }],
@@ -724,7 +724,7 @@ const FIIL = /(iyor|ıyor|uyor|üyor|yoruz|yorum|yorsun|dık|dik|duk|dük|tık|t
 function bakisKur(temel, v, d){
   $('#stBakis')?.remove();
   const P = d.paragraflar || [], sure = +v.sure || 0, sag = $('#doc .sagk');
-  if (v.toplanti || !sag || P.length < 3 || sure < 60) return;
+  if (v.toplanti || v.yazi || !sag || P.length < 3 || sure < 60) return;
   const adlar = Object.values(v.etiket || {}), renk = ad => `var(${SPK[Math.max(0, adlar.indexOf(ad)) % SPK.length]})`;
   // konuşma payları ve tempo
   const pay = {}; let toplamSn = 0, toplamK = 0; const kova = 24, K = Array(kova).fill(0), Ks = Array(kova).fill(0), sayac = {}, bicim = {};
@@ -842,7 +842,8 @@ const bekle = setInterval(() => { if ($('#hist')){ clearInterval(bekle); suzgecK
 if ($('#dls')) new MutationObserver(() => temizlikKur()).observe($('#dls'), {childList: true});
 if ($('#aySistem') && $('#aySistem').textContent.trim() && !$('#aySistem').textContent.includes('Yükleniyor')) gelisimCiz();
 if (matchMedia('(max-width:520px)').matches && $('#link')) $('#link').placeholder = (window.DIL?.t || (x => x))('Video linki');
-{ const sc = document.createElement('script'); sc.src = '/static/studio_asistan.js?v=11'; document.body.appendChild(sc); }
+{ const sc = document.createElement('script'); sc.src = '/static/studio_asistan.js?v=12'; document.body.appendChild(sc); }
+{ const c2 = document.createElement('link'); c2.rel = 'stylesheet'; c2.href = '/static/studio_icerik.css?v=5'; document.head.appendChild(c2); const sc = document.createElement('script'); sc.src = '/static/studio_icerik.js?v=6'; document.body.appendChild(sc); }
 kurulumCiz(); { let n = 0; const t = setInterval(() => { if (state.tumListe || ++n > 60){ clearInterval(t); try{ sonCiz(); }catch(e){} } }, 300); }
 if (state.aktifTemel && state.sonuc){ duzeltKur(); if (!veri().toplanti){ yayinCiz(state.aktifTemel); sonrakiEkle(state.aktifTemel, veri()); } }
 })();

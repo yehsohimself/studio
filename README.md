@@ -9,6 +9,7 @@ Built for Apple silicon. Open source under the MIT license.
 
 Paste a video link (YouTube, Instagram, TikTok, Vimeo…) or drop a file, then pick what you want, or just say it:
 
+- **Not only video:** paste an Instagram, X or Pinterest post and get the images in full size (with the caption and the text inside them), or paste an article and get clean text with its images, even when the site blocks copying. Export Word, PDF or Markdown; summary, translation and questions work the same. Paywalls are not bypassed: with a membership you can use your own browser session.
 - **Talk to Studio:** type a request in plain words ("cut a 40-second vertical clip from the best moment", "what does she say about
   savings?"). It has read the whole video and your library, asks back when something is unclear, and hands you the work as a card
   you start with one tap. Voice input, remembered preferences, live progress.

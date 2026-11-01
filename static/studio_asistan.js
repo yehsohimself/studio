@@ -249,6 +249,11 @@ async function eylem(anahtar, a){
         isKaydet(j.id, {link: e.link, baslik: state.preview?.baslik, kapak: state.preview?.kapak, sure: state.preview?.sure});
         if (j.indir_id) isKaydet(j.indir_id, {tur: 'indir', link: e.link});
         kartYaz(anahtar, {durum: 'sirada', is: j.id, not: T('Sıraya girdi')}); break; }
+      case 'icerik_al': { kartYaz(anahtar, {durum: 'calisiyor', not: T('Alıyorum')});
+        const j = await api('/api/icerik/al', {link: e.link});
+        if (j.tur === 'yazi'){ kartYaz(anahtar, {durum: 'bitti', not: T('Yazı kitaplıkta'), ac: {temel: j.temel}, acEt: T('Aç')}); try{ gecmisYukle(); }catch(_){} }
+        else { kartYaz(anahtar, {durum: 'bitti', not: `${j.kayit.dosyalar.length} ${T('görsel indirildi')}`, ac: {gorseller: true}, acEt: T('Görseller’de gör')}); }
+        break; }
       case 'indir': { const j = await api('/api/baslat', {link: e.link, islem: 'indir', kalite: e.kalite, kesit: e.kesit || ''}); isKaydet(j.id, {tur: 'indir', link: e.link, kalite: e.kalite}); kartYaz(anahtar, {durum: 'sirada', is: j.id, not: T('Sıraya girdi')}); break; }
       case 'klip': { const j = await api('/api/baslat', {islem: 'klip', temel: e.temel, kesit: `${e.bas}-${e.bit}`, dikey: e.dikey, stil: e.stil, dil: e.dil}); isKaydet(j.id, {tur: 'klip', temel: e.temel, baslik: e.baslik, kapak: kap}); kartYaz(anahtar, {durum: 'sirada', is: j.id, not: T('Sıraya girdi')}); break; }
       case 'altyazili': { const j = await api('/api/baslat', {islem: 'altyazili', temel: e.temel, dil: e.dil, stil: e.stil, dikey: e.dikey}); isKaydet(j.id, {tur: 'altyazili', temel: e.temel, baslik: e.baslik, kapak: kap}); kartYaz(anahtar, {durum: 'sirada', is: j.id, not: T('Sıraya girdi')}); break; }
@@ -266,7 +271,7 @@ async function eylem(anahtar, a){
     takipBaslat();
   }catch(err){ kartYaz(anahtar, {durum: 'hata', hata: err.message}); }
 }
-function sonucAc(ac){
+function sonucAc(ac){ if (ac?.gorseller){ try{ libGoster('gr', true); }catch(_){} return; }
   if (!ac) return;
   if (ac.sn != null){ zamanaGit(ac.sn, ac.temel); return; }
   if (ac.dosya){ try{ oynat({ad: ac.dosya, baslik: ac.baslik || ac.dosya}); }catch(e){ yuzSec('kitaplik'); libGoster('dl', true); } return; }

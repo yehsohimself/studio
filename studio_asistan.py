@@ -162,7 +162,7 @@ def _video_metni(temel, ciktilar=None):
     yol = KLASOR / f"{temel}.json"
     d = json.loads(yol.read_text(encoding="utf-8"))
     v = d["veri"]
-    ek = [f"TEMEL: {temel}", f"SÜRE: {_zaman(v.get('sure'))}", f"DİL: {v.get('dil') or '?'}", f"KANAL: {v.get('kanal') or '-'}", f"LİNK: {v.get('link') or '-'}"]
+    ek = (["TÜR: yazılı makale, video değil. Zaman damgası yazma; bölüm başlığıyla atıf yap. Klip, dublaj, altyazı önerme."] if v.get("yazi") else []) + [f"TEMEL: {temel}", f"SÜRE: {_zaman(v.get('sure'))}", f"DİL: {v.get('dil') or '?'}", f"KANAL: {v.get('kanal') or '-'}", f"LİNK: {v.get('link') or '-'}"]
     o = v.get("ozet") if isinstance(v.get("ozet"), dict) else {}
     if o.get("bolumler"):
         ek.append("BÖLÜMLER: " + "; ".join(f"[{_zaman(b.get('sn')) if isinstance(b.get('sn'), (int, float)) else (b.get('zaman') or '')}] {b.get('baslik') or b.get('ad') or ''}" for b in o["bolumler"][:30]))
@@ -184,6 +184,7 @@ YETENEKLER = """STUDIO'NUN YAPABİLDİKLERİ (eylem kodlarıyla):
 - yaziya_dok {link, ozet:true|false, ceviri:"en"|"", altyazili:false, dublaj:"en"|"", indir:false} : linkteki videoyu yazıya döker (konuşmacılar ayrılır). İsterse aynı işte çeviri, altyazılı video, dublaj ve video dosyası.
 - ozetle {link} : yalnız özet (hızlı yol, konuşmacı ayrımı yok).
 - indir {link, kalite:"mp3|360|480|720|1080|en", kesit:"1:20-2:45"|""} : videoyu ya da sesini bilgisayara indirir.
+- icerik_al {link} : video OLMAYAN linkte görsel ya da yazıyı alır: Instagram/X/Pinterest gönderisindeki görselleri indirir (görsellerin üstündeki yazı ve açıklama da okunur), bir sayfadaki makaleyi kopyalamaya kapalı olsa da temiz metin olarak kitaplığa alır (sonra özet, çeviri, Word, PDF). Link bir görsel ya da yazıysa yaziya_dok değil bunu öner.
 - ac {temel} : kitaplıktaki bir videoyu açar.
 - git {sn} : açık videoda o saniyeye gider (oynatıcı ve metin oraya kayar).
 - klip {temel, bas, bit, dikey:true|false, stil:"kutu|sade|karaoke|pop|vurgu", dil:"orijinal"|"en"...} : bas-bit saniyeleri arasından altyazılı klip (dikey = 9:16, yüzü takip eder). 15-90 sn ideal.
@@ -255,7 +256,8 @@ def istem_kur(mesaj, temel="", link="", isler=None, ciktilar=None, onizleme=None
     if link:
         oz = onizleme or {}
         parca.append(f"KULLANICININ YAPIŞTIRDIĞI LİNK: {link}" + (f" — başlık: {oz.get('baslik')}, süre: {_zaman(oz.get('sure'))}, kanal: {oz.get('kanal') or '-'}" if oz.get("baslik") else "")
-                     + (" (bu video kitaplıkta zaten var: " + oz["mevcut"] + ")" if oz.get("mevcut") else ""))
+                     + (" (bu video kitaplıkta zaten var: " + oz["mevcut"] + ")" if oz.get("mevcut") else "")
+                     + (f"\nBU BİR {'GÖRSEL GÖNDERİSİ' if oz.get('icerik_tur') == 'gorsel' else 'YAZI'}, video değil. Metni: {oz.get('icerik_ozet') or '-'}" + (f"\nGörselin üstündeki yazı: {oz['icerik_yazi']}" if oz.get("icerik_yazi") else "") if oz.get("icerik_tur") else ""))
     odak = "" if temel else _odak(d["mesajlar"], {r["temel"] for r in liste})
     if temel and (KLASOR / f"{temel}.json").exists():
         metin, _v = _video_metni(temel, ciktilar)
@@ -314,6 +316,11 @@ def eylemleri_dogrula(ham, temel_acik=""):
         temel = str(e.get("temel") or temel_acik or "")
         neden = str(e.get("neden") or "")[:160]
         r = None
+        if t == "icerik_al":
+            link = str(e.get("link") or "").strip()
+            if re.match(r"^https?://", link):
+                out.append({"tur": t, "link": link, "etiket": "Görseli ya da yazıyı al", "detay": re.sub(r"^https?://(www\.)?", "", link)[:70], "neden": neden})
+            continue
         if t in ("klip", "altyazili", "cevir", "dublaj", "one_cikanlar", "yayin", "ozet_yenile", "sessizlik", "ac"):
             if temel not in kitap:
                 continue

@@ -23,16 +23,16 @@ URUNLER = {
     "studio": {
         "ad": "Studio",
         "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "06_marka", "07_cekirdek", "09_cekirdek", "10_sayfalar", "11_ozellik_sayaci", "12_api",
-                     "13_takip", "16_altyapi_ve_meet", "17_disa_aktarim", "18_indirilenler", "21_studio", "22_misafir", "24_guvenlik"],
-        "moduller": ["site", "transkript", "indir", "isimlendir", "adlar", "altyazi", "anlam", "arkaplan", "broll", "ceviri", "claude_yaz", "dublaj",
+                     "13_takip", "16_altyapi_ve_meet", "38_claude_butce", "17_disa_aktarim", "18_indirilenler", "21_studio", "22_misafir", "24_guvenlik", "39_icerik"],
+        "moduller": ["site", "transkript", "indir", "isimlendir", "adlar", "altyazi", "anlam", "arkaplan", "broll", "ceviri", "claude_yaz", "claude_butce", "dublaj",
                      "dudak", "duzenle", "goruntu", "harfler", "kadraj", "kalite", "kapak", "kayit_json", "kitaplik_onbellek", "klipler", "konusan", "marka",
-                     "ozet", "sahne_dizin", "sesler", "sor", "sohbet", "studio_asistan", "sesnot", "studio_duzelt", "studio_gelisim", "studio_onizle", "takip", "temizle", "terimler",
+                     "ozet", "sahne_dizin", "sesler", "sor", "sohbet", "studio_asistan", "icerik", "sesnot", "studio_duzelt", "studio_gelisim", "studio_onizle", "takip", "temizle", "terimler",
                      "yakma", "yayin", "haftalik", "notlar", "notlarim", "yedek", "geri_yukle", "sizinti", "ortak", "gizli", "duman_testi", "yeniden_baslat",
                      "videohub_mcp", "disa_depo"],
-        "static": ["index.html", "studio_ek.js", "studio_ek.css", "studio_asistan.js", "studio_asistan.css", "misafir.js", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
+        "static": ["index.html", "studio_ek.js", "studio_ek.css", "studio_asistan.js", "studio_asistan.css", "studio_icerik.js", "studio_icerik.css", "misafir.js", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
                    "ikon-512-maskable.png", "il", "logo", "ikon", "altyazi_ornek", "arka_ornek", "dublaj_ornek"],
         "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "kurulum.sh", "ayarlar.ornek.json", ".gitignore", "atolye/markalar.ornek.json",
-                     "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_studio_asistan.py", "tests/test_yedek.py"],
+                     "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_studio_asistan.py", "tests/test_icerik.py", "tests/test_yedek.py"],
         "requirements_cikar": ["python-pptx", "scenedetect", "opencv-python-headless", "pywebpush", "segno"],
         "komut": ("Video Hub.command", "Studio.command"),
     },
@@ -147,6 +147,7 @@ Built for Apple silicon. Open source under the MIT license.
 
 Paste a video link (YouTube, Instagram, TikTok, Vimeo…) or drop a file, then pick what you want, or just say it:
 
+- **Not only video:** paste an Instagram, X or Pinterest post and get the images in full size (with the caption and the text inside them), or paste an article and get clean text with its images, even when the site blocks copying. Export Word, PDF or Markdown; summary, translation and questions work the same. Paywalls are not bypassed: with a membership you can use your own browser session.
 - **Talk to Studio:** type a request in plain words ("cut a 40-second vertical clip from the best moment", "what does she say about
   savings?"). It has read the whole video and your library, asks back when something is unclear, and hands you the work as a card
   you start with one tap. Voice input, remembered preferences, live progress.
@@ -231,10 +232,10 @@ URUNLER["pt"] = {
     "ad": "Health",
     "parcalar": [],
     "moduller": ["pt", "pt_site", "pt_sunucu", "pt_beslenme", "pt_bls", "pt_form", "pt_hareket", "pt_hizli", "pt_ilk", "pt_kanit", "pt_kart",
-                 "pt_kitaplik", "pt_koc", "pt_oneri", "pt_oyun", "pt_programlar", "pt_hedef", "pt_kontrol", "pt_uzun", "pt_modul", "pt_yeniden", "pt_hikaye", "pt_push", "pt_rota", "pt_saglik", "pt_ses", "pt_sohbet",
-                 "pt_storyboard", "pt_anatomi", "pt_yemek", "pt_youtube", "sesnot", "claude_yaz", "ortak", "gizli", "sizinti"],
-    "static": ["pt.html", "pt_gorsel.js", "pt_gorsel.css", "pt-sw.js", "pt.webmanifest", "pt-ikon-180.png", "pt-ikon-192.png", "pt-ikon-512.png", "pt-ikon-512-maskable.png", "logo/pt.svg"],
-    "dosyalar": ["LICENSE", "pytest.ini", "tests/test_pt_oyun.py", "tests/test_pt_hedef.py", "tests/test_pt_uzun.py", "tests/test_pt_modul.py", "tests/test_pt_yeniden.py", "tests/test_pt_sohbet_saglik.py", "tests/test_pt_hikaye_selam.py"],
+                 "pt_kitaplik", "pt_koc", "pt_oneri", "pt_oyun", "pt_programlar", "pt_hedef", "pt_kontrol", "pt_uzun", "pt_modul", "pt_yeniden", "pt_hikaye", "pt_oruc", "pt_push", "pt_rota", "pt_saglik", "pt_ses", "pt_sohbet",
+                 "pt_storyboard", "pt_anatomi", "pt_yemek", "pt_youtube", "sesnot", "claude_yaz", "claude_butce", "ortak", "gizli", "sizinti"],
+    "static": ["pt.html", "pt_gorsel.js", "pt_gorsel.css", "pt_ana.js", "pt_ana.css", "pt-sw.js", "pt.webmanifest", "pt-ikon-180.png", "pt-ikon-192.png", "pt-ikon-512.png", "pt-ikon-512-maskable.png", "logo/pt.svg"],
+    "dosyalar": ["LICENSE", "pytest.ini", "tests/test_pt_oyun.py", "tests/test_pt_hedef.py", "tests/test_pt_uzun.py", "tests/test_pt_modul.py", "tests/test_pt_yeniden.py", "tests/test_pt_sohbet_saglik.py", "tests/test_pt_hikaye_selam.py", "tests/test_pt_oruc_saat.py"],
     "kopya": [f"pt_medya/{a}" for a in PT_MEDYA_JSON] + ["modeller/bls/bls.json"],
     "sablon": "disa/pt",
     "requirements_cikar": [],
@@ -248,7 +249,7 @@ URUNLER["content"] = {
     "ad": "Content",
     "parcalar": [],
     "moduller": ["content", "content_site", "content_sunucu", "content_yontem", "content_kanit", "content_araclar", "content_dogrulama", "content_benzer", "content_sohbet",
-                 "content_test", "claude_yaz", "goruntu", "sesnot", "ortak", "gizli", "sizinti"],
+                 "content_test", "claude_yaz", "claude_butce", "goruntu", "sesnot", "ortak", "gizli", "sizinti"],
     "static": ["content.html", "logo/content.svg"],
     "dosyalar": ["LICENSE", "pytest.ini"],
     "sablon": "disa/content",
@@ -268,7 +269,7 @@ MEET_HARIC = re.compile(r"^(atolye|content|couple|pt|ghost_)|^(paylasim|kesif|ka
 URUNLER["meet"] = {
     "ad": "Meet",
     "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "04_toplanti", "05_asana", "07_cekirdek", "07_meet", "08_canli",
-                 "09_cekirdek", "09_meet", "10_sayfalar", "11_ozellik_sayaci", "12_api", "14_haftalik", "16_altyapi_ve_meet", "16_meet",
+                 "09_cekirdek", "09_meet", "10_sayfalar", "11_ozellik_sayaci", "12_api", "14_haftalik", "16_altyapi_ve_meet", "38_claude_butce", "16_meet",
                  "17_disa_aktarim", "18_indirilenler", "20_meet_gelisim", "22_misafir", "23_misafir_meet", "24_guvenlik", "25_sahip_uzak",
                  "27_meet_altyazi", "28_meet_devam", "29_meet_saglik", "30_kayit_disi", "31_yazi_dili", "33_kayit_bekci", "35_meet_asistan", "36_takvim_bulut"],
     "kapanis": ["site", "transkript", "canli", "canli_asistan", "sesnot", "duman_testi", "yeniden_baslat", "sizinti", "disa_depo", "yedek",
@@ -298,7 +299,7 @@ def _meet_son(hedef):
     m["description"] = ("Meet for Google Meet, Teams and Zoom on the web: tells the local Meet app when you are in a call, who is there and "
                         "who is speaking (from captions); side panel with prep notes, live suggestions, notes and summary. Talks only to Meet on this Mac.")
     m["permissions"] = [x for x in m["permissions"] if x != "contextMenus"]
-    m["host_permissions"] = [x for x in m["host_permissions"] if not any(k in x for k in ("x.com", "instagram", ":8767"))]
+    m["host_permissions"] = [x for x in m["host_permissions"] if not any(k in x for k in ("x.com", "instagram", ":8767", "mail.google.com"))]
     m["content_scripts"] = [c for c in m["content_scripts"] if not set(c["js"]) & {"x.js", "ig.js"}]
     (u / "manifest.json").write_text(_json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     for f in ("x.js", "ig.js"):
@@ -306,10 +307,16 @@ def _meet_son(hedef):
     b = (u / "background.js").read_text(encoding="utf-8")
     i, j = b.index("// ---- Creator atölyesi"), b.index("// ---- Kendini iyileştirme")
     b = b[:i] + b[j:]
+    if "// ---- Ledger ekstreleri" in b:                      # Ledger'ın Gmail okuması (3.25) Meet deposunda yok
+        i = b.index("// ---- Ledger ekstreleri (")
+        j = b.index("// ---- Ledger ekstreleri son ----") + len("// ---- Ledger ekstreleri son ----")
+        b = b[:i] + b[j:]
     b = "\n".join(l for l in b.splitlines() if not l.lstrip().startswith(("if (m.tur === 'x_", "if (m.tur === 'ig_", "async function hesaplarAl()",
                                                                            "chrome.alarms.create('hesaplar'")))
     b = b.replace(" if (a.name === 'hesaplar') hesaplarAl();", "")
     assert "hesaplarAl" not in b and "contextMenus" not in b, "uzantı: Ghost/Atölye kalıntısı"
+    assert "mail.google" not in b and "Ledger" not in b, "uzantı: Ledger kalıntısı"
+    assert not any("mail.google" in x for x in m["host_permissions"]), "uzantı: Gmail izni kaldı"
     (u / "background.js").write_text(b + "\n", encoding="utf-8")
     gi = hedef / ".gitignore"
     if "!uzanti/ikonlar/*.png" not in gi.read_text(encoding="utf-8"):
@@ -324,18 +331,18 @@ GHOST_HARIC = re.compile(r"^(atolye|content|couple|pt|pt_|meet_|danisman|kisaca|
 URUNLER["ghost"] = {
     "ad": "Ghost",
     "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "07_cekirdek", "07_ghost", "09_cekirdek", "10_sayfalar",
-                 "11_ozellik_sayaci", "12_api", "16_altyapi_ve_meet", "17_disa_aktarim", "18_indirilenler", "19_ghost_gelisim", "24_guvenlik",
+                 "11_ozellik_sayaci", "12_api", "16_altyapi_ve_meet", "38_claude_butce", "17_disa_aktarim", "18_indirilenler", "19_ghost_gelisim", "24_guvenlik",
                  "32_ghost_kurulum", "33_ghost_danisman", "34_ghost_sohbet", "36_ghost_oneri"],
     "kapanis": ["site", "transkript", "sesnot", "duman_testi", "yeniden_baslat", "sizinti", "yedek", "geri_yukle", "isimlendir", "takip",
-                "ghost_kurulum", "ghost_danisman", "ghost_sohbet", "ghost_oneri", "paylasim", "kesif", "karisim", "tetik", "konu_toplantisi", "fikir_kartlari", "hesaplar", "performans", "yerimleri",
+                "ghost_kurulum", "ghost_danisman", "ghost_sohbet", "ghost_oneri", "ghost_arsiv", "paylasim", "kesif", "karisim", "tetik", "konu_toplantisi", "fikir_kartlari", "hesaplar", "performans", "yerimleri",
                 "ghost_blog", "ghost_defter", "ghost_gelisim", "ghost_hikaye", "ghost_kaynak", "ghost_kendi", "ghost_rehber", "ghost_tempo", "ghost_yanit",
                 "abonelik", "bultenler", "kantan", "seckiler", "reklam_arsivi", "oranlar", "dil_cevir"],
     "haric": GHOST_HARIC,
     "moduller": [],
-    "static": ["index.html", "ghost_tek.html", "ghost_ek.js", "ghost_ek.css", "ghost_oneri.js", "dil.js", "dil", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
+    "static": ["index.html", "ghost_tek.html", "ghost_ek.js", "ghost_ek.css", "ghost_oneri.js", "ghost_arsiv.js", "dil.js", "dil", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
                "ikon-512-maskable.png", "il", "logo", "ikon"],
     "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "uzanti/x.js", "uzanti/ig.js", "uzanti/ikonlar",
-                 "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_ghost_tempo.py", "tests/test_ghost_kurulum.py", "tests/test_ghost_danisman.py", "tests/test_ghost_sohbet.py", "tests/test_ghost_oneri.py"],
+                 "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_ghost_tempo.py", "tests/test_ghost_kurulum.py", "tests/test_ghost_danisman.py", "tests/test_ghost_sohbet.py", "tests/test_ghost_oneri.py", "tests/test_ghost_arsiv.py"],
     "sablon": "disa/ghost",
     "requirements_cikar": ["python-pptx", "scenedetect", "opencv-python-headless", "pywebpush", "auto-editor", "shazamio", "segno"],
     "komut": ("", "Ghost.command"),

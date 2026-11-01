@@ -769,7 +769,7 @@ def studio_asistan_uc():
     if link:
         for (l, _c), oz in onizleme_bellek.items():
             if l == link:
-                onizleme = {k: oz.get(k) for k in ("baslik", "sure", "kanal")}
+                onizleme = {k: oz.get(k) for k in ("baslik", "sure", "kanal", "icerik_tur", "icerik_ozet", "icerik_yazi")}
                 if isinstance(oz.get("mevcut"), dict):
                     onizleme["mevcut"] = oz["mevcut"].get("temel") or ""
                 break
