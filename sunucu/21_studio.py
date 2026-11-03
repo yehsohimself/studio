@@ -258,7 +258,7 @@ def _yayin_uret(temel, marka="", kapak=True, log=print):
                 yayin.kapak_gorselleri(KLASOR / f"{temel}.json", video, log=log)
         except SystemExit as e:
             log(f"Kapak görselleri çizilemedi: {e}")
-    _bildir("Yayın paketi hazır", (json.loads((KLASOR / f"{temel}.json").read_text(encoding="utf-8"))["veri"].get("baslik") or temel)[:80])
+    _bildir("Yayın paketi hazır", (json.loads((KLASOR / f"{temel}.json").read_text(encoding="utf-8"))["veri"].get("baslik") or temel)[:80], url=_urun_adresi("transcript", temel))
     return True
 
 

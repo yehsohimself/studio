@@ -5,7 +5,7 @@
    Sesle yazma (bas, konuş, bırak), dosya ve link bırakma. Sunucu: /api/asistan (studio_asistan.py). Davetliye kapalı. */
 (() => {
 if (typeof URUN === 'undefined' || URUN !== 'transcript' || document.documentElement.dataset.misafir === '1') return;
-{ const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/static/studio_asistan.css?v=10'; document.head.appendChild(l); }
+{ const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/static/studio_asistan.css?v=11'; document.head.appendChild(l); }
 const T = x => (window.DIL?.t || (y => y))(x);
 const durumSakla = (k, v) => { try{ v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
 const durumOku = k => { let v = null; try{ v = JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){} if (!v && k.startsWith('asKart_')) v = AS.kartlar?.[k.slice(7)] || null; return v; };
@@ -137,7 +137,7 @@ function mesajHtml(m, i){
     ${m.hatirlandi ? `<div class="as-hat">${svg('M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z')}<span>${esc(T('Aklımda tutacağım'))}: ${esc(m.hatirlandi)}</span></div>` : ''}
     ${!m.hata && !m.akiyor && m.metin ? `<span class="as-alt"><button type="button" class="as-kop" data-i="${i}">${esc(T('Kopyala'))}</button></span>` : ''}</div></div>`;
 }
-let durumYazi = '';
+let durumYazi = [];
 function ciz(asagi){
   const yakin = M.scrollHeight - M.scrollTop - M.clientHeight < 140;
   if (!AS.mesajlar.length && !AS.bekliyor){ M.innerHTML = bos(); $('#asSec').innerHTML = ''; return; }
@@ -147,12 +147,13 @@ function ciz(asagi){
     if (m.rol === 'ben'){ const b = m.temel || ''; if (bag !== null && b !== bag && b){ const ad = (state.tumListe || []).find(x => x.temel === b)?.baslik || (b === state.aktifTemel ? state.sonuc?.veri?.baslik : '') || '';
         if (ad) h += `<div class="as-bag"><span>${esc(T('Şimdi'))}: ${esc(ad.length > 60 ? ad.slice(0, 58) + '…' : ad)}</span></div>`; } bag = b; }
     h += mesajHtml(m, i); });
-  if (AS.bekliyor) h += `<div class="as-b st dusunuyor"><span class="as-av as-orb dusun"></span><div class="as-ic"><span class="as-durum">${esc(durumYazi)}</span></div></div>`;
+  if (AS.bekliyor) h += `<div class="as-b st dusunuyor"><span class="as-av as-orb dusun"></span><div class="as-ic">${Bekleme.html('studio', durumYazi)}</div></div>`;
   M.innerHTML = h;
   const son = AS.mesajlar[AS.mesajlar.length - 1];
   const sec = (!AS.bekliyor && son && ((son.rol === 'studio' && !son.akiyor) || son.rol === 'not')) ? (son.secenekler || []) : [];
   const duz = x => String(x).replace(/\[(\d{1,2}:\d{2}(?::\d{2})?)(?:@[^\]]*)?\]/g, '$1');
-  $('#asSec').innerHTML = sec.map(s => typeof s === 'string' ? `<button type="button" class="as-cip" data-soru="${esc(duz(s))}">${esc(duz(s))}</button>`
+  const kart = (!AS.bekliyor && son && son.rol === 'studio' && !son.akiyor) ? SoruKarti.html('st' + son.zaman, son.sorular, sor) : '';
+  $('#asSec').innerHTML = kart || sec.map(s => typeof s === 'string' ? `<button type="button" class="as-cip" data-soru="${esc(duz(s))}">${esc(duz(s))}</button>`
     : `<button type="button" class="as-cip" data-soru="${esc(s.m)}" data-ac="${esc(s.t || '')}">${esc(s.e)}</button>`).join('');
   if (asagi || yakin) M.scrollTop = M.scrollHeight;
 }
@@ -165,9 +166,8 @@ const DURUMLAR = {
   genel: ['Kitaplığınıza bakıyorum', 'Düşünüyorum', 'Toparlıyorum']
 };
 function durumBaslat(){
-  const L = DURUMLAR[acikVideo() ? 'video' : linkKutusu() ? 'link' : 'genel']; let i = 0; durumYazi = T(L[0]) + '…';
-  clearInterval(AS.durumT); const t0 = Date.now();
-  AS.durumT = setInterval(() => { const s = (Date.now() - t0) / 1000; i = s < 7 ? 0 : s < 16 ? 1 : 2; durumYazi = T(L[i]) + '…'; const d = M.querySelector('.as-durum'); if (d && d.textContent !== durumYazi) d.textContent = durumYazi; }, 1000);
+  durumYazi = DURUMLAR[acikVideo() ? 'video' : linkKutusu() ? 'link' : 'genel'].map(T);
+  Bekleme.basla('studio', $('#asForm'));
 }
 async function sor(metin){
   metin = (metin || '').trim(); if (!metin || AS.bekliyor) return;
@@ -190,7 +190,7 @@ async function sor(metin){
     if (!m.metin.trim()) m.metin = m.eylemler?.length ? T('Şunu hazırladım:') : T('Buna şu an bir yanıtım yok.');
     if (m.hatirlandi) AS.tercihler.push({metin: m.hatirlandi});
   }catch(err){ const x = AS.mesajlar.includes(m) ? m : (AS.mesajlar.push(m), m); x.hata = true; x.metin = err.message || T('Siteye ulaşılamadı.'); }
-  m.akiyor = false; AS.bekliyor = false; clearInterval(AS.durumT); $('#asOrb').classList.remove('dusun'); ciz();
+  m.akiyor = false; AS.bekliyor = false; Bekleme.bitir('studio'); $('#asOrb').classList.remove('dusun'); ciz();
   // tek ve anlık eylem (aç / git) kullanıcı açıkça istediyse beklemeden yapılır: "fonların anlatıldığı yeri göster"
   if ((m.eylemler || []).length === 1 && m.eylemler[0].tur === 'git') eylem(m.zaman + '_0', 'calis');
 }
@@ -368,7 +368,7 @@ $('#asEk').onclick = () => $('#asDosya').click();
 $('#asDosya').onchange = () => { const f = $('#asDosya').files[0]; $('#asDosya').value = ''; if (f) dosyaEkle(f); };
 async function dosyaEkle(f){
   const z = Date.now() / 1000, m = {rol: 'yerel', metin: `${f.name} ${T('yükleniyor')}…`, zaman: z, anahtar: 'd' + Math.round(z), eylemler: []};
-  AS.mesajlar.push({rol: 'ben', metin: '📎 ' + f.name, zaman: z}); AS.mesajlar.push(m); ciz(true);
+  AS.mesajlar.push({rol: 'ben', metin: f.name, zaman: z}); AS.mesajlar.push(m); ciz(true);
   try{ const fd = new FormData(); fd.append('dosya', f); const r = await fetch('/api/yukle', {method: 'POST', body: fd}); const j = await r.json(); if (!r.ok) throw new Error(j.hata);
     m.metin = T('Dosyayı aldım. Ne yapalım?');
     m.eylemler = [{tur: 'dosya_tx', yol: j.yol, ad: j.ad, etiket: 'Yazıya dök', detay: 'Transkript, konuşmacılar ve özet'}, {tur: 'dosya_oz', yol: j.yol, ad: j.ad, etiket: 'Özetle', detay: 'Hızlı özet; konuşmacılar ayrılmaz'}];

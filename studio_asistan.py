@@ -12,6 +12,8 @@ import threading
 import time
 from pathlib import Path
 
+import ortak
+
 KLASOR = Path(__file__).resolve().parent
 HAFIZA = KLASOR / "kayitlar" / "studio_asistan.json"
 GECMIS_MESAJ = 14
@@ -218,7 +220,8 @@ NASIL KONUŞURSUN
 
 YANITIN SONU
 Gerekirse yanıtın en sonuna şu bloğu ekle (yoksa ekleme):
-<eylem>{{"secenekler": ["..."], "eylemler": [{{"tur": "...", ...}}], "hatirla": ""}}</eylem>
+<eylem>{{"secenekler": ["..."], "sorular": [], "eylemler": [{{"tur": "...", ...}}], "hatirla": ""}}</eylem>
+- sorular: {soru_karti}
 - secenekler: kullanıcının tek dokunuşla verebileceği kısa cevaplar (en çok 4, her biri ≤6 kelime). Soru sormadıysan ya da önerinin devamı yoksa boş bırak; uygun olunca 1-3 "sonraki adım" önerisi de olabilir.
 - eylemler: yalnızca aşağıdaki kodlar ve alanlar; temel değerlerini listeden birebir kopyala; saniyeler sayı.
 Blok dışında JSON ya da kod gösterme.
@@ -227,7 +230,7 @@ Blok dışında JSON ya da kod gösterme.
 
 
 def _sistem(ad):
-    return SISTEM.format(ad=ad or "kullanıcı", yetenekler=YETENEKLER)
+    return SISTEM.format(ad=ad or "kullanıcı", yetenekler=YETENEKLER, soru_karti=ortak.SORU_KARTI_ISTEM)
 
 
 def _odak(mesajlar, gecerli):
@@ -458,11 +461,12 @@ def akis(mesaj, temel="", link="", isler=None, ciktilar=None, onizleme=None):
         yield ("metin", gorunen[verilen:])
     secenekler = [re.sub(r"\s+", " ", str(s)).strip()[:60] for s in (blok.get("secenekler") or []) if str(s).strip()][:4]
     eylemler = eylemleri_dogrula(blok.get("eylemler"), temel)
+    sorular = ortak.soru_karti(blok.get("sorular"))
     hatirlandi = blok.get("hatirla") if tercih_ekle(blok.get("hatirla")) else ""
     z = round(time.time(), 3)                  # kart anahtarı = mesaj zamanı; tarayıcı bunu kullanır ki kart durumu sunucudakiyle eşleşsin
     mesaj_ekle({"rol": "ben", "metin": mesaj, "temel": temel or "", "link": link or "", "zaman": z - 0.001},
-               {"rol": "studio", "metin": gorunen, "temel": temel or "", "secenekler": secenekler, "eylemler": eylemler, "hatirlandi": hatirlandi, "zaman": z})
-    yield ("ek", {"secenekler": secenekler, "eylemler": eylemler, "hatirlandi": hatirlandi, "zaman": z})
+               {"rol": "studio", "metin": gorunen, "temel": temel or "", "secenekler": secenekler, "sorular": sorular, "eylemler": eylemler, "hatirlandi": hatirlandi, "zaman": z})
+    yield ("ek", {"secenekler": secenekler, "sorular": sorular, "eylemler": eylemler, "hatirlandi": hatirlandi, "zaman": z})
 
 
 if __name__ == "__main__":

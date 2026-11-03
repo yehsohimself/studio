@@ -62,7 +62,7 @@ async function yayinCiz(temel, ilk){
   const p = d.paket;
   const markaSec = `<select class="sel" id="ypMarka" title="Marka seçilirse markanın tonu, zorunluları ve yasakları uygulanır"><option value="">Markasız</option>${d.markalar.map(m => `<option value="${esc(m.kod)}"${(p?.marka || d.onerilen_marka) === m.kod ? ' selected' : ''}>${esc(m.ad)}</option>`).join('')}</select>`;
   if (d.calisiyor){
-    k.innerHTML = `<h4>Yayın paketi</h4><div class="yp-ilerle"><div class="pbar mini"><div style="width:60%"></div></div><span>${esc((d.log || []).slice(-1)[0] || 'Hazırlanıyor…')}</span></div>`;
+    k.innerHTML = `<h4>Yayın paketi</h4>${Bekleme.satirlar('yayin' + temel, (d.log?.length ? d.log : ['Hazırlanıyor']).map(s => String(s).replace(/\s*\([^)]*\)/g, '').replace(/\.{3}$/, '')))}`;
     ypTimer = setTimeout(() => yayinCiz(temel), 3000); return; }
   if (!p){
     k.innerHTML = `<h4>Yayın paketi</h4><div class="yp-ust"><p>${YP_ACIKLAMA} Yaklaşık 1-2 dakika.</p>${markaSec}<button class="sbtn" type="button" id="ypHazirla">Hazırla</button></div>${d.hata ? `<div class="hint" style="color:var(--red)">${esc(d.hata)}</div>` : ''}`;
@@ -837,12 +837,12 @@ function gelismisKur(){
 const _libGoster = libGoster;
 libGoster = function(tab, kaydir){ _libGoster(tab, kaydir); try{ $('#stSuz')?.classList.toggle('hidden', tab !== 'tx'); $('#stSahne')?.classList.toggle('hidden', tab !== 'tx' || !SZ.sahne); if (tab === 'tx' && SZ.sahne) $('#hist').classList.add('hidden'); if (tab === 'dl') temizlikKur(); }catch(e){} };   // eslint-disable-line no-global-assign
 
-const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=25'; document.head.appendChild(css);
+const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/studio_ek.css?v=26'; document.head.appendChild(css);
 const bekle = setInterval(() => { if ($('#hist')){ clearInterval(bekle); suzgecKur(); } }, 300);
 if ($('#dls')) new MutationObserver(() => temizlikKur()).observe($('#dls'), {childList: true});
 if ($('#aySistem') && $('#aySistem').textContent.trim() && !$('#aySistem').textContent.includes('Yükleniyor')) gelisimCiz();
 if (matchMedia('(max-width:520px)').matches && $('#link')) $('#link').placeholder = (window.DIL?.t || (x => x))('Video linki');
-{ const sc = document.createElement('script'); sc.src = '/static/studio_asistan.js?v=12'; document.body.appendChild(sc); }
+{ const sc = document.createElement('script'); sc.src = '/static/studio_asistan.js?v=15'; document.body.appendChild(sc); }
 { const c2 = document.createElement('link'); c2.rel = 'stylesheet'; c2.href = '/static/studio_icerik.css?v=5'; document.head.appendChild(c2); const sc = document.createElement('script'); sc.src = '/static/studio_icerik.js?v=6'; document.body.appendChild(sc); }
 kurulumCiz(); { let n = 0; const t = setInterval(() => { if (state.tumListe || ++n > 60){ clearInterval(t); try{ sonCiz(); }catch(e){} } }, 300); }
 if (state.aktifTemel && state.sonuc){ duzeltKur(); if (!veri().toplanti){ yayinCiz(state.aktifTemel); sonrakiEkle(state.aktifTemel, veri()); } }

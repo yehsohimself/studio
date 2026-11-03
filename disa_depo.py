@@ -24,12 +24,12 @@ URUNLER = {
         "ad": "Studio",
         "parcalar": ["00_baslangic", "01_yardimcilar", "02_isci", "03_video_isleri", "06_marka", "07_cekirdek", "09_cekirdek", "10_sayfalar", "11_ozellik_sayaci", "12_api",
                      "13_takip", "16_altyapi_ve_meet", "38_claude_butce", "17_disa_aktarim", "18_indirilenler", "21_studio", "22_misafir", "24_guvenlik", "39_icerik"],
-        "moduller": ["site", "transkript", "indir", "isimlendir", "adlar", "altyazi", "anlam", "arkaplan", "broll", "ceviri", "claude_yaz", "claude_butce", "dublaj",
+        "moduller": ["bildirimler", "site", "transkript", "indir", "isimlendir", "adlar", "altyazi", "anlam", "arkaplan", "broll", "ceviri", "claude_yaz", "claude_butce", "dublaj",
                      "dudak", "duzenle", "goruntu", "harfler", "kadraj", "kalite", "kapak", "kayit_json", "kitaplik_onbellek", "klipler", "konusan", "marka",
                      "ozet", "sahne_dizin", "sesler", "sor", "sohbet", "studio_asistan", "icerik", "sesnot", "studio_duzelt", "studio_gelisim", "studio_onizle", "takip", "temizle", "terimler",
                      "yakma", "yayin", "haftalik", "notlar", "notlarim", "yedek", "geri_yukle", "sizinti", "ortak", "gizli", "duman_testi", "yeniden_baslat",
                      "videohub_mcp", "disa_depo"],
-        "static": ["index.html", "studio_ek.js", "studio_ek.css", "studio_asistan.js", "studio_asistan.css", "studio_icerik.js", "studio_icerik.css", "misafir.js", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
+        "static": ["bekleme.js", "tema.js", "zil.js", "soru_karti.js", "index.html", "studio_ek.js", "studio_ek.css", "studio_asistan.js", "studio_asistan.css", "studio_icerik.js", "studio_icerik.css", "misafir.js", "dil.js", "dil", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
                    "ikon-512-maskable.png", "il", "logo", "ikon", "altyazi_ornek", "arka_ornek", "dublaj_ornek"],
         "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "kurulum.sh", "ayarlar.ornek.json", ".gitignore", "atolye/markalar.ornek.json",
                      "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_studio_asistan.py", "tests/test_icerik.py", "tests/test_yedek.py"],
@@ -53,7 +53,7 @@ def kes(urun, hedef, log=print):
         if kaynak.is_dir():
             if d.exists():
                 shutil.rmtree(d)
-            shutil.copytree(kaynak, d, ignore=shutil.ignore_patterns("__pycache__", ".DS_Store"))
+            shutil.copytree(kaynak, d, ignore=shutil.ignore_patterns("__pycache__", ".DS_Store", "capital_en.json"))
             for f in d.rglob("*"):
                 if f.is_file():
                     kopyalanan.add(f.relative_to(hedef).as_posix())
@@ -225,17 +225,17 @@ gider) ya da yerel Ollama modeli gerekir. Kurulum: yukarıdaki dört komut, sonr
 
 
 # ----------------------------------------------------------------------------- PT (2026-10-29)
-PT_MEDYA_JSON = ["kartlar.json", "youtube.json", "youtube_sorgu.json", "anatomi.json", "storyboard.json", "modul_video.json"]
+PT_MEDYA_JSON = ["hazir_yemek.json", "kartlar.json", "youtube.json", "youtube_sorgu.json", "anatomi.json", "storyboard.json", "modul_video.json"]
 PT_MEDYA_HARIC = ("istekler.json", "_kisi.png", "_onizleme.png", "_ses_model", "bekleyen.json", "ham.mp4", "bas.png", "bit.png")
 
 URUNLER["pt"] = {
     "ad": "Health",
     "parcalar": [],
-    "moduller": ["pt", "pt_site", "pt_sunucu", "pt_beslenme", "pt_bls", "pt_form", "pt_hareket", "pt_hizli", "pt_ilk", "pt_kanit", "pt_kart",
-                 "pt_kitaplik", "pt_koc", "pt_oneri", "pt_oyun", "pt_programlar", "pt_hedef", "pt_kontrol", "pt_uzun", "pt_modul", "pt_yeniden", "pt_hikaye", "pt_oruc", "pt_push", "pt_rota", "pt_saglik", "pt_ses", "pt_sohbet",
+    "moduller": ["bildirimler", "pt", "pt_site", "pt_sunucu", "pt_beslenme", "pt_bls", "pt_form", "pt_hareket", "pt_hizli", "pt_ilk", "pt_kanit", "pt_kart",
+                 "pt_gidisat", "pt_gunluk", "pt_kitaplik", "pt_koc", "pt_oneri", "pt_oyun", "pt_programlar", "pt_hedef", "pt_kontrol", "pt_uzun", "pt_modul", "pt_yeniden", "pt_hikaye", "pt_oruc", "pt_push", "pt_rota", "pt_saglik", "pt_ses", "pt_sohbet",
                  "pt_storyboard", "pt_anatomi", "pt_yemek", "pt_youtube", "sesnot", "claude_yaz", "claude_butce", "ortak", "gizli", "sizinti"],
-    "static": ["pt.html", "pt_gorsel.js", "pt_gorsel.css", "pt_ana.js", "pt_ana.css", "pt-sw.js", "pt.webmanifest", "pt-ikon-180.png", "pt-ikon-192.png", "pt-ikon-512.png", "pt-ikon-512-maskable.png", "logo/pt.svg"],
-    "dosyalar": ["LICENSE", "pytest.ini", "tests/test_pt_oyun.py", "tests/test_pt_hedef.py", "tests/test_pt_uzun.py", "tests/test_pt_modul.py", "tests/test_pt_yeniden.py", "tests/test_pt_sohbet_saglik.py", "tests/test_pt_hikaye_selam.py", "tests/test_pt_oruc_saat.py"],
+    "static": ["bekleme.js", "tema.js", "zil.js", "pt.html", "pt_gorsel.js", "pt_gorsel.css", "pt_ana.js", "pt_ana.css", "pt_hazir.js", "pt_hazir.css", "pt-sw.js", "pt.webmanifest", "pt-ikon-180.png", "pt-ikon-192.png", "pt-ikon-512.png", "pt-ikon-512-maskable.png", "logo/pt.svg"],
+    "dosyalar": ["LICENSE", "pytest.ini", "tests/test_pt_oyun.py", "tests/test_pt_saglik_hae.py", "tests/test_pt_hazir.py", "tests/test_pt_hedef.py", "tests/test_pt_uzun.py", "tests/test_pt_modul.py", "tests/test_pt_yeniden.py", "tests/test_pt_sohbet_saglik.py", "tests/test_pt_hikaye_selam.py", "tests/test_pt_oruc_saat.py", "tests/test_pt_gunluk.py", "tests/test_pt_gidisat.py"],
     "kopya": [f"pt_medya/{a}" for a in PT_MEDYA_JSON] + ["modeller/bls/bls.json"],
     "sablon": "disa/pt",
     "requirements_cikar": [],
@@ -248,9 +248,9 @@ URUNLER["pt"] = {
 URUNLER["content"] = {
     "ad": "Content",
     "parcalar": [],
-    "moduller": ["content", "content_site", "content_sunucu", "content_yontem", "content_kanit", "content_araclar", "content_dogrulama", "content_benzer", "content_sohbet",
+    "moduller": ["bildirimler", "content", "content_site", "content_sunucu", "content_yontem", "content_kanit", "content_araclar", "content_dogrulama", "content_benzer", "content_sohbet",
                  "content_test", "claude_yaz", "claude_butce", "goruntu", "sesnot", "ortak", "gizli", "sizinti"],
-    "static": ["content.html", "logo/content.svg"],
+    "static": ["bekleme.js", "tema.js", "zil.js", "soru_karti.js", "content.html", "logo/content.svg"],
     "dosyalar": ["LICENSE", "pytest.ini"],
     "sablon": "disa/content",
     "requirements_cikar": [],
@@ -275,7 +275,7 @@ URUNLER["meet"] = {
     "kapanis": ["site", "transkript", "canli", "canli_asistan", "sesnot", "duman_testi", "yeniden_baslat", "sizinti", "disa_depo", "yedek",
                 "geri_yukle", "videohub_mcp", "isimlendir", "takip", "dolgu", "studio_duzelt", "meet_asistan", "takvim_bulut"],
     "moduller": [],
-    "static": ["index.html", "meet_ek.js", "meet_ek.css", "meet_asistan.js", "meet_asistan.css", "misafir.js", "misafir_meet.js", "sahip_uzak.js", "dil.js", "dil", "manifest.webmanifest",
+    "static": ["bekleme.js", "tema.js", "zil.js", "soru_karti.js", "index.html", "meet_ek.js", "meet_ek.css", "meet_asistan.js", "meet_asistan.css", "misafir.js", "misafir_meet.js", "sahip_uzak.js", "dil.js", "dil", "manifest.webmanifest",
                "note.webmanifest", "note-ikon-180.png", "note-ikon-192.png", "note-ikon-512.png", "note-ikon-512-maskable.png", "ikon-180.png",
                "ikon-192.png", "ikon-512.png", "ikon-512-maskable.png", "il", "logo", "ikon"],
     "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "ayarlar.ornek.json", ".gitignore", "kaydedici/kaydedici.swift", "kaydedici/Info.plist",
@@ -339,7 +339,7 @@ URUNLER["ghost"] = {
                 "abonelik", "bultenler", "kantan", "seckiler", "reklam_arsivi", "oranlar", "dil_cevir"],
     "haric": GHOST_HARIC,
     "moduller": [],
-    "static": ["index.html", "ghost_tek.html", "ghost_ek.js", "ghost_ek.css", "ghost_oneri.js", "ghost_arsiv.js", "dil.js", "dil", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
+    "static": ["bekleme.js", "tema.js", "zil.js", "soru_karti.js", "index.html", "ghost_tek.html", "ghost_ek.js", "ghost_ek.css", "ghost_oneri.js", "ghost_arsiv.js", "dil.js", "dil", "manifest.webmanifest", "ikon-180.png", "ikon-192.png", "ikon-512.png",
                "ikon-512-maskable.png", "il", "logo", "ikon"],
     "dosyalar": ["requirements.txt", "pytest.ini", "LICENSE", "uzanti/x.js", "uzanti/ig.js", "uzanti/ikonlar",
                  "tests/conftest.py", "tests/test_birimler.py", "tests/test_site.py", "tests/test_ghost_tempo.py", "tests/test_ghost_kurulum.py", "tests/test_ghost_danisman.py", "tests/test_ghost_sohbet.py", "tests/test_ghost_oneri.py", "tests/test_ghost_arsiv.py"],

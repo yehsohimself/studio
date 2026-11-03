@@ -203,7 +203,7 @@ body.urun-transcript .job .pbar{display:none}
 .sa-cizgi{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .sa-cizgi .sa-p{fill:none;stroke:var(--hair2,var(--hair));stroke-width:1.5;stroke-dasharray:2 5;stroke-linecap:round;transition:stroke .4s}
 .sa-cizgi .sa-p.ok{stroke:var(--vurgu,var(--acc));stroke-dasharray:none;stroke-opacity:.8}
-.sa-cizgi .sa-p.ak{stroke:var(--vurgu,var(--acc));stroke-dasharray:14 10;stroke-opacity:.9;animation:saAk 1.1s linear infinite;filter:drop-shadow(0 0 3px rgba(var(--vurgu-rgb,45,91,255),.8))}
+.sa-cizgi .sa-p.ak{stroke:var(--vurgu,var(--acc));stroke-dasharray:14 10;stroke-opacity:.9;animation:saAk 1.1s linear infinite;filter:none}
 @keyframes saAk{to{stroke-dashoffset:-24}}
 .sa-d{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:7px;width:34px;color:var(--muted);transition:color .3s}
 .sa-d i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--surface,var(--bg));border:1.5px solid var(--hair2,var(--hair));transition:background .35s,border-color .35s,color .35s,box-shadow .35s}
@@ -302,7 +302,7 @@ body.urun-transcript.bagli #preview{display:none!important}
 .sn-cikti em:nth-child(2){animation-delay:.4s}.sn-cikti em:nth-child(3){animation-delay:.8s}.sn-cikti em:nth-child(4){animation-delay:1.2s}
 .sn-ok{width:60px;height:24px;margin-top:26px;overflow:visible}
 .sn-ok .sn-cz{fill:none;stroke:var(--hair2,var(--hair));stroke-width:1.5;stroke-dasharray:2 5}
-.sn-ok .sn-ak{fill:none;stroke:var(--vurgu,var(--acc));stroke-width:1.8;stroke-dasharray:14 46;stroke-dashoffset:60;stroke-linecap:round;animation:snAk 1.8s linear infinite;filter:drop-shadow(0 0 3px rgba(var(--vurgu-rgb,45,91,255),.8))}
+.sn-ok .sn-ak{fill:none;stroke:var(--vurgu,var(--acc));stroke-width:1.8;stroke-dasharray:14 46;stroke-dashoffset:60;stroke-linecap:round;animation:snAk 1.8s linear infinite;filter:none}
 @keyframes snAk{to{stroke-dashoffset:0}}
 @media (max-width:700px){.sn-akis{grid-template-columns:1fr}.sn-ok{display:none}}
 @media (prefers-reduced-motion:reduce){
@@ -326,7 +326,7 @@ body.urun-transcript .job:has(.st-akis) .tick{display:none}
 
 /* 20) Bir bakışta: konuşma payı halkası, tempo eğrisi, en çok geçen kelimeler (2026-10-31) */
 .st-bakis{margin:4px 0 22px;padding:16px 16px 14px;border-radius:18px;background:var(--surface,rgba(255,255,255,.03));box-shadow:0 0 0 1px var(--hair) inset;position:relative;overflow:hidden}
-.st-bakis::before{content:"";position:absolute;inset:-40% -10% auto auto;width:60%;height:120%;pointer-events:none;background:radial-gradient(closest-side,rgba(var(--vurgu-rgb),.10),transparent)}
+.st-bakis::before{content:"";position:absolute;inset:-40% -10% auto auto;width:60%;height:120%;pointer-events:none;background:none}
 .sb-ust{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .sb-ust b{font:700 15px var(--sans)}.sb-ust span{color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
 .sb-izgara{display:grid;grid-template-columns:1fr 1.25fr 1.15fr;gap:10px}
